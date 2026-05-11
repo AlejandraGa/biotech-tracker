@@ -122,7 +122,6 @@ export default function App() {
     };
     fetchPrices();
   }, []);
-  const [tickerInput, setTickerInput] = useState('');
   const [newsFilter, setNewsFilter] = useState('');
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
