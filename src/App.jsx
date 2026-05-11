@@ -98,6 +98,7 @@ async function callClaude(prompt) {
 
 export default function App() {
   const [tab, setTab] = useState('watchlist');
+  const [darkMode, setDarkMode] = useState(true);
   const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
   const [tickerInput, setTickerInput] = useState('');
   const [newsFilter, setNewsFilter] = useState('');
@@ -128,7 +129,7 @@ export default function App() {
   const losers = watchlist.filter(s => s.change < 0).length;
 
   return (
-    <div style={s.app}>
+    <div style={{...s.app, background: darkMode ? '' : '#f5f5f5', minHeight: '100vh'}} >
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } input:focus { border-color: #7c6af7 !important; } button:hover { opacity: 0.85; }`}</style>
 
       <div style={s.header}>
@@ -136,7 +137,10 @@ export default function App() {
           <div style={s.title}>Biotech & Pharma Tracker</div>
           <div style={s.subtitle}>Follow your picks · News · FDA catalysts</div>
         </div>
-        <span style={s.liveBadge}>● Live</span>
+        <div style={{display:'flex', gap:12, alignItems:'center'}}>
+          <button style={{...s.btnSm, fontSize:13}} onClick={() => setDarkMode(!darkMode)}>{darkMode ? '☀️ Light' : '🌙 Dark'}</button>
+          <span style={s.liveBadge}>● Live</span>
+        </div>
       </div>
 
       <div style={s.tabs}>
