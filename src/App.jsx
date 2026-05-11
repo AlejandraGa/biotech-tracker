@@ -101,6 +101,28 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
   const [tickerInput, setTickerInput] = useState('');
+  const [loadingPrices, setLoadingPrices] = useState(false);
+
+  React.useEffect(() => {
+    const fetchPrices = async () => {
+      setLoadingPrices(true);
+      try {
+        const res = await fetch('/api/stocks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tickers: INITIAL_WATCHLIST.map(s => s.ticker) })
+        });
+        const data = await res.json();
+        setWatchlist(prev => prev.map(stock => {
+          const updated = data.find(d => d.ticker === stock.ticker);
+          return updated ? { ...stock, ...updated } : stock;
+        }));
+      } catch(e) { console.error(e); }
+      setLoadingPrices(false);
+    };
+    fetchPrices();
+  }, []);
+  const [tickerInput, setTickerInput] = useState('');
   const [newsFilter, setNewsFilter] = useState('');
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
