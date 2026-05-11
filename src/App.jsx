@@ -106,6 +106,25 @@ export default function App() {
   const [newsFilter, setNewsFilter] = useState('');
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
+  const [realNews, setRealNews] = useState([]);
+  const [loadingNews, setLoadingNews] = useState(false);
+
+  React.useEffect(() => {
+    const fetchNews = async () => {
+      setLoadingNews(true);
+      try {
+        const res = await fetch('/api/news', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tickers: INITIAL_WATCHLIST.map(s => s.ticker) })
+        });
+        const data = await res.json();
+        setRealNews(data);
+      } catch(e) { console.error(e); }
+      setLoadingNews(false);
+    };
+    fetchNews();
+  }, []);
 
   React.useEffect(() => {
     const fetchPrices = async () => {
@@ -157,7 +176,8 @@ export default function App() {
     setLoading(prev => ({ ...prev, [key]: false }));
   }, [summaries]);
 
-  const filteredNews = NEWS_DATA.filter(n => !newsFilter || n.headline.toLowerCase().includes(newsFilter.toLowerCase()) || n.ticker.toLowerCase().includes(newsFilter.toLowerCase()) || n.tag.toLowerCase().includes(newsFilter.toLowerCase()));
+  const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
+  const filteredNews = newsSource.filter(n => !newsFilter || n.headline.toLowerCase().includes(newsFilter.toLowerCase()) || n.ticker.toLowerCase().includes(newsFilter.toLowerCase()) || (n.tag && n.tag.toLowerCase().includes(newsFilter.toLowerCase())));
   const gainers = watchlist.filter(s => s.change >= 0).length;
   const losers = watchlist.filter(s => s.change < 0).length;
 
@@ -227,8 +247,9 @@ export default function App() {
       {tab === 'news' && (
         <div>
           <input style={{ ...s.input, marginBottom: '1.25rem' }} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Filter by keyword, ticker or tag..." />
-          {filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#333350', padding: '2rem', fontSize: 14 }}>No news matching filter.</div>}
-          {filteredNews.map((n, i) => (
+          {loadingNews && <div style={{ textAlign: 'center', color: '#555570', padding: '2rem', fontSize: 14 }}><Spinner />Loading news...</div>}
+          {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#333350', padding: '2rem', fontSize: 14 }}>No news matching filter.</div>}
+          {!loadingNews && filteredNews.map((n, i) => (
             <div key={i} style={s.card}>
               <div style={{ ...s.rowBetween, marginBottom: 6 }}>
                 <div style={s.row}>
