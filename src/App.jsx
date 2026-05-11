@@ -140,7 +140,9 @@ export default function App() {
       if (data[0]) {
         setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0] } : s));
       }
-    } catch(e) { console.error(e); }
+  } catch(e) {
+      setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Ticker not found — check the symbol and try again.' } : s));
+    }
   }, [tickerInput, watchlist]);
 
   const removeTicker = (ticker) => setWatchlist(prev => prev.filter(s => s.ticker !== ticker));
