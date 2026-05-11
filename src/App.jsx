@@ -126,11 +126,22 @@ export default function App() {
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
 
-  const addTicker = useCallback(() => {
+  const addTicker = useCallback(async () => {
     const val = tickerInput.trim().toUpperCase();
     if (!val || watchlist.find(s => s.ticker === val)) { setTickerInput(''); return; }
-    setWatchlist(prev => [...prev, { ticker: val, name: val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Add your own notes about this company.' }]);
     setTickerInput('');
+    setWatchlist(prev => [...prev, { ticker: val, name: val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading...' }]);
+    try {
+      const res = await fetch('/api/stocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tickers: [val] })
+      });
+      const data = await res.json();
+      if (data[0]) {
+        setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0] } : s));
+      }
+    } catch(e) { console.error(e); }
   }, [tickerInput, watchlist]);
 
   const removeTicker = (ticker) => setWatchlist(prev => prev.filter(s => s.ticker !== ticker));
