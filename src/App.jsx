@@ -48,7 +48,7 @@ const s = {
   ticker: { fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 500, color: '#82b1ff' },
   muted: { fontSize: 13, color: '#666680' },
   badge: (type) => {
-    const map = { green: ['rgba(52,211,153,0.1)','#34d399','rgba(52,211,153,0.2)'], red: ['rgba(248,113,113,0.1)','#f87171','rgba(248,113,113,0.2)'], amber: ['rgba(251,191,36,0.1)','#fbbf24','rgba(251,191,36,0.2)'], purple: ['rgba(124,106,247,0.1)','#7c6af7','rgba(124,106,247,0.2)'], blue: ['rgba(96,165,250,0.1)','#60a5fa','rgba(96,165,250,0.2)'] };
+    const map = { green: ['rgba(52,211,153,0.1)','#34d399','rgba(52,211,153,0.2)'], red: ['rgba(248,113,113,0.1)','#faa19b','rgba(248,113,113,0.2)'], amber: ['rgba(251,191,36,0.1)','#fbbf24','rgba(251,191,36,0.2)'], purple: ['rgba(124,106,247,0.1)','#7c6af7','rgba(124,106,247,0.2)'], blue: ['rgba(96,165,250,0.1)','#60a5fa','rgba(96,165,250,0.2)'] };
     const [bg, color, border] = map[type] || map.blue;
     return { fontSize: 11, padding: '3px 8px', borderRadius: 20, background: bg, color, border: `0.5px solid ${border}`, fontWeight: 500, whiteSpace: 'nowrap' };
   },
@@ -58,7 +58,7 @@ const s = {
   aiBox: { background: '#0d0d14', borderRadius: 8, padding: '12px 14px', fontSize: 13, color: '#9999b8', marginTop: 10, lineHeight: 1.7, border: '0.5px solid #1a1a28' },
   divider: { border: 'none', borderTop: '0.5px solid #1a1a28', margin: '10px 0' },
   priceUp: { color: '#00e676', fontWeight: 500 },
-  priceDown: { color: '#ff5252', fontWeight: 500 },
+  priceDown: { color: '#faa19b', fontWeight: 500 },
   fdaDate: { fontSize: 11, color: '#555570', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' },
 };
 
@@ -193,7 +193,7 @@ export default function App() {
           <div style={s.grid4}>
             <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#7c6af7' }}>{watchlist.length}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Gainers</div><div style={{ ...s.metricVal, color: '#34d399' }}>{gainers}</div></div>
-            <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#f87171' }}>{losers}</div></div>
+            <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#faa19b' }}>{losers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>FDA events (30d)</div><div style={{ ...s.metricVal, color: '#fbbf24' }}>4</div></div>
           </div>
           {watchlist.map((stock) => (
