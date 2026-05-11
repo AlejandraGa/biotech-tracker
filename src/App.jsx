@@ -34,7 +34,7 @@ const s = {
   app: { maxWidth: 900, margin: '0 auto', padding: '2rem 1.5rem' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' },
   title: { fontSize: 24, fontWeight: 600, color: '#e8e8f0', letterSpacing: '-0.5px' },
-  subtitle: { fontSize: 13, color: '#666680', marginTop: 2 },
+  subtitle: { fontSize: 13, color: '#9999b8', marginTop: 2 },
   liveBadge: { fontSize: 11, padding: '4px 10px', borderRadius: 20, background: 'rgba(0,230,118,0.1)', color: '#00e676', border: '0.5px solid rgba(0,230,118,0.25)', fontWeight: 500 },
   tabs: { display: 'flex', gap: 2, borderBottom: '0.5px solid #1e1e2e', marginBottom: '1.5rem' },
   tab: (active) => ({ padding: '10px 18px', fontSize: 13, cursor: 'pointer', border: 'none', background: 'none', color: active ? '#e8e8f0' : '#555570', borderBottom: active ? '2px solid #7c6af7' : '2px solid transparent', marginBottom: -1, fontWeight: active ? 500 : 400, transition: 'color 0.15s' }),
@@ -46,7 +46,7 @@ const s = {
   row: { display: 'flex', alignItems: 'center', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   ticker: { fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 500, color: '#82b1ff' },
-  muted: { fontSize: 13, color: '#666680' },
+  muted: { fontSize: 13, color: '#9999b8' },
   badge: (type) => {
     const map = { green: ['rgba(52,211,153,0.1)','#34d399','rgba(52,211,153,0.2)'], red: ['rgba(248,113,113,0.1)','#faa19b','rgba(248,113,113,0.2)'], amber: ['rgba(251,191,36,0.1)','#fbbf24','rgba(251,191,36,0.2)'], purple: ['rgba(124,106,247,0.1)','#7c6af7','rgba(124,106,247,0.2)'], blue: ['rgba(96,165,250,0.1)','#60a5fa','rgba(96,165,250,0.2)'] };
     const [bg, color, border] = map[type] || map.blue;
