@@ -1,13 +1,15 @@
 import React, { useState, useCallback } from 'react';
 
-const ANTHROPIC_API_KEY = process.env.REACT_APP_ANTHROPIC_API_KEY || '';
-
 const INITIAL_WATCHLIST = [
-  { ticker: 'MRNA', name: 'Moderna', price: 47.82, change: 2.3, mktcap: '19B', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
-  { ticker: 'EDIT', name: 'Editas Medicine', price: 4.21, change: -5.1, mktcap: '380M', stage: 'Phase 1/2', note: 'CRISPR gene editing for sickle cell' },
-  { ticker: 'RXRX', name: 'Recursion Pharma', price: 5.70, change: 1.8, mktcap: '1.1B', stage: 'Platform', note: 'AI-driven drug discovery platform' },
-  { ticker: 'BEAM', name: 'Beam Therapeutics', price: 11.45, change: -2.9, mktcap: '700M', stage: 'Phase 1', note: 'Base editing in hemoglobinopathies' },
-  { ticker: 'KYMR', name: 'Kymera Therapeutics', price: 23.10, change: 4.6, mktcap: '1.3B', stage: 'Phase 2', note: 'Targeted protein degradation, STAT6 program' },
+  { ticker: 'MRNA', name: 'Moderna', price: 0, change: 0, mktcap: '—', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
+  { ticker: 'EDIT', name: 'Editas Medicine', price: 0, change: 0, mktcap: '—', stage: 'Phase 1/2', note: 'CRISPR gene editing for sickle cell' },
+  { ticker: 'RXRX', name: 'Recursion Pharma', price: 0, change: 0, mktcap: '—', stage: 'Platform', note: 'AI-driven drug discovery platform' },
+  { ticker: 'BEAM', name: 'Beam Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Phase 1', note: 'Base editing in hemoglobinopathies' },
+  { ticker: 'KYMR', name: 'Kymera Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'Targeted protein degradation, STAT6 program' },
+  { ticker: 'GBIO', name: 'Generation Bio', price: 0, change: 0, mktcap: '—', stage: 'Phase 1/2', note: 'Non-viral gene therapy platform' },
+  { ticker: 'KALA', name: 'Kailera Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'GLP-1 based obesity programs' },
+  { ticker: 'ODSY', name: 'Odyssey Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Preclinical', note: 'Precision immunology' },
+  { ticker: 'EVMN', name: 'Evommune Inc', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'Inflammatory disease programs' },
 ];
 
 const NEWS_DATA = [
@@ -101,11 +103,12 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
   const [tickerInput, setTickerInput] = useState('');
-  const [loadingPrices, setLoadingPrices] = useState(false);
+  const [newsFilter, setNewsFilter] = useState('');
+  const [summaries, setSummaries] = useState({});
+  const [loading, setLoading] = useState({});
 
   React.useEffect(() => {
     const fetchPrices = async () => {
-      setLoadingPrices(true);
       try {
         const res = await fetch('/api/stocks', {
           method: 'POST',
@@ -118,13 +121,9 @@ export default function App() {
           return updated ? { ...stock, ...updated } : stock;
         }));
       } catch(e) { console.error(e); }
-      setLoadingPrices(false);
     };
     fetchPrices();
   }, []);
-  const [newsFilter, setNewsFilter] = useState('');
-  const [summaries, setSummaries] = useState({});
-  const [loading, setLoading] = useState({});
 
   const addTicker = useCallback(async () => {
     const val = tickerInput.trim().toUpperCase();
@@ -161,7 +160,7 @@ export default function App() {
   const losers = watchlist.filter(s => s.change < 0).length;
 
   return (
-    <div style={{...s.app, background: darkMode ? '' : '#f5f5f5', minHeight: '100vh'}} >
+    <div style={{...s.app, background: darkMode ? '' : '#f5f5f5', minHeight: '100vh'}}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } } input:focus { border-color: #7c6af7 !important; } button:hover { opacity: 0.85; }`}</style>
 
       <div style={s.header}>
@@ -183,7 +182,6 @@ export default function App() {
         ))}
       </div>
 
-      {/* WATCHLIST */}
       {tab === 'watchlist' && (
         <div>
           <div style={{ display: 'flex', gap: 8, marginBottom: '1.25rem' }}>
@@ -224,7 +222,6 @@ export default function App() {
         </div>
       )}
 
-      {/* NEWS */}
       {tab === 'news' && (
         <div>
           <input style={{ ...s.input, marginBottom: '1.25rem' }} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Filter by keyword, ticker or tag..." />
@@ -251,7 +248,6 @@ export default function App() {
         </div>
       )}
 
-      {/* FDA CALENDAR */}
       {tab === 'fda' && (
         <div>
           <p style={{ ...s.muted, marginBottom: '1rem' }}>Upcoming PDUFA dates, advisory committee meetings & trial readouts</p>
