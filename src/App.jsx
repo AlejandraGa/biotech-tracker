@@ -116,7 +116,7 @@ export default function App() {
         const res = await fetch('/api/news', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tickers: INITIAL_WATCHLIST.map(s => s.ticker) })
+          body: JSON.stringify({ tickers: watchlist.map(s => s.ticker) })
         });
         const data = await res.json();
         setRealNews(data);
@@ -124,7 +124,7 @@ export default function App() {
       setLoadingNews(false);
     };
     fetchNews();
-  }, []);
+  }, [watchlist]);
 
   React.useEffect(() => {
     const fetchPrices = async () => {
