@@ -766,7 +766,9 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                   <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                   <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
                   <div style={np.featuredByline}>
-                    {featured.ticker && <span style={{ fontFamily: "'DM Mono', monospace", color: '#c8102e', fontWeight: 600 }}>{featured.ticker} · </span>}
+                    {featured.companies && featured.companies.length > 0 && featured.companies.map(c => (
+                      <span key={c.ticker} style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '1px 6px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)', marginRight: 5 }}>{c.ticker}</span>
+                    ))}
                     {featured.source} · {featured.date}
                     {featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}
                   </div>
@@ -794,9 +796,11 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                   return (
                     <div key={idx} className="np-secondary-card" style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 10, padding: '1rem', transition: 'background 0.15s', display: 'flex', flexDirection: 'column', gap: 0 }}>
                       <div style={{ marginBottom: 12 }}><NewsImage photoKeyword={n.photoKeyword} seed={idx} height={140} /></div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
                         <span style={np.tagPill(n.tag)}>{n.tag}</span>
-                        {n.ticker && <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '1px 6px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)' }}>{n.ticker}</span>}
+                        {n.companies && n.companies.map(c => (
+                          <span key={c.ticker} style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '1px 6px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)' }}>{c.ticker}</span>
+                        ))}
                       </div>
                       <p style={np.secondaryHeadline}>{n.headline}</p>
                       <p style={np.secondarySource}>{n.source} · {n.date}{n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}</p>
