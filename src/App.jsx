@@ -98,9 +98,9 @@ const np = {
   datebarText: { fontSize: 11, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" },
   sectionLabel: { fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 },
   featuredWrap: { display: 'grid', gridTemplateColumns: '1fr 280px', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' },
-  featuredHeadline: { fontSize: 30, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Georgia', serif" },
+  featuredHeadline: { fontSize: 34, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Georgia', serif" },
   featuredByline: { fontSize: 11, color: '#777', marginBottom: 10, letterSpacing: '0.3px', fontFamily: "'DM Mono', monospace" },
-  featuredSummary: { fontSize: 15, lineHeight: 1.75, color: '#333', fontFamily: "'Georgia', serif" },
+  featuredSummary: { fontSize: 16, lineHeight: 1.75, color: '#333', fontFamily: "'Georgia', serif" },
   secondaryGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1.25rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' },
   secondaryHeadline: { fontSize: 15, fontWeight: 700, lineHeight: 1.3, color: '#111', marginBottom: 6, fontFamily: "'Georgia', serif" },
   secondarySource: { fontSize: 11, color: '#777', fontFamily: "'DM Mono', monospace", marginBottom: 6 },
@@ -868,10 +868,10 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                   const idx = i + 1;
                   return (
                     <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start', transition: 'background 0.15s', borderRadius: 4 }}
-                      onMouseOver={e => e.currentTarget.style.background = '#f5f2ee'}
+                      onMouseOver={e => e.currentTarget.style.background = '#faf8f5'}
                       onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                     >
-                      <div style={{ flexShrink: 0, width: 110, height: 74, borderRadius: 6, overflow: 'hidden' }}>
+                      <div style={{ flexShrink: 0, width: 130, height: 90, borderRadius: 6, overflow: 'hidden' }}>
                         <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={74} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -880,8 +880,8 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                           <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{n.source} · {n.date}</span>
                           {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
                         </div>
-                        <p style={{ ...np.secondaryHeadline, fontSize: 15, margin: '0 0 5px 0' }}>{n.headline}</p>
-                        {n.summary && <p style={{ fontSize: 12, lineHeight: 1.6, color: '#666', margin: '0 0 8px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
+                        <p style={{ ...np.secondaryHeadline, fontSize: 17, margin: '0 0 6px 0' }}>{n.headline}</p>
+                        {n.summary && <p style={{ fontSize: 14, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
                         <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${n.headline}". Context: ${n.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
                           {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
                         </button>
