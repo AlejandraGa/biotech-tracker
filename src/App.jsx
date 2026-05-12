@@ -549,6 +549,7 @@ export default function App() {
   const [loading, setLoading] = useState({});
   const [realNews, setRealNews] = useState([]);
   const [loadingNews, setLoadingNews] = useState(false);
+  const [pressReleases, setPressReleases] = useState([]);
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -561,6 +562,17 @@ export default function App() {
       setLoadingNews(false);
     };
     fetchNews();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchPress = async () => {
+      try {
+        const res = await fetch('/api/press');
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) setPressReleases(data);
+      } catch (e) { console.error(e); }
+    };
+    fetchPress();
   }, []);
 
   React.useEffect(() => {
@@ -720,6 +732,9 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
           /* Search bar */
           .search-row { flex-direction: column !important; }
           .search-row button { width: 100% !important; }
+
+          /* News layout: stack on mobile */
+          .news-layout { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
@@ -741,6 +756,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
 
       {/* ══════════════ NEWS TAB ══════════════ */}
       {tab === 'news' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '2rem', alignItems: 'flex-start' }} className="news-layout">
         <div style={np.wrapper}>
           <div style={np.datebar}>
             <span style={np.datebarText}>{today}</span>
@@ -750,8 +766,39 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
             </span>
           </div>
 
+          {/* ── Category filter pills ── */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: '1rem' }} className="filter-pills">
+            {['All', 'Pharma', 'Biotech', 'FDA', 'Clinical Trials', 'Deals', 'Gene Therapy', 'AI', 'Oncology', 'Finance'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)}
+                style={{
+                  padding: '5px 14px',
+                  borderRadius: 20,
+                  border: (categoryFilter === cat || (cat === 'All' && !categoryFilter))
+                    ? '1.5px solid #1a1a1a'
+                    : '1px solid #d1ccc4',
+                  background: (categoryFilter === cat || (cat === 'All' && !categoryFilter))
+                    ? '#1a1a1a'
+                    : 'transparent',
+                  color: (categoryFilter === cat || (cat === 'All' && !categoryFilter))
+                    ? '#fff'
+                    : '#555',
+                  fontSize: 12,
+                  fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400,
+                  cursor: 'pointer',
+                  fontFamily: "'DM Mono', monospace",
+                  letterSpacing: '0.2px',
+                  transition: 'all 0.15s',
+                  whiteSpace: 'nowrap',
+                }}
+              >{cat}</button>
+            ))}
+          </div>
+
+          {/* ── Keyword search ── */}
           <div style={np.filterBar}>
-            <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Filter by keyword, ticker or tag…" />
+            <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or ticker…" />
             {newsFilter && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setNewsFilter('')}>✕ Clear</button>}
           </div>
 
@@ -817,6 +864,40 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
               </div>
             </div>
           )}
+        </div>
+      )}
+
+        </div>
+          {/* ── Press Releases Sidebar ── */}
+          <div style={{ position: 'sticky', top: '1rem' }}>
+            <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>Company Announcements</div>
+            </div>
+            {pressReleases.length === 0 && (
+              <div style={{ fontSize: 12, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>Loading…</div>
+            )}
+            {pressReleases.map((pr, i) => (
+              <div key={i} style={{ paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid #e5e0d8' }}>
+                <a
+                  href={pr.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 5px 0', fontFamily: "'Georgia', serif" }}>
+                    {pr.headline}
+                  </p>
+                </a>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace" }}>From {pr.company || pr.source}</span>
+                  {pr.date && <span style={{ fontSize: 10, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>· {pr.date}</span>}
+                </div>
+              </div>
+            ))}
+            {pressReleases.length > 0 && (
+              <a href="https://www.biopharmadive.com/press-release/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>View all press releases ↗</a>
+            )}
+          </div>
         </div>
       )}
 
