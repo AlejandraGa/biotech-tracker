@@ -112,6 +112,18 @@ export default async function handler(req, res) {
     results.forEach(r => { if (r.status === 'fulfilled') all = all.concat(r.value); });
 
     all = deduplicate(all);
+
+    // Filter out French-language and non-pharma press releases
+    const FRENCH_WORDS = ['selon', 'pour', 'dans', 'avec', 'une ', 'les ', 'des ', 'qui ', 'est ', 'par ', 'aux ', 'après', 'finalise', "l'acquisition", 'améliore', 'bioinformatique'];
+    const NOISE_PR = ['gummies', 'cannabis', 'cannabinoid', 'aviation', 'biometric', 'enrollment', 'device management', 'revenue performance', 'spring sale', 'summer sale'];
+    all = all.filter(a => {
+      const lower = a.headline.toLowerCase();
+      const frenchCount = FRENCH_WORDS.filter(w => lower.includes(w)).length;
+      if (frenchCount >= 1) return false;
+      if (NOISE_PR.some(kw => lower.includes(kw))) return false;
+      return true;
+    });
+
     all.sort((a, b) => {
       if (a.dateObj && b.dateObj) return new Date(b.dateObj) - new Date(a.dateObj);
       return 0;
