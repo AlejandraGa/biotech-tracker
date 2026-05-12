@@ -550,6 +550,7 @@ export default function App() {
   const [realNews, setRealNews] = useState([]);
   const [loadingNews, setLoadingNews] = useState(false);
   const [pressReleases, setPressReleases] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState('');
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -674,12 +675,36 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
   }, []);
 
   const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
-  const filteredNews = newsSource.filter(n =>
-    !newsFilter ||
-    n.headline.toLowerCase().includes(newsFilter.toLowerCase()) ||
-    n.ticker.toLowerCase().includes(newsFilter.toLowerCase()) ||
-    (n.tag && n.tag.toLowerCase().includes(newsFilter.toLowerCase()))
-  );
+
+  // Category → keywords to match against tag + headline
+  const CATEGORY_KEYWORDS = {
+    'Pharma':          ['pharma', 'drug', 'medicine', 'therapeutic'],
+    'Biotech':         ['biotech', 'biologic', 'biosimilar', 'gene', 'cell therapy', 'crispr', 'mrna'],
+    'FDA':             ['fda', 'regulatory', 'approval', 'pdufa', 'ema', 'nda', 'bla'],
+    'Clinical Trials': ['trial', 'phase', 'clinical', 'readout', 'efficacy', 'endpoint'],
+    'Deals':           ['deal', 'partner', 'acqui', 'merger', 'licens', 'collaboration'],
+    'Gene Therapy':    ['gene therapy', 'gene edit', 'crispr', 'aav', 'base edit', 'prime edit'],
+    'AI':              ['artificial intel', ' ai ', 'machine learn', 'algorithm', 'digital', 'data-driven'],
+    'Oncology':        ['cancer', 'oncol', 'tumor', 'immuno-oncol', 'checkpoint', 'car-t'],
+    'Finance':         ['ipo', 'funding', 'invest', 'earning', 'revenue', 'financ', 'stock'],
+  };
+
+  const filteredNews = newsSource.filter(n => {
+    // Category filter
+    if (categoryFilter) {
+      const kws = CATEGORY_KEYWORDS[categoryFilter] || [];
+      const haystack = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
+      const matchesCat = kws.some(kw => haystack.includes(kw)) ||
+        (n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()));
+      if (!matchesCat) return false;
+    }
+    // Text search
+    if (newsFilter) {
+      const haystack = (n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '')).toLowerCase();
+      if (!haystack.includes(newsFilter.toLowerCase())) return false;
+    }
+    return true;
+  });
 
   const gainers = watchlist.filter(s => s.change >= 0).length;
   const losers = watchlist.filter(s => s.change < 0).length;
@@ -735,6 +760,9 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
 
           /* News layout: stack on mobile */
           .news-layout { grid-template-columns: 1fr !important; }
+
+          /* Filter pills: smaller on mobile */
+          .filter-pills button { padding: 4px 10px !important; font-size: 11px !important; }
         }
       `}</style>
 
