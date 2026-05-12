@@ -2,9 +2,9 @@
 // Fetches from BioPharma Dive press releases + GlobeNewswire biotech feed
 
 const PRESS_FEEDS = [
-  { url: 'https://www.biopharmadive.com/press-release/feed/', source: 'BioPharma Dive PR' },
-  { url: 'https://www.globenewswire.com/RssFeed/subjectcode/15-Biotechnology', source: 'GlobeNewswire' },
-  { url: 'https://www.prnewswire.com/rss/news-releases-list.rss?tagAbbr=BTH', source: 'PR Newswire' },
+  { url: 'https://www.biopharmadive.com/press-release/feed/', source: 'BioPharma Dive' },
+  { url: 'https://www.fiercebiotech.com/rss/press-releases', source: 'Fierce Biotech' },
+  { url: 'https://www.fiercepharma.com/rss/press-releases', source: 'Fierce Pharma' },
 ];
 
 function stripHTML(str) {
@@ -113,15 +113,30 @@ export default async function handler(req, res) {
 
     all = deduplicate(all);
 
-    // Filter out French-language and non-pharma press releases
-    const FRENCH_WORDS = ['selon', 'pour', 'dans', 'avec', 'une ', 'les ', 'des ', 'qui ', 'est ', 'par ', 'aux ', 'après', 'finalise', "l'acquisition", 'améliore', 'bioinformatique'];
-    const NOISE_PR = ['gummies', 'cannabis', 'cannabinoid', 'aviation', 'biometric', 'enrollment', 'device management', 'revenue performance', 'spring sale', 'summer sale'];
+    // Keep only articles with pharma/biotech relevant keywords
+    const PHARMA_KEYWORDS = [
+      'trial', 'phase', 'fda', 'ema', 'approval', 'drug', 'therapy', 'therapeutic',
+      'clinical', 'patient', 'data', 'efficacy', 'safety', 'biomarker', 'endpoint',
+      'cancer', 'oncol', 'tumor', 'immuno', 'antibody', 'biologic', 'biosimilar',
+      'gene', 'crispr', 'mrna', 'rna', 'cell therapy', 'rare disease', 'orphan',
+      'nda', 'bla', 'ind', 'pdufa', 'sNDA', 'label', 'investigational',
+      'pharma', 'biotech', 'biopharma', 'medicine', 'disease', 'treatment',
+      'compound', 'molecule', 'mechanism', 'pathway', 'target', 'inhibitor',
+      'agonist', 'antagonist', 'monoclonal', 'vaccine', 'immunotherapy',
+      'acquisition', 'merger', 'licensing', 'partnership', 'collaboration',
+      'milestone', 'royalty', 'series a', 'series b', 'ipo', 'financing',
+    ];
+
+    // French-language detection
+    const FRENCH_WORDS = ['selon', 'pour', ' dans ', 'avec ', ' les ', ' des ', ' qui ', ' est ', ' par ', 'après', "l'", 'améliore', 'finalise', 'annonce', 'lance'];
+
     all = all.filter(a => {
       const lower = a.headline.toLowerCase();
+      // Reject French
       const frenchCount = FRENCH_WORDS.filter(w => lower.includes(w)).length;
-      if (frenchCount >= 1) return false;
-      if (NOISE_PR.some(kw => lower.includes(kw))) return false;
-      return true;
+      if (frenchCount >= 2) return false;
+      // Must contain at least one pharma keyword
+      return PHARMA_KEYWORDS.some(kw => lower.includes(kw));
     });
 
     all.sort((a, b) => {
