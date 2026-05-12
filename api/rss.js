@@ -59,13 +59,9 @@ function detectCompanies(text) {
 
 const RSS_FEEDS = [
   { url: 'https://www.biopharmadive.com/feeds/news/', source: 'BioPharma Dive' },
-  { url: 'https://www.statnews.com/feed/', source: 'STAT News' },
+  { url: 'https://endpts.com/feed/', source: 'Endpoints News' },
   { url: 'https://www.fiercebiotech.com/rss/xml', source: 'Fierce Biotech' },
   { url: 'https://www.fiercepharma.com/rss/xml', source: 'Fierce Pharma' },
-  { url: 'https://endpts.com/feed/', source: 'Endpoints News' },
-  { url: 'https://www.pharmexec.com/rss', source: 'Pharm Exec' },
-  { url: 'https://www.evaluate.com/vantage/rss', source: 'Evaluate Vantage' },
-  { url: 'https://feeds.feedburner.com/InVivoMedtechInsight', source: 'In Vivo' },
 ];
 
 // Strip ALL HTML and decode entities — aggressive clean
@@ -245,10 +241,20 @@ export default async function handler(req, res) {
       'electric vehicle', 'crypto', 'bitcoin', 'real estate', 'stock market crash',
       'medicaid work requirement', 'social security', 'medicare cuts', 'opioid politics',
       'opinion:', 'stat+:', 'letters to the editor', 'podcast:', 'news roundup',
+      'deadliest drug', 'abortion', 'election', 'political', 'congress',
     ];
+
+    // French-language detection — common French words that wouldn't appear in English pharma headlines
+    const FRENCH_WORDS = ['selon', 'pour', 'dans', 'avec', 'sur', 'une ', 'les ', 'des ', 'qui ', 'est ', 'par ', 'son ', 'leur', 'aux ', 'mais', 'aussi', 'après', 'avant'];
+
     allArticles = allArticles.filter(a => {
       const lower = a.headline.toLowerCase();
-      return !NOISE_KEYWORDS.some(kw => lower.includes(kw));
+      // Reject if contains noise keywords
+      if (NOISE_KEYWORDS.some(kw => lower.includes(kw))) return false;
+      // Reject if likely French (3+ French words in headline)
+      const frenchCount = FRENCH_WORDS.filter(w => lower.includes(w)).length;
+      if (frenchCount >= 2) return false;
+      return true;
     });
 
     // Source priority weights — higher = shown first when same date
