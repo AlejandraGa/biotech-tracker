@@ -236,11 +236,55 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'All feeds failed' });
     }
 
-    // Deduplicate, then sort newest first
+    // Deduplicate
     allArticles = deduplicate(allArticles);
+
+    // Filter out clearly non-biotech/pharma articles
+    const NOISE_KEYWORDS = [
+      'alcohol epidemic', 'gun control', 'housing', 'immigration', 'climate change',
+      'electric vehicle', 'crypto', 'bitcoin', 'real estate', 'stock market crash',
+      'medicaid work requirement', 'social security', 'medicare cuts', 'opioid politics',
+      'opinion:', 'stat+:', 'letters to the editor', 'podcast:', 'news roundup',
+    ];
+    allArticles = allArticles.filter(a => {
+      const lower = a.headline.toLowerCase();
+      return !NOISE_KEYWORDS.some(kw => lower.includes(kw));
+    });
+
+    // Source priority weights — higher = shown first when same date
+    const SOURCE_PRIORITY = {
+      'BioPharma Dive': 10,
+      'Endpoints News': 9,
+      'Fierce Biotech': 8,
+      'Evaluate Vantage': 7,
+      'Fierce Pharma': 6,
+      'In Vivo': 5,
+      'Pharm Exec': 4,
+      'STAT News': 3,
+    };
+
+    // Sort: primarily by recency (last 48h), then by source priority
+    const now = Date.now();
+    const RECENT_WINDOW = 48 * 60 * 60 * 1000; // 48 hours in ms
+
     allArticles.sort((a, b) => {
-      if (a.dateObj && b.dateObj) return new Date(b.dateObj) - new Date(a.dateObj);
-      return 0;
+      const dateA = a.dateObj ? new Date(a.dateObj).getTime() : 0;
+      const dateB = b.dateObj ? new Date(b.dateObj).getTime() : 0;
+      const aRecent = (now - dateA) < RECENT_WINDOW;
+      const bRecent = (now - dateB) < RECENT_WINDOW;
+
+      // Both recent: sort by source priority first, then date
+      if (aRecent && bRecent) {
+        const pA = SOURCE_PRIORITY[a.source] || 0;
+        const pB = SOURCE_PRIORITY[b.source] || 0;
+        if (pB !== pA) return pB - pA;
+        return dateB - dateA;
+      }
+      // One recent, one not: recent wins
+      if (aRecent) return -1;
+      if (bRecent) return 1;
+      // Both old: just sort by date
+      return dateB - dateA;
     });
 
     // Remove internal dateObj field before sending
