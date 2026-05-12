@@ -30,15 +30,16 @@ const FDA_DATA = [
   { date: 'Oct 14, 2025', ticker: 'MRNA', drug: 'mRNA-1345 (RSV)', event: 'PDUFA date', type: 'approval', note: 'High stakes — crowded RSV market but strong data' },
 ];
 
-// Tag color mapping
+// Tag color mapping — light theme
 function tagColor(tag) {
-  if (!tag) return { bg: '#1a1a2e', color: '#7c6af7', border: '#2a2a4a' };
+  if (!tag) return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
   const t = tag.toLowerCase();
-  if (t.includes('trial') || t.includes('clinical')) return { bg: 'rgba(52,211,153,0.08)', color: '#34d399', border: 'rgba(52,211,153,0.2)' };
-  if (t.includes('regulat') || t.includes('fda')) return { bg: 'rgba(96,165,250,0.08)', color: '#60a5fa', border: 'rgba(96,165,250,0.2)' };
-  if (t.includes('partner')) return { bg: 'rgba(251,191,36,0.08)', color: '#fbbf24', border: 'rgba(251,191,36,0.2)' };
-  if (t.includes('conference')) return { bg: 'rgba(244,114,182,0.08)', color: '#f472b6', border: 'rgba(244,114,182,0.2)' };
-  return { bg: 'rgba(124,106,247,0.08)', color: '#7c6af7', border: 'rgba(124,106,247,0.2)' };
+  if (t.includes('trial') || t.includes('clinical')) return { bg: 'rgba(22,163,74,0.08)', color: '#15803d', border: 'rgba(22,163,74,0.25)' };
+  if (t.includes('regulat') || t.includes('fda')) return { bg: 'rgba(29,78,216,0.07)', color: '#1d4ed8', border: 'rgba(29,78,216,0.2)' };
+  if (t.includes('partner') || t.includes('deal')) return { bg: 'rgba(161,98,7,0.07)', color: '#a16207', border: 'rgba(161,98,7,0.2)' };
+  if (t.includes('conference')) return { bg: 'rgba(190,18,60,0.07)', color: '#be123c', border: 'rgba(190,18,60,0.2)' };
+  if (t.includes('finance')) return { bg: 'rgba(21,128,61,0.07)', color: '#166534', border: 'rgba(21,128,61,0.2)' };
+  return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
 }
 
 function stageBadge(stage) {
@@ -55,74 +56,75 @@ function fdaBadge(type) {
 }
 
 const s = {
-  app: { maxWidth: 960, margin: '0 auto', padding: '2rem 1.5rem', minHeight: '100vh' },
+  app: { maxWidth: 960, margin: '0 auto', padding: '2rem 1.5rem', minHeight: '100vh', background: '#f7f4ef' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' },
-  title: { fontSize: 22, fontWeight: 700, color: '#e8e8f0', letterSpacing: '-0.5px', fontFamily: "'Georgia', serif" },
-  subtitle: { fontSize: 12, color: '#555570', marginTop: 2, letterSpacing: '0.3px' },
-  liveBadge: { fontSize: 11, padding: '4px 10px', borderRadius: 20, background: 'rgba(0,230,118,0.1)', color: '#00e676', border: '0.5px solid rgba(0,230,118,0.25)', fontWeight: 500 },
-  tabs: { display: 'flex', gap: 2, borderBottom: '0.5px solid #1e1e2e', marginBottom: '1.75rem' },
-  tab: (active) => ({ padding: '10px 18px', fontSize: 13, cursor: 'pointer', border: 'none', background: 'none', color: active ? '#e8e8f0' : '#555570', borderBottom: active ? '2px solid #7c6af7' : '2px solid transparent', marginBottom: -1, fontWeight: active ? 600 : 400, transition: 'color 0.15s', letterSpacing: '0.2px' }),
-  card: { background: '#111118', border: '0.5px solid #1e1e2e', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: 10 },
+  title: { fontSize: 22, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px', fontFamily: "'Georgia', serif" },
+  subtitle: { fontSize: 12, color: '#888', marginTop: 2, letterSpacing: '0.3px' },
+  liveBadge: { fontSize: 11, padding: '4px 10px', borderRadius: 20, background: 'rgba(22,163,74,0.1)', color: '#16a34a', border: '0.5px solid rgba(22,163,74,0.3)', fontWeight: 600 },
+  tabs: { display: 'flex', gap: 2, borderBottom: '2px solid #1a1a1a', marginBottom: '1.75rem' },
+  tab: (active) => ({ padding: '10px 18px', fontSize: 13, cursor: 'pointer', border: 'none', background: 'none', color: active ? '#1a1a1a' : '#888', borderBottom: active ? '3px solid #c8102e' : '3px solid transparent', marginBottom: -2, fontWeight: active ? 700 : 400, transition: 'color 0.15s', letterSpacing: '0.3px', fontFamily: "'Georgia', serif" }),
+  card: { background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '1rem 1.25rem', marginBottom: 10 },
   grid4: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px,1fr))', gap: 10, marginBottom: '1.25rem' },
-  metric: { background: '#0d0d14', borderRadius: 10, padding: '12px 14px', border: '0.5px solid #1a1a28' },
-  metricLabel: { fontSize: 11, color: '#555570', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.5px' },
-  metricVal: { fontSize: 22, fontWeight: 500 },
+  metric: { background: '#fff', borderRadius: 8, padding: '12px 14px', border: '1px solid #e5e0d8' },
+  metricLabel: { fontSize: 11, color: '#888', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.5px' },
+  metricVal: { fontSize: 22, fontWeight: 700, color: '#1a1a1a' },
   row: { display: 'flex', alignItems: 'center', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  ticker: { fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#7c6af7', background: 'rgba(124,106,247,0.08)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(124,106,247,0.2)' },
-  muted: { fontSize: 13, color: '#9999b8' },
+  ticker: { fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)' },
+  muted: { fontSize: 13, color: '#555' },
   badge: (type) => {
     const map = {
-      green: ['rgba(52,211,153,0.1)', '#34d399', 'rgba(52,211,153,0.2)'],
-      red: ['rgba(248,113,113,0.1)', '#faa19b', 'rgba(248,113,113,0.2)'],
-      amber: ['rgba(251,191,36,0.1)', '#fbbf24', 'rgba(251,191,36,0.2)'],
-      purple: ['rgba(124,106,247,0.1)', '#7c6af7', 'rgba(124,106,247,0.2)'],
-      blue: ['rgba(96,165,250,0.1)', '#60a5fa', 'rgba(96,165,250,0.2)'],
+      green: ['rgba(22,163,74,0.08)', '#15803d', 'rgba(22,163,74,0.25)'],
+      red: ['rgba(200,16,46,0.08)', '#c8102e', 'rgba(200,16,46,0.25)'],
+      amber: ['rgba(161,98,7,0.08)', '#a16207', 'rgba(161,98,7,0.25)'],
+      purple: ['rgba(109,40,217,0.08)', '#6d28d9', 'rgba(109,40,217,0.25)'],
+      blue: ['rgba(29,78,216,0.08)', '#1d4ed8', 'rgba(29,78,216,0.25)'],
     };
     const [bg, color, border] = map[type] || map.blue;
-    return { fontSize: 11, padding: '3px 8px', borderRadius: 20, background: bg, color, border: `0.5px solid ${border}`, fontWeight: 500, whiteSpace: 'nowrap' };
+    return { fontSize: 11, padding: '3px 8px', borderRadius: 20, background: bg, color, border: `0.5px solid ${border}`, fontWeight: 600, whiteSpace: 'nowrap' };
   },
-  input: { background: '#0d0d14', border: '0.5px solid #1e1e2e', borderRadius: 8, padding: '9px 14px', color: '#e8e8f0', fontSize: 13, outline: 'none', width: '100%' },
-  btn: { background: 'rgba(124,106,247,0.1)', border: '0.5px solid rgba(124,106,247,0.3)', borderRadius: 8, padding: '8px 14px', color: '#7c6af7', fontSize: 12, cursor: 'pointer', fontWeight: 500 },
-  btnSm: { background: 'transparent', border: '0.5px solid #1e1e2e', borderRadius: 6, padding: '5px 10px', color: '#555570', fontSize: 11, cursor: 'pointer' },
-  aiBox: { background: '#0d0d14', borderRadius: 8, padding: '12px 14px', fontSize: 13, color: '#9999b8', marginTop: 10, lineHeight: 1.7, border: '0.5px solid #1a1a28' },
-  divider: { border: 'none', borderTop: '0.5px solid #1a1a28', margin: '10px 0' },
-  priceUp: { color: '#00e676', fontWeight: 500 },
-  priceDown: { color: '#faa19b', fontWeight: 500 },
-  fdaDate: { fontSize: 11, color: '#555570', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' },
+  input: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 8, padding: '9px 14px', color: '#1a1a1a', fontSize: 13, outline: 'none', width: '100%' },
+  btn: { background: '#1a1a1a', border: 'none', borderRadius: 6, padding: '8px 14px', color: '#fff', fontSize: 12, cursor: 'pointer', fontWeight: 600 },
+  btnSm: { background: 'transparent', border: '1px solid #d1ccc4', borderRadius: 6, padding: '5px 10px', color: '#555', fontSize: 11, cursor: 'pointer' },
+  aiBox: { background: '#faf8f4', borderRadius: 8, padding: '12px 14px', fontSize: 13, color: '#444', marginTop: 10, lineHeight: 1.7, border: '1px solid #e5e0d8' },
+  divider: { border: 'none', borderTop: '1px solid #e5e0d8', margin: '10px 0' },
+  priceUp: { color: '#16a34a', fontWeight: 600 },
+  priceDown: { color: '#c8102e', fontWeight: 600 },
+  fdaDate: { fontSize: 11, color: '#888', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' },
 };
 
-// ─── Newspaper styles ───────────────────────────────────────────────────────
+// ─── Newspaper styles (light theme) ────────────────────────────────────────
 const np = {
   wrapper: {
     fontFamily: "'Georgia', 'Times New Roman', serif",
   },
-  // Top date bar
   datebar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottom: '1px solid #2a2a3e',
-    paddingBottom: '0.5rem',
-    marginBottom: '1rem',
+    borderTop: '3px solid #1a1a1a',
+    borderBottom: '1px solid #1a1a1a',
+    paddingTop: '0.4rem',
+    paddingBottom: '0.4rem',
+    marginBottom: '1.25rem',
   },
-  datebarText: { fontSize: 11, color: '#555570', letterSpacing: '0.5px', textTransform: 'uppercase' },
-  // Section label
+  datebarText: { fontSize: 11, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" },
   sectionLabel: {
     fontSize: 10,
     fontWeight: 700,
-    letterSpacing: '2px',
+    letterSpacing: '2.5px',
     textTransform: 'uppercase',
-    color: '#7c6af7',
-    marginBottom: 6,
+    color: '#c8102e',
+    marginBottom: 8,
     fontFamily: "'DM Mono', monospace",
+    borderBottom: '1px solid #e5e0d8',
+    paddingBottom: 4,
   },
-  // Big headline article (featured)
   featuredWrap: {
     display: 'grid',
-    gridTemplateColumns: '1fr 260px',
+    gridTemplateColumns: '1fr 280px',
     gap: '1.5rem',
-    borderBottom: '0.5px solid #2a2a3e',
+    borderBottom: '1px solid #d1ccc4',
     paddingBottom: '1.5rem',
     marginBottom: '1.5rem',
   },
@@ -130,61 +132,38 @@ const np = {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    borderBottom: '0.5px solid #2a2a3e',
+    borderBottom: '1px solid #d1ccc4',
     paddingBottom: '1.5rem',
     marginBottom: '1.5rem',
   },
   featuredHeadline: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 700,
-    lineHeight: 1.2,
-    color: '#f0f0fc',
+    lineHeight: 1.15,
+    color: '#111',
     marginBottom: 10,
-    letterSpacing: '-0.5px',
+    letterSpacing: '-0.3px',
     fontFamily: "'Georgia', serif",
   },
   featuredByline: {
     fontSize: 11,
-    color: '#555570',
+    color: '#777',
     marginBottom: 10,
     letterSpacing: '0.3px',
     fontFamily: "'DM Mono', monospace",
   },
   featuredSummary: {
-    fontSize: 14,
-    lineHeight: 1.7,
-    color: '#b0b0cc',
+    fontSize: 15,
+    lineHeight: 1.75,
+    color: '#333',
     fontFamily: "'Georgia', serif",
   },
-  // Image placeholder (abstract graphic)
-  imgPlaceholder: (seed) => {
-    const colors = [
-      ['#1a1033', '#7c6af7'],
-      ['#0a1a1a', '#34d399'],
-      ['#1a1000', '#fbbf24'],
-      ['#0a0a1a', '#60a5fa'],
-      ['#1a0a1a', '#f472b6'],
-    ];
-    const [bg, accent] = colors[seed % colors.length];
-    return {
-      background: bg,
-      borderRadius: 8,
-      border: `0.5px solid ${accent}22`,
-      height: 160,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      overflow: 'hidden',
-      position: 'relative',
-      flexShrink: 0,
-    };
-  },
-  // Secondary grid
+  imgPlaceholder: () => ({}), // unused — kept for compat
   secondaryGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
     gap: '1.25rem',
-    borderBottom: '0.5px solid #2a2a3e',
+    borderBottom: '1px solid #d1ccc4',
     paddingBottom: '1.5rem',
     marginBottom: '1.5rem',
   },
@@ -192,23 +171,22 @@ const np = {
     fontSize: 15,
     fontWeight: 700,
     lineHeight: 1.3,
-    color: '#d8d8f0',
+    color: '#111',
     marginBottom: 6,
     fontFamily: "'Georgia', serif",
   },
   secondarySource: {
     fontSize: 11,
-    color: '#555570',
+    color: '#777',
     fontFamily: "'DM Mono', monospace",
     marginBottom: 6,
   },
   secondaryBody: {
     fontSize: 13,
-    lineHeight: 1.6,
-    color: '#888898',
+    lineHeight: 1.65,
+    color: '#444',
     fontFamily: "'Georgia', serif",
   },
-  // Tag pill
   tagPill: (tag) => {
     const c = tagColor(tag);
     return {
@@ -221,75 +199,37 @@ const np = {
       borderRadius: 3,
       background: c.bg,
       color: c.color,
-      border: `0.5px solid ${c.border}`,
+      border: `1px solid ${c.border}`,
       marginBottom: 8,
       fontFamily: "'DM Mono', monospace",
     };
   },
-  // Divider vertical (for column separators)
-  colDivider: {
-    borderLeft: '0.5px solid #2a2a3e',
-    margin: '0 0.25rem',
-  },
-  // Filter bar
-  filterBar: {
-    display: 'flex',
-    gap: 8,
-    marginBottom: '1.25rem',
-    alignItems: 'center',
-  },
+  colDivider: { borderLeft: '1px solid #d1ccc4', margin: '0 0.25rem' },
+  filterBar: { display: 'flex', gap: 8, marginBottom: '1.25rem', alignItems: 'center' },
   filterInput: {
-    background: '#0d0d14',
-    border: '0.5px solid #1e1e2e',
+    background: '#fff',
+    border: '1px solid #d1ccc4',
     borderRadius: 6,
     padding: '7px 12px',
-    color: '#e8e8f0',
+    color: '#1a1a1a',
     fontSize: 12,
     outline: 'none',
     flex: 1,
     fontFamily: "'DM Mono', monospace",
   },
-  // AI box inside newspaper
   npAiBox: {
-    background: '#0d0d14',
+    background: '#faf8f4',
     borderRadius: 6,
-    padding: '10px 12px',
-    fontSize: 12,
-    color: '#9999b8',
-    marginTop: 8,
-    lineHeight: 1.7,
-    border: '0.5px solid #1a1a28',
+    padding: '10px 14px',
+    fontSize: 13,
+    color: '#333',
+    marginTop: 10,
+    lineHeight: 1.75,
+    border: '1px solid #e5e0d8',
     fontFamily: "'Georgia', serif",
+    borderLeft: '3px solid #c8102e',
   },
 };
-
-// Map tag → Unsplash search keyword
-function tagToKeyword(tag, ticker) {
-  const t = (tag || '').toLowerCase();
-  if (t.includes('trial') || t.includes('clinical')) return 'clinical trial laboratory';
-  if (t.includes('regulat') || t.includes('fda')) return 'FDA regulation medicine';
-  if (t.includes('partner')) return 'biotech partnership science';
-  if (t.includes('conference')) return 'medical conference science';
-  if (t.includes('crispr') || ticker === 'EDIT' || ticker === 'BEAM') return 'DNA gene editing';
-  if (ticker === 'MRNA') return 'mRNA vaccine science';
-  if (ticker === 'RXRX') return 'artificial intelligence laboratory';
-  return 'pharmaceutical research laboratory';
-}
-
-// Curated Picsum photo IDs that look good for biotech/science/pharma context
-const PICSUM_IDS = [
-  237, 287, 364, 366, 396, 414, 425, 488, 511, 534,
-  582, 593, 618, 667, 680, 701, 736, 755, 780, 811,
-];
-
-function useNewsImage(tag, ticker, seed) {
-  const [imgError, setImgError] = React.useState(false);
-  // Pick a deterministic photo ID based on seed
-  const photoId = PICSUM_IDS[seed % PICSUM_IDS.length];
-  // Picsum: free, no API key, always works
-  const imgUrl = `https://picsum.photos/id/${photoId}/600/300`;
-  return { imgUrl, imgError, setImgError };
-}
 
 // Fallback SVG if image fails to load
 function FallbackGraphic({ seed }) {
@@ -316,11 +256,16 @@ function FallbackGraphic({ seed }) {
   );
 }
 
-// News image component: tries Unsplash, falls back to SVG
-function NewsImage({ tag, ticker, seed, height = 160 }) {
-  const { imgUrl, imgError, setImgError } = useNewsImage(tag, ticker, seed);
+// NewsImage: uses photoKeyword from the RSS article for a relevant Picsum query.
+// When Pexels API key is added later, swap the imgUrl line only.
+function NewsImage({ photoKeyword, seed = 0, height = 160 }) {
+  const [imgError, setImgError] = React.useState(false);
 
-  if (imgError || !imgUrl) {
+  // Picsum with a stable seed so each article gets a consistent image.
+  // When you have the Pexels key, replace this URL with the Pexels API call.
+  const imgUrl = `https://picsum.photos/seed/${encodeURIComponent(photoKeyword || seed)}/600/300`;
+
+  if (imgError) {
     return (
       <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden' }}>
         <FallbackGraphic seed={seed} />
@@ -329,19 +274,12 @@ function NewsImage({ tag, ticker, seed, height = 160 }) {
   }
 
   return (
-    <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden', background: '#0d0d14', position: 'relative' }}>
+    <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden', background: '#f0ede8' }}>
       <img
         src={imgUrl}
         alt=""
         onError={() => setImgError(true)}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          borderRadius: 8,
-          display: 'block',
-          opacity: 0.85,
-        }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block', opacity: 0.85 }}
       />
     </div>
   );
@@ -349,7 +287,7 @@ function NewsImage({ tag, ticker, seed, height = 160 }) {
 
 function Spinner() {
   return (
-    <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #2a2a3a', borderTopColor: '#7c6af7', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />
+    <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />
   );
 }
 
@@ -456,12 +394,13 @@ export default function App() {
   const secondary = filteredNews.slice(1);
 
   return (
-    <div style={{ ...s.app, background: darkMode ? '' : '#f5f5f5' }}>
+    <div style={s.app}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        input:focus { border-color: #7c6af7 !important; }
+        body { background: #f7f4ef; }
+        input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
-        .np-secondary-card:hover { background: #161622 !important; }
+        .np-secondary-card:hover { background: #faf8f4 !important; }
       `}</style>
 
       {/* ── App Header ── */}
@@ -471,7 +410,7 @@ export default function App() {
           <div style={s.subtitle}>Follow your picks · News · FDA catalysts</div>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button style={{ ...s.btnSm, fontSize: 13 }} onClick={() => setDarkMode(!darkMode)}>{darkMode ? '☀️ Light' : '🌙 Dark'}</button>
+
           <span style={s.liveBadge}>● Live</span>
         </div>
       </div>
@@ -494,7 +433,7 @@ export default function App() {
           {/* Date bar */}
           <div style={np.datebar}>
             <span style={np.datebarText}>{today}</span>
-            <span style={{ ...np.datebarText, color: '#7c6af7' }}>
+            <span style={{ ...np.datebarText, color: '#c8102e' }}>
               {filteredNews.length} {filteredNews.length === 1 ? 'story' : 'stories'}
               {realNews.length > 0 ? ' · Live feed' : ' · Sample data'}
             </span>
@@ -514,13 +453,13 @@ export default function App() {
           </div>
 
           {loadingNews && (
-            <div style={{ textAlign: 'center', color: '#555570', padding: '3rem', fontSize: 13 }}>
+            <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}>
               <Spinner />Loading news…
             </div>
           )}
 
           {!loadingNews && filteredNews.length === 0 && (
-            <div style={{ textAlign: 'center', color: '#333350', padding: '3rem', fontSize: 14 }}>
+            <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>
               No stories match your filter.
             </div>
           )}
@@ -536,13 +475,13 @@ export default function App() {
                   <h2 style={np.featuredHeadline}>{featured.headline}</h2>
                   <div style={np.featuredByline}>
                     {featured.ticker && (
-                      <span style={{ fontFamily: "'DM Mono', monospace", color: '#7c6af7' }}>{featured.ticker} · </span>
+                      <span style={{ fontFamily: "'DM Mono', monospace", color: '#c8102e', fontWeight: 600 }}>{featured.ticker} · </span>
                     )}
                     {featured.source}
                     {' · '}
                     {featured.date}
                     {featured.link && (
-                      <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#7c6af7', fontSize: 11, textDecoration: 'none' }}>Read full article ↗</a>
+                      <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>
                     )}
                   </div>
                   {featured.summary && (
@@ -563,7 +502,7 @@ export default function App() {
                 </div>
                 {/* Right: real photo */}
                 <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
-                  <NewsImage tag={featured.tag} ticker={featured.ticker} seed={0} height={200} />
+                  <NewsImage photoKeyword={featured.photoKeyword} seed={0} height={200} />
                 </div>
               </div>
             </div>
@@ -582,8 +521,8 @@ export default function App() {
                       key={idx}
                       className="np-secondary-card"
                       style={{
-                        background: '#111118',
-                        border: '0.5px solid #1e1e2e',
+                        background: '#fff',
+                        border: '1px solid #e5e0d8',
                         borderRadius: 10,
                         padding: '1rem',
                         transition: 'background 0.15s',
@@ -594,7 +533,7 @@ export default function App() {
                     >
                       {/* Photo */}
                       <div style={{ marginBottom: 12 }}>
-                        <NewsImage tag={n.tag} ticker={n.ticker} seed={idx} height={140} />
+                        <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={140} />
                       </div>
 
                       {/* Tag + ticker row */}
@@ -604,11 +543,11 @@ export default function App() {
                           <span style={{
                             fontFamily: "'DM Mono', monospace",
                             fontSize: 11,
-                            color: '#7c6af7',
-                            background: 'rgba(124,106,247,0.08)',
+                            color: '#c8102e',
+                            background: 'rgba(200,16,46,0.07)',
                             padding: '1px 6px',
                             borderRadius: 3,
-                            border: '0.5px solid rgba(124,106,247,0.2)',
+                            border: '0.5px solid rgba(200,16,46,0.2)',
                           }}>{n.ticker}</span>
                         )}
                       </div>
@@ -620,7 +559,7 @@ export default function App() {
                       <p style={np.secondarySource}>
                         {n.source} · {n.date}
                         {n.link && (
-                          <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: '#7c6af7', textDecoration: 'none' }}>↗</a>
+                          <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>
                         )}
                       </p>
 
@@ -659,7 +598,7 @@ export default function App() {
             <button style={s.btn} onClick={addTicker}>Add →</button>
           </div>
           <div style={s.grid4}>
-            <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#7c6af7' }}>{watchlist.length}</div></div>
+            <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#1a1a1a' }}>{watchlist.length}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Gainers</div><div style={{ ...s.metricVal, color: '#34d399' }}>{gainers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#faa19b' }}>{losers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>FDA events (30d)</div><div style={{ ...s.metricVal, color: '#fbbf24' }}>4</div></div>
@@ -672,7 +611,7 @@ export default function App() {
                   <span style={s.muted}>{stock.name}</span>
                   <span style={s.badge(stageBadge(stock.stage))}>{stock.stage}</span>
                 </div>
-                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333350', fontSize: 18, lineHeight: 1 }} onClick={() => removeTicker(stock.ticker)}>×</button>
+                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: 18, lineHeight: 1 }} onClick={() => removeTicker(stock.ticker)}>×</button>
               </div>
               <div style={s.row}>
                 {stock.price > 0 && <span style={{ fontSize: 18, fontWeight: 500 }}>${stock.price.toFixed(2)}</span>}
