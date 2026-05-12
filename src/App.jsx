@@ -389,92 +389,154 @@ function StockCard({ stock, onRemove, onLoadDetail }) {
   );
 }
 
-// ─── Search suggestions dropdown ──────────────────────────────────────────────
-const POPULAR_BIOTECH = [
-  { ticker: 'NVAX', name: 'Novavax' }, { ticker: 'GILD', name: 'Gilead Sciences' },
-  { ticker: 'BIIB', name: 'Biogen' }, { ticker: 'REGN', name: 'Regeneron' },
-  { ticker: 'VRTX', name: 'Vertex Pharma' }, { ticker: 'ALNY', name: 'Alnylam' },
-  { ticker: 'SGEN', name: 'Seagen' }, { ticker: 'BMRN', name: 'BioMarin' },
-  { ticker: 'BLUE', name: 'bluebird bio' }, { ticker: 'CRSP', name: 'CRISPR Therapeutics' },
-  { ticker: 'NTLA', name: 'Intellia Therapeutics' }, { ticker: 'ARCT', name: 'Arctus Bio' },
-  { ticker: 'FATE', name: 'Fate Therapeutics' }, { ticker: 'SRRK', name: 'Scholar Rock' },
-  { ticker: 'PTGX', name: 'Protagonist Therapeutics' }, { ticker: 'FOLD', name: 'Amicus Therapeutics' },
-];
-
+// ─── Smart Search Bar with Finnhub live lookup ────────────────────────────────
 function SearchBar({ onAdd, watchlist }) {
   const [val, setVal] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSugg, setShowSugg] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState('');
+  const debounceRef = React.useRef(null);
+
+  const searchTickers = async (query) => {
+    if (!query || query.length < 2) { setSuggestions([]); setShowSugg(false); return; }
+    setSearching(true);
+    try {
+      // Use Finnhub symbol search — same API key your /api/stocks uses
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      // data should be array of { ticker, name }
+      if (Array.isArray(data) && data.length > 0) {
+        setSuggestions(data.slice(0, 7));
+        setShowSugg(true);
+      } else {
+        setSuggestions([]);
+        setShowSugg(true); // still show "no results" state
+      }
+    } catch {
+      setSuggestions([]);
+    }
+    setSearching(false);
+  };
 
   const handleChange = (e) => {
-    const v = e.target.value.toUpperCase();
+    const v = e.target.value;
     setVal(v);
-    if (v.length >= 1) {
-      const matches = POPULAR_BIOTECH.filter(s =>
-        s.ticker.startsWith(v) || s.name.toUpperCase().includes(v)
-      ).slice(0, 5);
-      setSuggestions(matches);
-      setShowSugg(true);
+    setError('');
+    clearTimeout(debounceRef.current);
+    if (v.trim().length >= 2) {
+      debounceRef.current = setTimeout(() => searchTickers(v.trim()), 350);
     } else {
+      setSuggestions([]);
       setShowSugg(false);
     }
   };
 
-  const handleAdd = async (ticker) => {
-    const t = (ticker || val).trim().toUpperCase();
-    if (!t) return;
+  const handleSelect = async (ticker, name) => {
     setVal('');
+    setSuggestions([]);
     setShowSugg(false);
-    setLoading(true);
-    await onAdd(t);
-    setLoading(false);
+    setError('');
+    // Already in watchlist?
+    if (watchlist.find(s => s.ticker === ticker)) {
+      setError(`${ticker} is already in your watchlist.`);
+      return;
+    }
+    setAdding(true);
+    await onAdd(ticker, name);
+    setAdding(false);
   };
 
+  const handleManualAdd = async () => {
+    const t = val.trim().toUpperCase();
+    if (!t) return;
+    // Try to find it in current suggestions first
+    const match = suggestions.find(s => s.ticker === t);
+    if (match) { handleSelect(match.ticker, match.name); return; }
+    // Otherwise validate it exists via search
+    setAdding(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(t)}`);
+      const data = await res.json();
+      const exact = Array.isArray(data) && data.find(s => s.ticker === t);
+      if (exact) {
+        await handleSelect(exact.ticker, exact.name);
+      } else {
+        setError(`"${t}" not found. Check the ticker symbol and try again.`);
+      }
+    } catch {
+      setError('Search failed. Please try again.');
+    }
+    setAdding(false);
+    setVal('');
+  };
+
+  const tickerStyle = { fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)', flexShrink: 0 };
+
   return (
-    <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
+    <div style={{ marginBottom: '1.25rem' }}>
       <div style={{ display: 'flex', gap: 8 }}>
         <div style={{ position: 'relative', flex: 1 }}>
-          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa', fontSize: 14, pointerEvents: 'none' }}>🔍</span>
+          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: searching ? '#c8102e' : '#aaa', fontSize: 13, pointerEvents: 'none', transition: 'color 0.2s' }}>
+            {searching ? '⟳' : '🔍'}
+          </span>
           <input
-            style={{ ...s.input, paddingLeft: 34 }}
+            style={{ ...s.input, paddingLeft: 34, borderColor: error ? '#fca5a5' : undefined }}
             value={val}
             onChange={handleChange}
-            onKeyDown={e => e.key === 'Enter' && handleAdd()}
-            onBlur={() => setTimeout(() => setShowSugg(false), 150)}
-            onFocus={() => val.length >= 1 && setShowSugg(true)}
-            placeholder="Search ticker or company name (e.g. NVAX, CRSP)..."
+            onKeyDown={e => e.key === 'Enter' && handleManualAdd()}
+            onBlur={() => setTimeout(() => setShowSugg(false), 200)}
+            onFocus={() => suggestions.length > 0 && setShowSugg(true)}
+            placeholder="Search by name or ticker: 'Moderna', 'CRSP', 'Gilead'…"
+            disabled={adding}
           />
-          {showSugg && suggestions.length > 0 && (
-            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', zIndex: 100, marginTop: 4 }}>
-              {suggestions.map(s => (
-                <div
-                  key={s.ticker}
-                  style={{ padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid #f5f3ef' }}
-                  onMouseDown={() => handleAdd(s.ticker)}
-                  onMouseOver={e => e.currentTarget.style.background = '#faf8f4'}
-                  onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <span style={{ ...s.ticker, fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)' }}>{s.ticker}</span>
-                  <span style={{ fontSize: 13, color: '#444' }}>{s.name}</span>
-                </div>
-              ))}
-              {val.length >= 2 && !suggestions.find(s => s.ticker === val) && (
-                <div
-                  style={{ padding: '10px 14px', cursor: 'pointer', fontSize: 12, color: '#888', borderTop: '1px solid #f0ede8', fontFamily: "'DM Mono', monospace" }}
-                  onMouseDown={() => handleAdd(val)}
-                >
-                  + Add "{val}" manually
+
+          {/* Dropdown */}
+          {showSugg && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.1)', zIndex: 100, marginTop: 4, overflow: 'hidden' }}>
+              {suggestions.length === 0 && !searching && (
+                <div style={{ padding: '12px 14px', fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>
+                  No results found for "{val}"
                 </div>
               )}
+              {suggestions.map((item, i) => {
+                const alreadyIn = watchlist.find(s => s.ticker === item.ticker);
+                return (
+                  <div
+                    key={item.ticker}
+                    style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1, background: 'transparent', transition: 'background 0.1s' }}
+                    onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)}
+                    onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }}
+                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <span style={tickerStyle}>{item.ticker}</span>
+                    <span style={{ fontSize: 13, color: '#333', flex: 1 }}>{item.name}</span>
+                    {alreadyIn && <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>already added</span>}
+                    {!alreadyIn && <span style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>+ Add</span>}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
-        <button style={{ ...s.btn, minWidth: 80, display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => handleAdd()}>
-          {loading ? <Spinner /> : null}
-          {loading ? 'Adding…' : 'Add →'}
+
+        <button
+          style={{ ...s.btn, minWidth: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: adding ? 0.7 : 1 }}
+          onClick={handleManualAdd}
+          disabled={adding || !val.trim()}
+        >
+          {adding ? <><Spinner />Adding…</> : 'Add →'}
         </button>
       </div>
+
+      {/* Error message */}
+      {error && (
+        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#dc2626', fontFamily: "'DM Mono', monospace" }}>
+          <span>✕</span> {error}
+        </div>
+      )}
     </div>
   );
 }
@@ -519,9 +581,9 @@ export default function App() {
     fetchPrices();
   }, []);
 
-  const addTicker = useCallback(async (val) => {
+  const addTicker = useCallback(async (val, knownName) => {
     if (!val || watchlist.find(s => s.ticker === val)) return;
-    setWatchlist(prev => [...prev, { ticker: val, name: val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading…' }]);
+    setWatchlist(prev => [...prev, { ticker: val, name: knownName || val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading price data…' }]);
     try {
       const res = await fetch('/api/stocks', {
         method: 'POST',
@@ -530,10 +592,12 @@ export default function App() {
       });
       const data = await res.json();
       if (data[0]) {
-        setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0] } : s));
+        setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0], name: data[0].name || knownName || val } : s));
+      } else {
+        setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Price data unavailable.' } : s));
       }
     } catch (e) {
-      setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Ticker not found — check the symbol and try again.' } : s));
+      setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Could not fetch price data.' } : s));
     }
   }, [watchlist]);
 
