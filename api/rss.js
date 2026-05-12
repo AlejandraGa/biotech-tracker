@@ -1,6 +1,62 @@
 // api/rss.js — Vercel serverless function
 // Fetches RSS feeds from multiple biotech/pharma news sources
 
+// Known biotech/pharma companies — ticker + name variants to detect in headlines
+const KNOWN_COMPANIES = [
+  { ticker: 'MRNA', names: ['Moderna'] },
+  { ticker: 'EDIT', names: ['Editas'] },
+  { ticker: 'RXRX', names: ['Recursion'] },
+  { ticker: 'BEAM', names: ['Beam Therapeutics'] },
+  { ticker: 'KYMR', names: ['Kymera'] },
+  { ticker: 'GBIO', names: ['Generation Bio'] },
+  { ticker: 'KALA', names: ['Kailera'] },
+  { ticker: 'NVAX', names: ['Novavax'] },
+  { ticker: 'GILD', names: ['Gilead'] },
+  { ticker: 'BIIB', names: ['Biogen'] },
+  { ticker: 'REGN', names: ['Regeneron'] },
+  { ticker: 'VRTX', names: ['Vertex'] },
+  { ticker: 'ALNY', names: ['Alnylam'] },
+  { ticker: 'BMRN', names: ['BioMarin'] },
+  { ticker: 'BLUE', names: ['bluebird bio', 'bluebird'] },
+  { ticker: 'CRSP', names: ['CRISPR Therapeutics'] },
+  { ticker: 'NTLA', names: ['Intellia'] },
+  { ticker: 'PFE',  names: ['Pfizer'] },
+  { ticker: 'JNJ',  names: ['Johnson & Johnson', 'J&J', 'Janssen'] },
+  { ticker: 'LLY',  names: ['Eli Lilly', 'Lilly'] },
+  { ticker: 'NVO',  names: ['Novo Nordisk', 'Novo'] },
+  { ticker: 'AZN',  names: ['AstraZeneca'] },
+  { ticker: 'RHHBY',names: ['Roche', 'Genentech'] },
+  { ticker: 'NVS',  names: ['Novartis'] },
+  { ticker: 'ABBV', names: ['AbbVie'] },
+  { ticker: 'BMY',  names: ['Bristol Myers', 'Bristol-Myers', 'BMS'] },
+  { ticker: 'MRK',  names: ['Merck', 'MSD'] },
+  { ticker: 'AMGN', names: ['Amgen'] },
+  { ticker: 'BNTX', names: ['BioNTech'] },
+  { ticker: 'SGEN', names: ['Seagen'] },
+  { ticker: 'INCY', names: ['Incyte'] },
+  { ticker: 'RARE', names: ['Ultragenyx'] },
+  { ticker: 'IONS', names: ['Ionis'] },
+  { ticker: 'FOLD', names: ['Amicus'] },
+  { ticker: 'PTGX', names: ['Protagonist'] },
+  { ticker: 'FATE', names: ['Fate Therapeutics'] },
+  { ticker: 'SRRK', names: ['Scholar Rock'] },
+];
+
+// Detect company mentions in headline+summary, return { ticker, companyName }[]
+function detectCompanies(text) {
+  const found = [];
+  const lower = text.toLowerCase();
+  for (const co of KNOWN_COMPANIES) {
+    for (const name of co.names) {
+      if (lower.includes(name.toLowerCase())) {
+        found.push({ ticker: co.ticker, companyName: co.names[0] });
+        break; // only add once per company
+      }
+    }
+  }
+  return found;
+}
+
 const RSS_FEEDS = [
   { url: 'https://www.biopharmadive.com/feeds/news/', source: 'BioPharma Dive' },
   { url: 'https://www.statnews.com/feed/', source: 'STAT News' },
@@ -89,6 +145,11 @@ function parseRSS(xml, source) {
 
     const photoKeyword = extractPhotoKeyword(title, tag);
 
+    // Detect company mentions in headline + summary
+    const detected = detectCompanies(title + ' ' + description);
+    const ticker = detected.length === 1 ? detected[0].ticker : '';
+    const companies = detected; // all matches, for display
+
     items.push({
       headline: title,
       summary,
@@ -97,7 +158,8 @@ function parseRSS(xml, source) {
       dateObj: dateObj ? dateObj.toISOString() : '',
       link,
       tag,
-      ticker: '',
+      ticker,
+      companies,
       photoKeyword,
     });
   }
