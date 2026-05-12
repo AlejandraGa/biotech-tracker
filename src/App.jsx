@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 
-const INITIAL_WATCHLIST = [
+const DEFAULT_WATCHLIST = [
   { ticker: 'MRNA', name: 'Moderna', price: 0, change: 0, mktcap: '—', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
   { ticker: 'EDIT', name: 'Editas Medicine', price: 0, change: 0, mktcap: '—', stage: 'Phase 1/2', note: 'CRISPR gene editing for sickle cell' },
   { ticker: 'RXRX', name: 'Recursion Pharma', price: 0, change: 0, mktcap: '—', stage: 'Platform', note: 'AI-driven drug discovery platform' },
@@ -11,6 +11,35 @@ const INITIAL_WATCHLIST = [
   { ticker: 'ODSY', name: 'Odyssey Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Preclinical', note: 'Precision immunology' },
   { ticker: 'EVMN', name: 'Evommune Inc', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'Inflammatory disease programs' },
 ];
+
+// ── localStorage helpers ──────────────────────────────────────────────────────
+const LS_KEY = 'catalyst_watchlist_tickers';
+
+function getSavedTickers() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveWatchlist(list) {
+  try {
+    // Save only tickers + names + note (not prices — those are fetched fresh)
+    const toSave = list.map(({ ticker, name, stage, note }) => ({ ticker, name, stage, note }));
+    localStorage.setItem(LS_KEY, JSON.stringify(toSave));
+  } catch {}
+}
+
+function getInitialWatchlist() {
+  const saved = getSavedTickers();
+  if (!saved) return DEFAULT_WATCHLIST;
+  // Merge saved tickers with defaults — saved order wins, prices start at 0
+  return saved.map(s => ({
+    price: 0, change: 0, mktcap: '—',
+    ...DEFAULT_WATCHLIST.find(d => d.ticker === s.ticker),
+    ...s,
+  }));
+}
 
 // Other notable biotech/pharma companies (for Section 2)
 const OTHER_COMPANIES = [
@@ -24,7 +53,6 @@ const OTHER_COMPANIES = [
   { name: 'Vertex', query: 'Vertex Pharmaceuticals' },
 ];
 
-// Congress/conference source mapping for display
 const CONGRESS_SOURCES = {
   'ASCO': { label: 'ASCO', color: '#1d4ed8', bg: 'rgba(29,78,216,0.08)', border: 'rgba(29,78,216,0.25)' },
   'ESMO': { label: 'ESMO', color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.25)' },
@@ -49,7 +77,6 @@ function detectCongress(pub) {
 function getSourceBadge(pub) {
   const congress = detectCongress(pub);
   if (congress) return CONGRESS_SOURCES[congress];
-  // Journal-based badges
   const journal = (pub.journalTitle || '').toLowerCase();
   if (journal.includes('new england') || journal.includes('nejm')) return CONGRESS_SOURCES['NEJM'];
   if (journal.includes('lancet')) return CONGRESS_SOURCES['Lancet'];
@@ -85,7 +112,24 @@ const FDA_DATA = [
   { date: 'Oct 14, 2025', ticker: 'MRNA', drug: 'mRNA-1345 (RSV)', event: 'PDUFA date', type: 'approval', note: 'High stakes RSV market' },
 ];
 
-// ─── Europe PMC fetch (via server proxy to avoid CORS) ───────────────────────
+
+// Domains known to be paywalled — skip these articles
+const PAYWALLED_DOMAINS = [
+  'statnews.com', 'endpoints.com', 'endpts.com', 'fiercebiotech.com',
+  'fiercepharma.com', 'evaluate.com', 'evaluategroup.com', 'informa.com',
+  'pharmaintelligence.informa.com', 'scrip.pharmaintelligence.informa.com',
+  'invivoblog.com', 'biocentury.com', 'pinksheet.com', 'reutersplus.com',
+];
+
+function isPaywalled(article) {
+  if (!article.link) return false;
+  try {
+    const hostname = new URL(article.link).hostname.replace('www.', '');
+    return PAYWALLED_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d));
+  } catch { return false; }
+}
+
+// ─── Europe PMC fetch via proxy ───────────────────────────────────────────────
 async function fetchEuropePMC(query, rows = 10) {
   try {
     const url = `/api/europepmc?query=${encodeURIComponent(query)}&rows=${rows}`;
@@ -152,8 +196,8 @@ const s = {
     return { fontSize: 11, padding: '3px 8px', borderRadius: 20, background: bg, color, border: `0.5px solid ${border}`, fontWeight: 600, whiteSpace: 'nowrap' };
   },
   input: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 8, padding: '9px 14px', color: '#1a1a1a', fontSize: 13, outline: 'none', width: '100%' },
-  btn: { background: '#1a1a1a', border: 'none', borderRadius: 6, padding: '8px 14px', color: '#fff', fontSize: 12, cursor: 'pointer', fontWeight: 600 },
-  btnSm: { background: 'transparent', border: '1px solid #d1ccc4', borderRadius: 6, padding: '5px 10px', color: '#555', fontSize: 11, cursor: 'pointer' },
+  btn: { background: '#1a1a1a', border: 'none', borderRadius: 3, padding: '8px 14px', color: '#fff', fontSize: 12, cursor: 'pointer', fontWeight: 600 },
+  btnSm: { background: 'transparent', border: '1px solid #d1ccc4', borderRadius: 3, padding: '5px 10px', color: '#555', fontSize: 11, cursor: 'pointer' },
   aiBox: { background: '#faf8f4', borderRadius: 8, padding: '12px 14px', fontSize: 13, color: '#444', marginTop: 10, lineHeight: 1.7, border: '1px solid #e5e0d8' },
   divider: { border: 'none', borderTop: '1px solid #e5e0d8', margin: '10px 0' },
   priceUp: { color: '#16a34a', fontWeight: 600 },
@@ -233,25 +277,15 @@ function PubCard({ pub, companyName, showCompany }) {
   const badge = getSourceBadge(pub);
   const congress = detectCongress(pub);
   const isConference = congress !== null || (pub.pubType || '').toLowerCase().includes('conference') || (pub.pubType || '').toLowerCase().includes('abstract');
-
-  const doi = pub.doi;
-  const pubLink = doi
-    ? `https://doi.org/${doi}`
-    : pub.pmid
-    ? `https://pubmed.ncbi.nlm.nih.gov/${pub.pmid}/`
-    : null;
+  const pubLink = pub.doi ? `https://doi.org/${pub.doi}` : pub.pmid ? `https://pubmed.ncbi.nlm.nih.gov/${pub.pmid}/` : null;
 
   const handleAI = async () => {
     if (aiSummary) return;
     setLoadingAI(true);
     try {
-      const text = await callClaude(
-        `You are a clinical data expert and biotech analyst. In 3 concise sentences, summarize the key findings and clinical significance of this publication for a pharma professional: "${pub.title}". Journal: ${pub.journalTitle || 'N/A'}. Be specific, avoid hedging, focus on what matters clinically or commercially.`
-      );
+      const text = await callClaude(`You are a clinical data expert and biotech analyst. In 3 concise sentences, summarize the key findings and clinical significance of this publication for a pharma professional: "${pub.title}". Journal: ${pub.journalTitle || 'N/A'}. Be specific, avoid hedging, focus on what matters clinically or commercially.`);
       setAiSummary(text);
-    } catch {
-      setAiSummary('Could not generate summary.');
-    }
+    } catch { setAiSummary('Could not generate summary.'); }
     setLoadingAI(false);
   };
 
@@ -260,85 +294,32 @@ function PubCard({ pub, companyName, showCompany }) {
       onMouseOver={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}
       onMouseOut={e => e.currentTarget.style.boxShadow = 'none'}
     >
-      {/* Top row: badges + date */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-        {/* Congress / Journal badge */}
         <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontFamily: "'DM Mono', monospace" }}>
           {isConference ? '🎤 ' : '📄 '}{badge.label}
         </span>
-        {/* Publication type */}
-        {isConference && (
-          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(190,18,60,0.07)', color: '#be123c', border: '1px solid rgba(190,18,60,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600, letterSpacing: '0.5px' }}>
-            CONGRESS
-          </span>
-        )}
-        {/* Company tag (only in section 2) */}
-        {showCompany && companyName && (
-          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>
-            {companyName}
-          </span>
-        )}
-        {pub.isOpenAccess && (
-          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(21,128,61,0.07)', color: '#15803d', border: '0.5px solid rgba(21,128,61,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>
-            OA
-          </span>
-        )}
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>
-          {pub.pubDate || pub.pubYear || ''}
-        </span>
+        {isConference && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(190,18,60,0.07)', color: '#be123c', border: '1px solid rgba(190,18,60,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>CONGRESS</span>}
+        {showCompany && companyName && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>{companyName}</span>}
+        {pub.isOpenAccess && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(21,128,61,0.07)', color: '#15803d', border: '0.5px solid rgba(21,128,61,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>OA</span>}
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{pub.pubDate || pub.pubYear || ''}</span>
       </div>
-
-      {/* Title */}
-      <p style={{ fontSize: 14, fontWeight: 600, color: '#111', lineHeight: 1.4, margin: '0 0 6px 0', fontFamily: "'Georgia', serif", cursor: pubLink ? 'pointer' : 'default' }}
-        onClick={() => pubLink && window.open(pubLink, '_blank')}
-      >
-        {pub.title}
-        {pubLink && <span style={{ color: '#c8102e', fontSize: 11, marginLeft: 6, fontFamily: "'DM Mono', monospace" }}>↗</span>}
+      <p style={{ fontSize: 14, fontWeight: 600, color: '#111', lineHeight: 1.4, margin: '0 0 6px 0', fontFamily: "'Georgia', serif", cursor: pubLink ? 'pointer' : 'default' }} onClick={() => pubLink && window.open(pubLink, '_blank')}>
+        {pub.title}{pubLink && <span style={{ color: '#c8102e', fontSize: 11, marginLeft: 6, fontFamily: "'DM Mono', monospace" }}>↗</span>}
       </p>
-
-      {/* Authors + journal */}
       <div style={{ fontSize: 11, color: '#888', fontFamily: "'DM Mono', monospace", marginBottom: 8 }}>
         {pub.authors && <span>{pub.authors.split(',').slice(0,3).join(', ')}{pub.authors.split(',').length > 3 ? ' et al.' : ''}</span>}
         {pub.journalTitle && <span style={{ marginLeft: 8, color: '#bbb' }}>· {pub.journalTitle}</span>}
         {pub.citedByCount > 0 && <span style={{ marginLeft: 8, color: '#aaa' }}>· {pub.citedByCount} citations</span>}
       </div>
-
-      {/* Actions */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button
-          style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }}
-          onClick={handleAI}
-        >
+        <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={handleAI}>
           {loadingAI ? <><Spinner />Analyzing…</> : aiSummary ? '✓ Analysis' : 'AI analysis →'}
         </button>
-        {pub.abstract && (
-          <button
-            style={{ ...s.btnSm, fontSize: 11 }}
-            onClick={() => setExpanded(x => !x)}
-          >
-            {expanded ? 'Hide abstract' : 'Abstract ↓'}
-          </button>
-        )}
-        {pubLink && (
-          <a href={pubLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>
-            Full text ↗
-          </a>
-        )}
+        {pub.abstract && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setExpanded(x => !x)}>{expanded ? 'Hide abstract' : 'Abstract ↓'}</button>}
+        {pubLink && <a href={pubLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>Full text ↗</a>}
       </div>
-
-      {/* Abstract */}
-      {expanded && pub.abstract && (
-        <div style={{ marginTop: 10, fontSize: 12, color: '#444', lineHeight: 1.7, fontFamily: "'Georgia', serif", background: '#faf8f4', borderRadius: 6, padding: '10px 14px', border: '1px solid #e5e0d8' }}>
-          {pub.abstract}
-        </div>
-      )}
-
-      {/* AI summary */}
-      {aiSummary && (
-        <div style={{ ...np.npAiBox, marginTop: 10, fontSize: 12 }}>
-          {aiSummary}
-        </div>
-      )}
+      {expanded && pub.abstract && <div style={{ marginTop: 10, fontSize: 12, color: '#444', lineHeight: 1.7, fontFamily: "'Georgia', serif", background: '#faf8f4', borderRadius: 6, padding: '10px 14px', border: '1px solid #e5e0d8' }}>{pub.abstract}</div>}
+      {aiSummary && <div style={{ ...np.npAiBox, marginTop: 10, fontSize: 12 }}>{aiSummary}</div>}
     </div>
   );
 }
@@ -347,13 +328,13 @@ function PubCard({ pub, companyName, showCompany }) {
 function PublicationsTab({ watchlist }) {
   const [topicFilter, setTopicFilter] = useState('');
   const [searchText, setSearchText] = useState('');
-  const [pubTypeFilter, setPubTypeFilter] = useState('all'); // all | journal | congress
+  const [pubTypeFilter, setPubTypeFilter] = useState('all');
   const [watchlistPubs, setWatchlistPubs] = useState([]);
   const [otherPubs, setOtherPubs] = useState([]);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
   const [loadingOther, setLoadingOther] = useState(false);
   const [fetchedOnce, setFetchedOnce] = useState(false);
-  const [activeSection, setActiveSection] = useState('watchlist'); // 'watchlist' | 'other'
+  const [activeSection, setActiveSection] = useState('watchlist');
 
   const fetchPublications = useCallback(async () => {
     if (fetchedOnce) return;
@@ -361,14 +342,15 @@ function PublicationsTab({ watchlist }) {
     setLoadingWatchlist(true);
     setLoadingOther(true);
 
-    // Section 1: watchlist companies
-    const watchlistNames = watchlist.map(s => s.name);
+    // Section 1: watchlist — use short name, simple query (Europe PMC works better this way)
     const wResults = [];
-    for (const name of watchlistNames) {
-      const pubs = await fetchEuropePMC(`"${name}" AND (clinical trial OR phase OR cancer OR therapy OR treatment)`, 8);
-      pubs.forEach(p => wResults.push({ ...p, _company: name }));
+    for (const stock of watchlist) {
+      const shortName = stock.name
+        .replace(/\s+(Inc\.?|Therapeutics|Pharmaceuticals?|Pharma|Medicine|Sciences?|Biosciences?|Biotech|Bio)$/i, '')
+        .trim();
+      const pubs = await fetchEuropePMC(shortName, 8);
+      pubs.forEach(p => wResults.push({ ...p, _company: stock.name }));
     }
-    // Sort by date desc
     wResults.sort((a, b) => (b.pubDate || '').localeCompare(a.pubDate || ''));
     setWatchlistPubs(wResults);
     setLoadingWatchlist(false);
@@ -376,7 +358,7 @@ function PublicationsTab({ watchlist }) {
     // Section 2: other companies
     const oResults = [];
     for (const co of OTHER_COMPANIES) {
-      const pubs = await fetchEuropePMC(`"${co.query}" AND (clinical trial OR phase OR cancer OR therapy OR treatment)`, 5);
+      const pubs = await fetchEuropePMC(co.query, 5);
       pubs.forEach(p => oResults.push({ ...p, _company: co.name }));
     }
     oResults.sort((a, b) => (b.pubDate || '').localeCompare(a.pubDate || ''));
@@ -384,58 +366,38 @@ function PublicationsTab({ watchlist }) {
     setLoadingOther(false);
   }, [watchlist, fetchedOnce]);
 
-  React.useEffect(() => {
-    fetchPublications();
-  }, [fetchPublications]);
+  React.useEffect(() => { fetchPublications(); }, [fetchPublications]);
 
-  const applyFilters = (pubs) => {
-    return pubs.filter(pub => {
-      // Topic
-      if (!matchesTopic(pub, topicFilter)) return false;
-      // Type
-      if (pubTypeFilter === 'congress') {
-        const isCong = detectCongress(pub) !== null || (pub.pubType || '').toLowerCase().includes('conference') || (pub.pubType || '').toLowerCase().includes('abstract');
-        if (!isCong) return false;
-      }
-      if (pubTypeFilter === 'journal') {
-        const isCong = detectCongress(pub) !== null;
-        if (isCong) return false;
-      }
-      // Search text
-      if (searchText) {
-        const hay = ((pub.title || '') + ' ' + (pub.authors || '') + ' ' + (pub.journalTitle || '') + ' ' + (pub._company || '')).toLowerCase();
-        if (!hay.includes(searchText.toLowerCase())) return false;
-      }
-      return true;
-    });
-  };
+  const applyFilters = (pubs) => pubs.filter(pub => {
+    if (!matchesTopic(pub, topicFilter)) return false;
+    if (pubTypeFilter === 'congress') {
+      const isCong = detectCongress(pub) !== null || (pub.pubType || '').toLowerCase().includes('conference') || (pub.pubType || '').toLowerCase().includes('abstract');
+      if (!isCong) return false;
+    }
+    if (pubTypeFilter === 'journal') { if (detectCongress(pub) !== null) return false; }
+    if (searchText) {
+      const hay = ((pub.title || '') + ' ' + (pub.authors || '') + ' ' + (pub.journalTitle || '') + ' ' + (pub._company || '')).toLowerCase();
+      if (!hay.includes(searchText.toLowerCase())) return false;
+    }
+    return true;
+  });
 
   const filteredWatchlist = applyFilters(watchlistPubs);
   const filteredOther = applyFilters(otherPubs);
   const activePubs = activeSection === 'watchlist' ? filteredWatchlist : filteredOther;
   const activeLoading = activeSection === 'watchlist' ? loadingWatchlist : loadingOther;
-
-  const totalWatchlist = watchlistPubs.length;
-  const totalOther = otherPubs.length;
   const congressCount = (activeSection === 'watchlist' ? watchlistPubs : otherPubs).filter(p => detectCongress(p) !== null).length;
 
   return (
     <div>
-      {/* Header bar */}
       <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>
-          Scientific Publications & Congress Abstracts
-        </span>
-        <span style={{ fontSize: 10, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>
-          via Europe PMC · PubMed · Preprints
-        </span>
+        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Scientific Publications & Congress Abstracts</span>
+        <span style={{ fontSize: 10, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>via Europe PMC · PubMed · Preprints</span>
       </div>
-
-      {/* Metrics */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }}>
         {[
-          { label: 'Watchlist pubs', val: loadingWatchlist ? '…' : totalWatchlist, color: '#1a1a1a' },
-          { label: 'Other sector', val: loadingOther ? '…' : totalOther, color: '#1a1a1a' },
+          { label: 'Watchlist pubs', val: loadingWatchlist ? '…' : watchlistPubs.length, color: '#1a1a1a' },
+          { label: 'Other sector', val: loadingOther ? '…' : otherPubs.length, color: '#1a1a1a' },
           { label: 'Congress abstracts', val: activeLoading ? '…' : congressCount, color: '#c8102e' },
           { label: 'Showing', val: activeLoading ? '…' : activePubs.length, color: '#1d4ed8' },
         ].map(m => (
@@ -445,155 +407,53 @@ function PublicationsTab({ watchlist }) {
           </div>
         ))}
       </div>
-
-      {/* Section toggle */}
       <div style={{ display: 'flex', gap: 0, marginBottom: '1.25rem', background: '#f5f2ed', borderRadius: 8, padding: 4, width: 'fit-content' }}>
-        {[
-          { key: 'watchlist', label: '📌 My Watchlist', count: filteredWatchlist.length },
-          { key: 'other', label: '🌐 Sector (Other)', count: filteredOther.length },
-        ].map(sec => (
-          <button
-            key={sec.key}
-            onClick={() => setActiveSection(sec.key)}
-            style={{
-              padding: '8px 18px',
-              borderRadius: 6,
-              border: 'none',
-              background: activeSection === sec.key ? '#fff' : 'transparent',
-              color: activeSection === sec.key ? '#1a1a1a' : '#888',
-              fontWeight: activeSection === sec.key ? 700 : 400,
-              fontSize: 12,
-              cursor: 'pointer',
-              fontFamily: "'DM Mono', monospace",
-              letterSpacing: '0.3px',
-              boxShadow: activeSection === sec.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-              transition: 'all 0.15s',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {sec.label}
-            <span style={{ marginLeft: 6, fontSize: 10, color: activeSection === sec.key ? '#c8102e' : '#bbb', fontFamily: "'DM Mono', monospace" }}>
-              ({sec.count})
-            </span>
+        {[{ key: 'watchlist', label: '📌 My Watchlist', count: filteredWatchlist.length }, { key: 'other', label: '🌐 Sector (Other)', count: filteredOther.length }].map(sec => (
+          <button key={sec.key} onClick={() => setActiveSection(sec.key)} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: activeSection === sec.key ? '#fff' : 'transparent', color: activeSection === sec.key ? '#1a1a1a' : '#888', fontWeight: activeSection === sec.key ? 700 : 400, fontSize: 12, cursor: 'pointer', fontFamily: "'DM Mono', monospace", boxShadow: activeSection === sec.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
+            {sec.label}<span style={{ marginLeft: 6, fontSize: 10, color: activeSection === sec.key ? '#c8102e' : '#bbb' }}>({sec.count})</span>
           </button>
         ))}
       </div>
-
-      {/* ── Filter bar ── */}
       <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
-        {/* Topic pills */}
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Topic area</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {TOPIC_FILTERS.map(t => (
-              <button
-                key={t.key}
-                onClick={() => setTopicFilter(t.key)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 20,
-                  border: topicFilter === t.key ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4',
-                  background: topicFilter === t.key ? '#1a1a1a' : 'transparent',
-                  color: topicFilter === t.key ? '#fff' : '#555',
-                  fontSize: 11,
-                  fontWeight: topicFilter === t.key ? 600 : 400,
-                  cursor: 'pointer',
-                  fontFamily: "'DM Mono', monospace",
-                  transition: 'all 0.15s',
-                  whiteSpace: 'nowrap',
-                }}
-              >{t.label}</button>
+              <button key={t.key} onClick={() => setTopicFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: topicFilter === t.key ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: topicFilter === t.key ? '#1a1a1a' : 'transparent', color: topicFilter === t.key ? '#fff' : '#555', fontSize: 11, fontWeight: topicFilter === t.key ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s', whiteSpace: 'nowrap' }}>{t.label}</button>
             ))}
           </div>
         </div>
-
-        {/* Type filter */}
         <div style={{ marginBottom: 10 }}>
           <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Publication type</div>
           <div style={{ display: 'flex', gap: 6 }}>
-            {[
-              { key: 'all', label: 'All' },
-              { key: 'congress', label: '🎤 Congresses only' },
-              { key: 'journal', label: '📄 Journals only' },
-            ].map(t => (
-              <button
-                key={t.key}
-                onClick={() => setPubTypeFilter(t.key)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 20,
-                  border: pubTypeFilter === t.key ? '1.5px solid #c8102e' : '1px solid #d1ccc4',
-                  background: pubTypeFilter === t.key ? 'rgba(200,16,46,0.07)' : 'transparent',
-                  color: pubTypeFilter === t.key ? '#c8102e' : '#555',
-                  fontSize: 11,
-                  fontWeight: pubTypeFilter === t.key ? 700 : 400,
-                  cursor: 'pointer',
-                  fontFamily: "'DM Mono', monospace",
-                  transition: 'all 0.15s',
-                  whiteSpace: 'nowrap',
-                }}
-              >{t.label}</button>
+            {[{ key: 'all', label: 'All' }, { key: 'congress', label: '🎤 Congresses only' }, { key: 'journal', label: '📄 Journals only' }].map(t => (
+              <button key={t.key} onClick={() => setPubTypeFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: pubTypeFilter === t.key ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: pubTypeFilter === t.key ? 'rgba(200,16,46,0.07)' : 'transparent', color: pubTypeFilter === t.key ? '#c8102e' : '#555', fontSize: 11, fontWeight: pubTypeFilter === t.key ? 700 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s', whiteSpace: 'nowrap' }}>{t.label}</button>
             ))}
           </div>
         </div>
-
-        {/* Text search */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <input
-            style={{ ...np.filterInput, fontSize: 12 }}
-            value={searchText}
-            onChange={e => setSearchText(e.target.value)}
-            placeholder="Search by title, author, company…"
-          />
+          <input style={{ ...np.filterInput, fontSize: 12 }} value={searchText} onChange={e => setSearchText(e.target.value)} placeholder="Search by title, author, company…" />
           {searchText && <button style={s.btnSm} onClick={() => setSearchText('')}>✕</button>}
         </div>
       </div>
-
-      {/* ── Results ── */}
-      {activeLoading && (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
-          <Spinner />
-          <span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace" }}>
-            Fetching publications from Europe PMC…
-          </span>
-        </div>
-      )}
-
-      {!activeLoading && activePubs.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: "'DM Mono', monospace" }}>
-          No publications found for current filters.
-        </div>
-      )}
-
+      {activeLoading && <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}><Spinner /><span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace" }}>Fetching publications from Europe PMC…</span></div>}
+      {!activeLoading && activePubs.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: "'DM Mono', monospace" }}>No publications found for current filters.</div>}
       {!activeLoading && activePubs.length > 0 && (
         <div>
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
-            {activeSection === 'watchlist' ? 'Publications from your watchlist companies' : 'Publications from sector leaders'}
-            {' '}· {activePubs.length} results
+            {activeSection === 'watchlist' ? 'Publications from your watchlist companies' : 'Publications from sector leaders'} · {activePubs.length} results
           </div>
-
-          {activePubs.map((pub, i) => (
-            <PubCard
-              key={pub.id || i}
-              pub={pub}
-              companyName={pub._company}
-              showCompany={true}
-            />
-          ))}
+          {activePubs.map((pub, i) => <PubCard key={pub.id || i} pub={pub} companyName={pub._company} showCompany={true} />)}
         </div>
       )}
-
-      {/* Footer note */}
       <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace", lineHeight: 1.6 }}>
         Data sourced from <strong style={{ color: '#555' }}>Europe PMC</strong> (covers PubMed, Medline, preprints, and congress abstracts from ASCO, ESMO, EHA, ASH, AACR and others).
-        Publications are retrieved in real time. Congress abstracts may appear as preprints or supplemental issues.
         <a href="https://europepmc.org" target="_blank" rel="noopener noreferrer" style={{ color: '#c8102e', marginLeft: 6, textDecoration: 'none' }}>europepmc.org ↗</a>
       </div>
     </div>
   );
 }
 
-// ─── Analyst Rating Bar ───────────────────────────────────────────────────────
 function AnalystRatingBar({ buy, hold, sell }) {
   const total = buy + hold + sell;
   if (total === 0) return null;
@@ -613,8 +473,8 @@ function AnalystRatingBar({ buy, hold, sell }) {
       </div>
       <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
         <div style={{ width: `${buyPct}%`, background: '#16a34a', transition: 'width 0.6s ease' }} />
-        <div style={{ width: `${holdPct}%`, background: '#d97706', transition: 'width 0.6s ease' }} />
-        <div style={{ width: `${sellPct}%`, background: '#dc2626', transition: 'width 0.6s ease' }} />
+        <div style={{ width: `${holdPct}%`, background: '#d97706' }} />
+        <div style={{ width: `${sellPct}%`, background: '#dc2626' }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: "'DM Mono', monospace" }}>
         <span style={{ color: '#15803d' }}>Buy {buyPct}%</span>
@@ -637,9 +497,7 @@ function PriceTarget({ current, target }) {
       </div>
       <div style={{ borderLeft: '1px solid #e5e0d8', paddingLeft: 10 }}>
         <div style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>vs Current</div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: isUp ? '#16a34a' : '#dc2626' }}>
-          {isUp ? '▲' : '▼'} {Math.abs(upside)}%
-        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: isUp ? '#16a34a' : '#dc2626' }}>{isUp ? '▲' : '▼'} {Math.abs(upside)}%</div>
       </div>
     </div>
   );
@@ -657,13 +515,8 @@ function SentimentPills({ sentiments }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
       {sentiments.map((sent, i) => {
-        const tone = sent.tone?.toLowerCase() || 'neutral';
-        const c = colorMap[tone] || colorMap.neutral;
-        return (
-          <span key={i} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>
-            {c.icon} {sent.label}
-          </span>
-        );
+        const c = colorMap[sent.tone?.toLowerCase()] || colorMap.neutral;
+        return <span key={i} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>{c.icon} {sent.label}</span>;
       })}
     </div>
   );
@@ -679,17 +532,15 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
     setExpanded(next);
     if (next && !detail) {
       setLoadingDetail(true);
-      try {
-        const result = await onLoadDetail(stock, onStageUpdate);
-        setDetail(result);
-      } catch { setDetail({ error: 'Could not load details.' }); }
+      try { const result = await onLoadDetail(stock, onStageUpdate); setDetail(result); }
+      catch { setDetail({ error: 'Could not load details.' }); }
       setLoadingDetail(false);
     }
   };
 
   return (
     <div style={{ ...s.card, padding: 0, overflow: 'hidden', marginBottom: 12 }}>
-      <div style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }} className="stock-card-header" onClick={handleExpand}>
+      <div style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }} onClick={handleExpand}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
@@ -706,13 +557,12 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <span style={{ fontSize: 18, color: '#bbb', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>⌄</span>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 20, lineHeight: 1, padding: '0 2px' }} onClick={(e) => { e.stopPropagation(); onRemove(stock.ticker); }}>×</button>
+            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 20, lineHeight: 1, padding: '0 2px' }} onClick={e => { e.stopPropagation(); onRemove(stock.ticker); }}>×</button>
           </div>
         </div>
       </div>
-
       {expanded && (
-        <div style={{ padding: '16px 18px', background: '#fdfcfa' }} className="stock-card-detail">
+        <div style={{ padding: '16px 18px', background: '#fdfcfa' }}>
           {loadingDetail && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}><Spinner />Loading company intelligence…</div>}
           {detail && !detail.error && (
             <div>
@@ -732,7 +582,7 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>Key Risks</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {detail.risks.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#555', lineHeight: 1.5 }}><span style={{ color: '#c8102e', flexShrink: 0, marginTop: 1 }}>▸</span><span>{r}</span></div>)}
+                    {detail.risks.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#555', lineHeight: 1.5 }}><span style={{ color: '#c8102e', flexShrink: 0 }}>▸</span><span>{r}</span></div>)}
                   </div>
                 </div>
               )}
@@ -767,9 +617,7 @@ function SearchBar({ onAdd, watchlist }) {
   };
 
   const handleChange = (e) => {
-    const v = e.target.value;
-    setVal(v);
-    setError('');
+    const v = e.target.value; setVal(v); setError('');
     clearTimeout(debounceRef.current);
     if (v.trim().length >= 2) debounceRef.current = setTimeout(() => searchTickers(v.trim()), 350);
     else { setSuggestions([]); setShowSugg(false); }
@@ -778,14 +626,11 @@ function SearchBar({ onAdd, watchlist }) {
   const handleSelect = async (ticker, name) => {
     setVal(''); setSuggestions([]); setShowSugg(false); setError('');
     if (watchlist.find(s => s.ticker === ticker)) { setError(`${ticker} is already in your watchlist.`); return; }
-    setAdding(true);
-    await onAdd(ticker, name);
-    setAdding(false);
+    setAdding(true); await onAdd(ticker, name); setAdding(false);
   };
 
   const handleManualAdd = async () => {
-    const t = val.trim().toUpperCase();
-    if (!t) return;
+    const t = val.trim().toUpperCase(); if (!t) return;
     const match = suggestions.find(s => s.ticker === t);
     if (match) { handleSelect(match.ticker, match.name); return; }
     setAdding(true); setError('');
@@ -803,7 +648,7 @@ function SearchBar({ onAdd, watchlist }) {
 
   return (
     <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ display: 'flex', gap: 8 }} className="search-row">
+      <div style={{ display: 'flex', gap: 8 }}>
         <div style={{ position: 'relative', flex: 1 }}>
           <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: searching ? '#c8102e' : '#aaa', fontSize: 13, pointerEvents: 'none' }}>{searching ? '⟳' : '🔍'}</span>
           <input style={{ ...s.input, paddingLeft: 34, borderColor: error ? '#fca5a5' : undefined }} value={val} onChange={handleChange} onKeyDown={e => e.key === 'Enter' && handleManualAdd()} onBlur={() => setTimeout(() => setShowSugg(false), 200)} onFocus={() => suggestions.length > 0 && setShowSugg(true)} placeholder="Search by name or ticker: 'Moderna', 'CRSP', 'Gilead'…" disabled={adding} />
@@ -812,14 +657,11 @@ function SearchBar({ onAdd, watchlist }) {
               {suggestions.length === 0 && !searching && <div style={{ padding: '12px 14px', fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>No results for "{val}"</div>}
               {suggestions.map((item, i) => {
                 const alreadyIn = watchlist.find(s => s.ticker === item.ticker);
-                return (
-                  <div key={item.ticker} style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1, background: 'transparent', transition: 'background 0.1s' }} onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)} onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                    <span style={tickerStyle}>{item.ticker}</span>
-                    <span style={{ fontSize: 13, color: '#333', flex: 1 }}>{item.name}</span>
-                    {alreadyIn && <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>already added</span>}
-                    {!alreadyIn && <span style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>+ Add</span>}
-                  </div>
-                );
+                return <div key={item.ticker} style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1 }} onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)} onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                  <span style={tickerStyle}>{item.ticker}</span>
+                  <span style={{ fontSize: 13, color: '#333', flex: 1 }}>{item.name}</span>
+                  {alreadyIn ? <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>already added</span> : <span style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>+ Add</span>}
+                </div>;
               })}
             </div>
           )}
@@ -834,8 +676,18 @@ function SearchBar({ onAdd, watchlist }) {
 }
 
 export default function App() {
+  // ── Watchlist: initialise from localStorage, persist on every change ──────
+  const [watchlist, setWatchlist] = useState(getInitialWatchlist);
+
+  const setAndSaveWatchlist = useCallback((updater) => {
+    setWatchlist(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      saveWatchlist(next);
+      return next;
+    });
+  }, []);
+
   const [tab, setTab] = useState('news');
-  const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
   const [newsFilter, setNewsFilter] = useState('');
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
@@ -847,11 +699,7 @@ export default function App() {
   React.useEffect(() => {
     const fetchNews = async () => {
       setLoadingNews(true);
-      try {
-        const res = await fetch('/api/rss');
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) setRealNews(data);
-      } catch { }
+      try { const res = await fetch('/api/rss'); const data = await res.json(); if (Array.isArray(data) && data.length > 0) setRealNews(data); } catch {}
       setLoadingNews(false);
     };
     fetchNews();
@@ -859,11 +707,7 @@ export default function App() {
 
   React.useEffect(() => {
     const fetchPress = async () => {
-      try {
-        const res = await fetch('/api/press');
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) setPressReleases(data);
-      } catch { }
+      try { const res = await fetch('/api/press'); const data = await res.json(); if (Array.isArray(data) && data.length > 0) setPressReleases(data); } catch {}
     };
     fetchPress();
   }, []);
@@ -871,37 +715,40 @@ export default function App() {
   React.useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers: INITIAL_WATCHLIST.map(s => s.ticker) }) });
+        const tickers = watchlist.map(s => s.ticker);
+        const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers }) });
         const data = await res.json();
-        setWatchlist(prev => prev.map(stock => { const updated = data.find(d => d.ticker === stock.ticker); return updated ? { ...stock, ...updated } : stock; }));
-      } catch { }
+        setAndSaveWatchlist(prev => prev.map(stock => { const updated = data.find(d => d.ticker === stock.ticker); return updated ? { ...stock, ...updated } : stock; }));
+      } catch {}
     };
     fetchPrices();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addTicker = useCallback(async (val, knownName) => {
     if (!val || watchlist.find(s => s.ticker === val)) return;
-    setWatchlist(prev => [...prev, { ticker: val, name: knownName || val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading price data…' }]);
+    setAndSaveWatchlist(prev => [...prev, { ticker: val, name: knownName || val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading price data…' }]);
     try {
       const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers: [val] }) });
       const data = await res.json();
-      if (data[0]) setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0], name: data[0].name || knownName || val } : s));
-      else setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Price data unavailable.' } : s));
-    } catch {
-      setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Could not fetch price data.' } : s));
-    }
-  }, [watchlist]);
+      if (data[0]) setAndSaveWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0], name: data[0].name || knownName || val } : s));
+      else setAndSaveWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Price data unavailable.' } : s));
+    } catch { setAndSaveWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Could not fetch price data.' } : s)); }
+  }, [watchlist, setAndSaveWatchlist]);
 
-  const removeTicker = (ticker) => setWatchlist(prev => prev.filter(s => s.ticker !== ticker));
-  const updateStage = useCallback((ticker, stage) => { setWatchlist(prev => prev.map(s => s.ticker === ticker ? { ...s, stage } : s)); }, []);
+  const removeTicker = useCallback((ticker) => {
+    setAndSaveWatchlist(prev => prev.filter(s => s.ticker !== ticker));
+  }, [setAndSaveWatchlist]);
+
+  const updateStage = useCallback((ticker, stage) => {
+    setAndSaveWatchlist(prev => prev.map(s => s.ticker === ticker ? { ...s, stage } : s));
+  }, [setAndSaveWatchlist]);
 
   const getSummary = useCallback(async (key, prompt) => {
     if (summaries[key]) return;
     setLoading(prev => ({ ...prev, [key]: true }));
-    try {
-      const text = await callClaude(prompt);
-      setSummaries(prev => ({ ...prev, [key]: text }));
-    } catch { setSummaries(prev => ({ ...prev, [key]: 'Error generating summary.' })); }
+    try { const text = await callClaude(prompt); setSummaries(prev => ({ ...prev, [key]: text })); }
+    catch { setSummaries(prev => ({ ...prev, [key]: 'Error generating summary.' })); }
     setLoading(prev => ({ ...prev, [key]: false }));
   }, [summaries]);
 
@@ -920,15 +767,13 @@ For the biotech/pharma company ${stock.ticker} (${stock.name}), return this exac
 Return ONLY the JSON object.`;
     const raw = await callClaude(prompt);
     try {
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
+      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
       if (parsed.stage && parsed.stage !== 'Unknown' && onStageUpdate) onStageUpdate(stock.ticker, parsed.stage);
       return parsed;
     } catch { return { error: 'Could not parse company data.' }; }
   }, []);
 
   const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
-
   const CATEGORY_KEYWORDS = {
     'Pharma': ['pharma', 'drug', 'medicine', 'therapeutic'],
     'Biotech': ['biotech', 'biologic', 'biosimilar', 'gene', 'cell therapy', 'crispr', 'mrna'],
@@ -940,18 +785,14 @@ Return ONLY the JSON object.`;
     'Oncology': ['cancer', 'oncol', 'tumor', 'immuno-oncol', 'checkpoint', 'car-t'],
     'Finance': ['ipo', 'funding', 'invest', 'earning', 'revenue', 'financ', 'stock'],
   };
-
   const filteredNews = newsSource.filter(n => {
+    if (isPaywalled(n)) return false;
     if (categoryFilter) {
       const kws = CATEGORY_KEYWORDS[categoryFilter] || [];
-      const haystack = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
-      const matchesCat = kws.some(kw => haystack.includes(kw)) || (n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()));
-      if (!matchesCat) return false;
+      const hay = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
+      if (!kws.some(kw => hay.includes(kw)) && !(n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()))) return false;
     }
-    if (newsFilter) {
-      const haystack = (n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '')).toLowerCase();
-      if (!haystack.includes(newsFilter.toLowerCase())) return false;
-    }
+    if (newsFilter) { if (!(n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '')).toLowerCase().includes(newsFilter.toLowerCase())) return false; }
     return true;
   });
 
@@ -964,21 +805,18 @@ Return ONLY the JSON object.`;
   return (
     <div style={s.app} className="app-root">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         body { background: #fefcf9; margin: 0; }
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
-        .np-secondary-card:hover { background: #faf8f4 !important; }
         @media (max-width: 600px) {
           .app-root { padding: 1rem !important; }
           .app-header { flex-direction: column; align-items: flex-start !important; gap: 8px; }
           .app-tabs button { padding: 8px 10px !important; font-size: 9px !important; }
           .featured-grid { display: flex !important; flex-direction: column-reverse !important; }
-          .secondary-grid { grid-template-columns: 1fr !important; }
           .metrics-grid { grid-template-columns: 1fr 1fr !important; }
-          .search-row { flex-direction: column !important; }
           .news-layout { grid-template-columns: 1fr !important; }
         }
       `}</style>
@@ -986,17 +824,19 @@ Return ONLY the JSON object.`;
       {/* ── CATALYST HEADER ── */}
       <div style={{ borderBottom: '1px solid #e0dbd3', marginBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1rem', borderBottom: '1px solid #ece7df' }} className="app-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, background: '#0f1923', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="32" height="22" viewBox="0 0 44 28" fill="none">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Logo mark — slightly bigger to match new title size */}
+            <div style={{ width: 52, height: 52, background: '#0f1923', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="38" height="26" viewBox="0 0 44 28" fill="none">
                 <polyline points="2,20 9,20 13,5 20,23 25,13 29,17 34,8 40,8" stroke="#c8102e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
                 <circle cx="20" cy="23" r="2.2" fill="#c8102e"/>
                 <circle cx="13" cy="5" r="2.2" fill="#c8102e"/>
               </svg>
             </div>
             <div>
-              <div style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 24, fontWeight: 400, letterSpacing: '-0.3px', color: '#1a1a1a', lineHeight: 1 }}>Catalyst</div>
-              <div style={{ fontSize: 9, color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", marginTop: 3 }}>Biotech &amp; Pharma Intelligence</div>
+              {/* ★ BIGGER TITLE: 24 → 36px */}
+              <div style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 36, fontWeight: 400, letterSpacing: '-0.5px', color: '#1a1a1a', lineHeight: 1 }}>Catalyst</div>
+              <div style={{ fontSize: 9, color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", marginTop: 4 }}>Biotech &amp; Pharma Intelligence</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -1009,27 +849,9 @@ Return ONLY the JSON object.`;
             </div>
           </div>
         </div>
-
-        {/* Nav tabs — now includes Publications */}
         <div style={{ display: 'flex', gap: 0 }} className="app-tabs">
           {['news', 'watchlist', 'publications', 'fda'].map(t => (
-            <button key={t} style={{
-              padding: '10px 20px',
-              fontSize: 10,
-              cursor: 'pointer',
-              border: 'none',
-              background: 'none',
-              color: tab === t ? '#1a1a1a' : '#aaa',
-              borderBottom: tab === t ? '2px solid #c8102e' : '2px solid transparent',
-              fontWeight: tab === t ? 600 : 400,
-              letterSpacing: '1.8px',
-              textTransform: 'uppercase',
-              fontFamily: "'DM Mono', monospace",
-              transition: 'color 0.15s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-            }} onClick={() => setTab(t)}>
+            <button key={t} style={{ padding: '10px 20px', fontSize: 10, cursor: 'pointer', border: 'none', background: 'none', color: tab === t ? '#1a1a1a' : '#aaa', borderBottom: tab === t ? '2px solid #c8102e' : '2px solid transparent', fontWeight: tab === t ? 600 : 400, letterSpacing: '1.8px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", transition: 'color 0.15s', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => setTab(t)}>
               {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : t === 'publications' ? <>Publications <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, background: tab === t ? 'rgba(200,16,46,0.12)' : 'rgba(100,100,100,0.1)', color: tab === t ? '#c8102e' : '#aaa', fontWeight: 700 }}>NEW</span></> : 'FDA Calendar'}
             </button>
           ))}
@@ -1038,7 +860,7 @@ Return ONLY the JSON object.`;
 
       <div style={{ marginBottom: '1.75rem' }} />
 
-      {/* ══════════════ NEWS TAB ══════════════ */}
+      {/* ══ NEWS ══ */}
       {tab === 'news' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '2rem', alignItems: 'flex-start' }} className="news-layout">
           <div style={np.wrapper}>
@@ -1048,7 +870,7 @@ Return ONLY the JSON object.`;
             </div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: '1rem' }}>
               {['All', 'Pharma', 'Biotech', 'FDA', 'Clinical Trials', 'Deals', 'Gene Therapy', 'AI', 'Oncology', 'Finance'].map(cat => (
-                <button key={cat} onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 20, border: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#1a1a1a' : 'transparent', color: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#fff' : '#555', fontSize: 12, fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s', whiteSpace: 'nowrap' }}>{cat}</button>
+                <button key={cat} onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 4, border: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#1a1a1a' : 'transparent', color: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#fff' : '#555', fontSize: 12, fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s', whiteSpace: 'nowrap' }}>{cat}</button>
               ))}
             </div>
             <div style={np.filterBar}>
@@ -1092,7 +914,7 @@ Return ONLY the JSON object.`;
                             <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{n.source} · {n.date}</span>
                             {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
                           </div>
-                          <p style={{ ...np.secondaryHeadline, fontSize: 17, margin: '0 0 6px 0' }}>{n.headline}</p>
+                          <p style={{ fontSize: 17, fontWeight: 700, lineHeight: 1.3, color: '#111', margin: '0 0 6px 0', fontFamily: "'Georgia', serif" }}>{n.headline}</p>
                           {n.summary && <p style={{ fontSize: 14, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
                           <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `Explain this biotech news in 3-4 sentences: "${n.headline}". Context: ${n.summary}.`)}>
                             {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
@@ -1106,7 +928,6 @@ Return ONLY the JSON object.`;
               </div>
             )}
           </div>
-          {/* Sidebar */}
           <div style={{ position: 'sticky', top: '1rem' }}>
             <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>Company Announcements</div>
@@ -1117,7 +938,7 @@ Return ONLY the JSON object.`;
                 <a href={pr.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 5px 0', fontFamily: "'Georgia', serif" }}>{pr.headline}</p>
                 </a>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace" }}>From {pr.company || pr.source}</span>
                   {pr.date && <span style={{ fontSize: 10, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>· {pr.date}</span>}
                 </div>
@@ -1127,29 +948,38 @@ Return ONLY the JSON object.`;
         </div>
       )}
 
-      {/* ══════════════ WATCHLIST TAB ══════════════ */}
+      {/* ══ WATCHLIST ══ */}
       {tab === 'watchlist' && (
         <div>
-          <SearchBar onAdd={addTicker} watchlist={watchlist} />
-          <div style={s.grid4} className="metrics-grid">
-            <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#1a1a1a' }}>{watchlist.length}</div></div>
-            <div style={s.metric}><div style={s.metricLabel}>Gainers</div><div style={{ ...s.metricVal, color: '#34d399' }}>{gainers}</div></div>
-            <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#faa19b' }}>{losers}</div></div>
-            <div style={s.metric}><div style={s.metricLabel}>FDA events (30d)</div><div style={{ ...s.metricVal, color: '#fbbf24' }}>4</div></div>
+          {/* Search + compact stats row */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+            <div style={{ flex: 1 }}><SearchBar onAdd={addTicker} watchlist={watchlist} /></div>
+            {/* Compact stats pill */}
+            <div style={{ flexShrink: 0, display: 'flex', gap: 1, background: '#f0ede8', borderRadius: 6, padding: '6px 10px', border: '1px solid #e5e0d8', alignItems: 'center', gap: 12, marginTop: 1 }}>
+              {[
+                { label: 'Watching', val: watchlist.length, color: '#555' },
+                { label: 'Gainers', val: gainers, color: '#16a34a' },
+                { label: 'Losers', val: losers, color: '#c8102e' },
+              ].map((m, i) => (
+                <React.Fragment key={m.label}>
+                  {i > 0 && <span style={{ color: '#ddd', fontSize: 12 }}>|</span>}
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: "'DM Mono', monospace", lineHeight: 1 }}>{m.val}</div>
+                    <div style={{ fontSize: 9, color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace", marginTop: 2 }}>{m.label}</div>
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
           </div>
           <div style={{ fontSize: 11, color: '#aaa', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>↓ Click any card to expand company details, analyst ratings & investor sentiment</div>
-          {watchlist.map((stock) => (
-            <StockCard key={stock.ticker} stock={stock} onRemove={removeTicker} onLoadDetail={loadStockDetail} onStageUpdate={updateStage} />
-          ))}
+          {watchlist.map(stock => <StockCard key={stock.ticker} stock={stock} onRemove={removeTicker} onLoadDetail={loadStockDetail} onStageUpdate={updateStage} />)}
         </div>
       )}
 
-      {/* ══════════════ PUBLICATIONS TAB ══════════════ */}
-      {tab === 'publications' && (
-        <PublicationsTab watchlist={watchlist} />
-      )}
+      {/* ══ PUBLICATIONS ══ */}
+      {tab === 'publications' && <PublicationsTab watchlist={watchlist} />}
 
-      {/* ══════════════ FDA CALENDAR TAB ══════════════ */}
+      {/* ══ FDA ══ */}
       {tab === 'fda' && (
         <div>
           <p style={{ ...s.muted, marginBottom: '1rem' }}>Upcoming PDUFA dates, advisory committee meetings & trial readouts</p>
