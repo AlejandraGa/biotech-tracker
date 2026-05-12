@@ -277,7 +277,7 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
     <div style={{ ...s.card, padding: 0, overflow: 'hidden', marginBottom: 12 }}>
       {/* ── Header row (always visible) ── */}
       <div
-        style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }}
+        style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }} className="stock-card-header"
         onClick={handleExpand}
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
@@ -316,7 +316,7 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
 
       {/* ── Expanded detail panel ── */}
       {expanded && (
-        <div style={{ padding: '16px 18px', background: '#fdfcfa' }}>
+        <div style={{ padding: '16px 18px', background: '#fdfcfa' }} className="stock-card-detail">
           {loadingDetail && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}>
               <Spinner />Loading company intelligence…
@@ -477,7 +477,7 @@ function SearchBar({ onAdd, watchlist }) {
 
   return (
     <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8 }} className="search-row">
         <div style={{ position: 'relative', flex: 1 }}>
           <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: searching ? '#c8102e' : '#aaa', fontSize: 13, pointerEvents: 'none', transition: 'color 0.2s' }}>
             {searching ? '⟳' : '🔍'}
@@ -676,24 +676,62 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
   const secondary = filteredNews.slice(1);
 
   return (
-    <div style={s.app}>
+    <div style={s.app} className="app-root">
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        body { background: #f7f4ef; }
+        body { background: #f7f4ef; margin: 0; }
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
         .np-secondary-card:hover { background: #faf8f4 !important; }
+
+        /* ── Mobile responsive ── */
+        @media (max-width: 600px) {
+          .app-root { padding: 1rem !important; }
+
+          /* Header */
+          .app-header { flex-direction: column; align-items: flex-start !important; gap: 8px; margin-bottom: 1rem !important; }
+          .app-title { font-size: 18px !important; }
+
+          /* Tabs */
+          .app-tabs button { padding: 8px 12px !important; font-size: 12px !important; }
+
+          /* Top story: stack vertically on mobile */
+          .featured-grid {
+            display: flex !important;
+            flex-direction: column-reverse !important;
+            gap: 1rem !important;
+          }
+          .featured-headline { font-size: 20px !important; line-height: 1.25 !important; }
+          .featured-image { width: 100% !important; height: 180px !important; }
+
+          /* Secondary grid: single column */
+          .secondary-grid { grid-template-columns: 1fr !important; }
+
+          /* Metrics grid: 2 cols */
+          .metrics-grid { grid-template-columns: 1fr 1fr !important; }
+
+          /* Stock card padding */
+          .stock-card-header { padding: 12px 14px !important; }
+          .stock-card-detail { padding: 12px 14px !important; }
+
+          /* Date bar smaller text */
+          .datebar-text { font-size: 10px !important; }
+
+          /* Search bar */
+          .search-row { flex-direction: column !important; }
+          .search-row button { width: 100% !important; }
+        }
       `}</style>
 
-      <div style={s.header}>
+      <div style={s.header} className="app-header">
         <div>
-          <div style={s.title}>Biotech & Pharma Tracker</div>
+          <div style={s.title} className="app-title">Biotech & Pharma Tracker</div>
           <div style={s.subtitle}>Follow your picks · News · FDA catalysts</div>
         </div>
         <span style={s.liveBadge}>● Live</span>
       </div>
 
-      <div style={s.tabs}>
+      <div style={s.tabs} className="app-tabs">
         {['news', 'watchlist', 'fda'].map(t => (
           <button key={t} style={s.tab(tab === t)} onClick={() => setTab(t)}>
             {t === 'news' ? '📰 News' : t === 'watchlist' ? '★ Watchlist' : '📅 FDA Calendar'}
@@ -723,10 +761,10 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
           {!loadingNews && featured && (
             <div style={{ marginBottom: '1.5rem' }}>
               <div style={np.sectionLabel}>Top Story</div>
-              <div style={np.featuredWrap}>
+              <div style={np.featuredWrap} className="featured-grid">
                 <div>
                   <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
-                  <h2 style={np.featuredHeadline}>{featured.headline}</h2>
+                  <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
                   <div style={np.featuredByline}>
                     {featured.ticker && <span style={{ fontFamily: "'DM Mono', monospace", color: '#c8102e', fontWeight: 600 }}>{featured.ticker} · </span>}
                     {featured.source} · {featured.date}
@@ -750,7 +788,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
           {!loadingNews && secondary.length > 0 && (
             <div>
               <div style={np.sectionLabel}>More Stories</div>
-              <div style={np.secondaryGrid}>
+              <div style={np.secondaryGrid} className="secondary-grid">
                 {secondary.map((n, i) => {
                   const idx = i + 1;
                   return (
@@ -785,7 +823,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
           <SearchBar onAdd={addTicker} watchlist={watchlist} />
 
           {/* Metrics row */}
-          <div style={s.grid4}>
+          <div style={s.grid4} className="metrics-grid">
             <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#1a1a1a' }}>{watchlist.length}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Gainers</div><div style={{ ...s.metricVal, color: '#34d399' }}>{gainers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#faa19b' }}>{losers}</div></div>
