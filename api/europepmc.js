@@ -13,8 +13,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const encoded = encodeURIComponent(query);
-    const url = `https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=${encoded}&format=json&pageSize=${rows}&sort=date&resultType=lite`;
+    // Clean the query — strip complex boolean syntax, just use the company name
+    // Europe PMC returns 0 results with overly complex queries like "X" AND (a OR b OR c)
+    const cleanName = query
+      .replace(/\s+AND\s+[\s\S]*/i, '')
+      .replace(/\s+OR\s+[\s\S]*/i, '')
+      .replace(/^"+|"+$/g, '')
+      .trim();
+
+    // Simple quoted search — most reliable in Europe PMC
+    const epmc_query = `"${cleanName}"`;
+    const url = `https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=${encodeURIComponent(epmc_query)}&format=json&pageSize=${rows}&sort=date&resultType=lite`;
 
     const response = await fetch(url, {
       headers: {
