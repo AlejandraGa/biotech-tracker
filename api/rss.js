@@ -75,6 +75,14 @@ function stripHTML(str) {
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, ' ')
     .replace(/&apos;/g, "'")
+    .replace(/&rsquo;/g, "'")
+    .replace(/&lsquo;/g, "'")
+    .replace(/&rdquo;/g, '"')
+    .replace(/&ldquo;/g, '"')
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&hellip;/g, '…')
+    .replace(/&amp;/g, '&')
     .replace(/&#\d+;/g, '');
   s = s
     .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -126,8 +134,8 @@ function parseRSS(xml, source) {
       date = pubDate || '';
     }
 
-    const summary = description.length > 240
-      ? description.slice(0, 240).replace(/\s+\S*$/, '') + '…'
+    const summary = description.length > 340
+      ? description.slice(0, 340).replace(/\s+\S*$/, '') + '…'
       : description;
 
     const text = (title + ' ' + category).toLowerCase();
