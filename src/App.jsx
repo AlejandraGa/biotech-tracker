@@ -722,7 +722,6 @@ export default function App() {
       } catch {}
     };
     fetchPrices();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addTicker = useCallback(async (val, knownName) => {
