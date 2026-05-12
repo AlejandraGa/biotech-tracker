@@ -12,23 +12,99 @@ const INITIAL_WATCHLIST = [
   { ticker: 'EVMN', name: 'Evommune Inc', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'Inflammatory disease programs' },
 ];
 
+// Other notable biotech/pharma companies (for Section 2)
+const OTHER_COMPANIES = [
+  { name: 'Pfizer', query: 'Pfizer' },
+  { name: 'Novartis', query: 'Novartis' },
+  { name: 'Roche', query: 'Roche' },
+  { name: 'AstraZeneca', query: 'AstraZeneca' },
+  { name: 'BioNTech', query: 'BioNTech' },
+  { name: 'Regeneron', query: 'Regeneron' },
+  { name: 'Gilead', query: 'Gilead' },
+  { name: 'Vertex', query: 'Vertex Pharmaceuticals' },
+];
+
+// Congress/conference source mapping for display
+const CONGRESS_SOURCES = {
+  'ASCO': { label: 'ASCO', color: '#1d4ed8', bg: 'rgba(29,78,216,0.08)', border: 'rgba(29,78,216,0.25)' },
+  'ESMO': { label: 'ESMO', color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.25)' },
+  'ASH': { label: 'ASH', color: '#b91c1c', bg: 'rgba(185,28,28,0.08)', border: 'rgba(185,28,28,0.25)' },
+  'EHA': { label: 'EHA', color: '#0369a1', bg: 'rgba(3,105,161,0.08)', border: 'rgba(3,105,161,0.25)' },
+  'AACR': { label: 'AACR', color: '#047857', bg: 'rgba(4,120,87,0.08)', border: 'rgba(4,120,87,0.25)' },
+  'EORTC': { label: 'EORTC', color: '#9a3412', bg: 'rgba(154,52,18,0.08)', border: 'rgba(154,52,18,0.25)' },
+  'SITC': { label: 'SITC', color: '#4338ca', bg: 'rgba(67,56,202,0.08)', border: 'rgba(67,56,202,0.25)' },
+  'NEJM': { label: 'NEJM', color: '#dc2626', bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.2)' },
+  'Lancet': { label: 'Lancet', color: '#b45309', bg: 'rgba(180,83,9,0.08)', border: 'rgba(180,83,9,0.2)' },
+  'Nature': { label: 'Nature', color: '#15803d', bg: 'rgba(21,128,61,0.08)', border: 'rgba(21,128,61,0.2)' },
+};
+
+function detectCongress(pub) {
+  const haystack = ((pub.journalTitle || '') + ' ' + (pub.source || '') + ' ' + (pub.title || '')).toUpperCase();
+  for (const key of Object.keys(CONGRESS_SOURCES)) {
+    if (haystack.includes(key)) return key;
+  }
+  return null;
+}
+
+function getSourceBadge(pub) {
+  const congress = detectCongress(pub);
+  if (congress) return CONGRESS_SOURCES[congress];
+  // Journal-based badges
+  const journal = (pub.journalTitle || '').toLowerCase();
+  if (journal.includes('new england') || journal.includes('nejm')) return CONGRESS_SOURCES['NEJM'];
+  if (journal.includes('lancet')) return CONGRESS_SOURCES['Lancet'];
+  if (journal.includes('nature')) return CONGRESS_SOURCES['Nature'];
+  return { label: pub.journalTitle ? pub.journalTitle.slice(0, 20) : 'Journal', color: '#555', bg: 'rgba(100,100,100,0.07)', border: 'rgba(100,100,100,0.2)' };
+}
+
+const TOPIC_FILTERS = [
+  { key: '', label: 'All' },
+  { key: 'oncology', label: 'Oncology', keywords: ['cancer', 'oncol', 'tumor', 'carcinoma', 'leukemia', 'lymphoma', 'melanoma', 'immunotherapy'] },
+  { key: 'gene-therapy', label: 'Gene Therapy', keywords: ['gene therapy', 'gene edit', 'crispr', 'base edit', 'prime edit', 'aav', 'lentiviral'] },
+  { key: 'ai', label: 'AI / ML', keywords: ['artificial intelligence', 'machine learning', 'deep learning', 'neural', 'algorithm', 'ai-driven', 'computational'] },
+  { key: 'immunology', label: 'Immunology', keywords: ['immunol', 'autoimmune', 'inflammation', 'cytokine', 'checkpoint', 'car-t', 'bispecific'] },
+  { key: 'rare-disease', label: 'Rare Disease', keywords: ['rare disease', 'orphan', 'sickle cell', 'thalassemia', 'hemophilia', 'duchenne', 'spinal muscular'] },
+  { key: 'rna', label: 'RNA / mRNA', keywords: ['mrna', 'rna', 'antisense', 'sirna', 'oligonucleotide'] },
+];
+
 const NEWS_DATA = [
-  { ticker: 'MRNA', headline: 'Moderna reports positive Phase 3 data for mRNA-1345 RSV vaccine in older adults', source: 'BioPharma Dive', date: 'May 10, 2025', tag: 'Trial Results', summary: "Moderna's RSV vaccine candidate demonstrated 83.7% efficacy against RSV lower respiratory tract disease in adults 60+. Primary and secondary endpoints were met." },
-  { ticker: 'EDIT', headline: 'Editas Medicine announces EDIT-301 patient data showing durable HbF induction', source: 'Fierce Biotech', date: 'May 8, 2025', tag: 'Clinical Data', summary: 'EDIT-301 uses AsCas12a to edit the BCL11A enhancer, increasing fetal hemoglobin. Early patient data shows sustained elevation above therapeutic threshold.' },
-  { ticker: 'RXRX', headline: 'Recursion and Roche expand AI partnership to neurological disease targets', source: 'Reuters', date: 'May 7, 2025', tag: 'Partnership', summary: "Recursion's platform partnership with Roche is being extended to include CNS targets. This is a milestone payment trigger worth up to $50M." },
-  { ticker: 'BEAM', headline: 'Beam Therapeutics presents BEAM-302 alpha-1 antitrypsin deficiency data at ATS 2025', source: 'STAT News', date: 'May 6, 2025', tag: 'Conference', summary: 'BEAM-302 uses base editing to correct the Z-allele mutation causing A1AT deficiency. Data showed dose-dependent AAT protein restoration.' },
-  { ticker: 'KYMR', headline: "Kymera's KY1005 shows strong EASI-75 response in atopic dermatitis Phase 2", source: 'Evaluate Pharma', date: 'May 5, 2025', tag: 'Trial Results', summary: 'KY1005 targets STAT6, a key driver of Th2 inflammation in atopic dermatitis. 68% EASI-75 response at week 16 vs 18% placebo.' },
-  { ticker: 'MRNA', headline: "FDA accepts PDUFA date for Moderna's flu-COVID combination vaccine", source: 'FDA News', date: 'May 3, 2025', tag: 'Regulatory', summary: 'The FDA has set a PDUFA date of December 2025 for mRNA-1083. This combination approach is differentiated and would simplify vaccination schedules for older adults.' },
+  { ticker: 'MRNA', headline: 'Moderna reports positive Phase 3 data for mRNA-1345 RSV vaccine in older adults', source: 'BioPharma Dive', date: 'May 10, 2025', tag: 'Trial Results', summary: "Moderna's RSV vaccine candidate demonstrated 83.7% efficacy against RSV lower respiratory tract disease in adults 60+." },
+  { ticker: 'EDIT', headline: 'Editas Medicine announces EDIT-301 patient data showing durable HbF induction', source: 'Fierce Biotech', date: 'May 8, 2025', tag: 'Clinical Data', summary: 'EDIT-301 uses AsCas12a to edit the BCL11A enhancer. Early patient data shows sustained elevation above therapeutic threshold.' },
+  { ticker: 'RXRX', headline: 'Recursion and Roche expand AI partnership to neurological disease targets', source: 'Reuters', date: 'May 7, 2025', tag: 'Partnership', summary: "Recursion's platform partnership with Roche is being extended to include CNS targets." },
+  { ticker: 'BEAM', headline: 'Beam Therapeutics presents BEAM-302 alpha-1 antitrypsin deficiency data at ATS 2025', source: 'STAT News', date: 'May 6, 2025', tag: 'Conference', summary: 'BEAM-302 uses base editing to correct the Z-allele mutation.' },
+  { ticker: 'KYMR', headline: "Kymera's KY1005 shows strong EASI-75 response in atopic dermatitis Phase 2", source: 'Evaluate Pharma', date: 'May 5, 2025', tag: 'Trial Results', summary: '68% EASI-75 response at week 16 vs 18% placebo.' },
+  { ticker: 'MRNA', headline: "FDA accepts PDUFA date for Moderna's flu-COVID combination vaccine", source: 'FDA News', date: 'May 3, 2025', tag: 'Regulatory', summary: 'PDUFA date of December 2025 set for mRNA-1083.' },
 ];
 
 const FDA_DATA = [
-  { date: 'Jun 3, 2025', ticker: 'MRNA', drug: 'mRNA-1010 (flu)', event: 'PDUFA date', type: 'approval', note: 'Standard flu vaccine; likely approval but modest revenue impact' },
-  { date: 'Jun 17, 2025', ticker: 'KYMR', drug: 'KY1005 (AD)', event: 'Phase 2 full data', type: 'trial', note: 'Atopic dermatitis readout — high investor focus' },
-  { date: 'Jul 8, 2025', ticker: 'EDIT', drug: 'EDIT-301', event: 'IND expansion', type: 'regulatory', note: 'Expansion to beta-thalassemia indication' },
-  { date: 'Aug 22, 2025', ticker: 'BEAM', drug: 'BEAM-101', event: 'PDUFA date', type: 'approval', note: 'Sickle cell disease; competing with Casgevy' },
-  { date: 'Sep 5, 2025', ticker: 'RXRX', drug: 'REC-994', event: 'Phase 2 interim', type: 'trial', note: 'Cavernous malformation; first clinical proof-of-concept' },
-  { date: 'Oct 14, 2025', ticker: 'MRNA', drug: 'mRNA-1345 (RSV)', event: 'PDUFA date', type: 'approval', note: 'High stakes — crowded RSV market but strong data' },
+  { date: 'Jun 3, 2025', ticker: 'MRNA', drug: 'mRNA-1010 (flu)', event: 'PDUFA date', type: 'approval', note: 'Standard flu vaccine' },
+  { date: 'Jun 17, 2025', ticker: 'KYMR', drug: 'KY1005 (AD)', event: 'Phase 2 full data', type: 'trial', note: 'Atopic dermatitis readout' },
+  { date: 'Jul 8, 2025', ticker: 'EDIT', drug: 'EDIT-301', event: 'IND expansion', type: 'regulatory', note: 'Expansion to beta-thalassemia' },
+  { date: 'Aug 22, 2025', ticker: 'BEAM', drug: 'BEAM-101', event: 'PDUFA date', type: 'approval', note: 'Sickle cell disease' },
+  { date: 'Sep 5, 2025', ticker: 'RXRX', drug: 'REC-994', event: 'Phase 2 interim', type: 'trial', note: 'Cavernous malformation' },
+  { date: 'Oct 14, 2025', ticker: 'MRNA', drug: 'mRNA-1345 (RSV)', event: 'PDUFA date', type: 'approval', note: 'High stakes RSV market' },
 ];
+
+// ─── Europe PMC fetch (via server proxy to avoid CORS) ───────────────────────
+async function fetchEuropePMC(query, rows = 10) {
+  try {
+    const url = `/api/europepmc?query=${encodeURIComponent(query)}&rows=${rows}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Proxy error ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.error('fetchEuropePMC error:', e);
+    return [];
+  }
+}
+
+function matchesTopic(pub, topicKey) {
+  if (!topicKey) return true;
+  const topic = TOPIC_FILTERS.find(t => t.key === topicKey);
+  if (!topic || !topic.keywords) return true;
+  const haystack = ((pub.title || '') + ' ' + (pub.journalTitle || '') + ' ' + (pub.abstract || '')).toLowerCase();
+  return topic.keywords.some(kw => haystack.includes(kw));
+}
 
 function tagColor(tag) {
   if (!tag) return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
@@ -37,13 +113,12 @@ function tagColor(tag) {
   if (t.includes('regulat') || t.includes('fda')) return { bg: 'rgba(29,78,216,0.07)', color: '#1d4ed8', border: 'rgba(29,78,216,0.2)' };
   if (t.includes('partner') || t.includes('deal')) return { bg: 'rgba(161,98,7,0.07)', color: '#a16207', border: 'rgba(161,98,7,0.2)' };
   if (t.includes('conference')) return { bg: 'rgba(190,18,60,0.07)', color: '#be123c', border: 'rgba(190,18,60,0.2)' };
-  if (t.includes('finance')) return { bg: 'rgba(21,128,61,0.07)', color: '#166534', border: 'rgba(21,128,61,0.2)' };
   return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
 }
 
 function stageBadge(stage) {
   if (stage === 'Commercial') return 'green';
-  if (stage.includes('Phase')) return 'amber';
+  if (stage && stage.includes('Phase')) return 'amber';
   if (stage === 'Platform') return 'blue';
   return 'purple';
 }
@@ -56,12 +131,6 @@ function fdaBadge(type) {
 
 const s = {
   app: { maxWidth: 1400, margin: '0 auto', padding: '2rem 2.5rem', minHeight: '100vh', background: '#fefcf9' },
-  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' },
-  title: { fontSize: 22, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px', fontFamily: "'Georgia', serif" },
-  subtitle: { fontSize: 12, color: '#888', marginTop: 2, letterSpacing: '0.3px' },
-  liveBadge: { fontSize: 11, padding: '4px 10px', borderRadius: 20, background: 'rgba(22,163,74,0.1)', color: '#16a34a', border: '0.5px solid rgba(22,163,74,0.3)', fontWeight: 600 },
-  tabs: { display: 'flex', gap: 2, borderBottom: '2px solid #1a1a1a', marginBottom: '1.75rem' },
-  tab: (active) => ({ padding: '10px 18px', fontSize: 13, cursor: 'pointer', border: 'none', background: 'none', color: active ? '#1a1a1a' : '#888', borderBottom: active ? '3px solid #c8102e' : '3px solid transparent', marginBottom: -2, fontWeight: active ? 700 : 400, transition: 'color 0.15s', letterSpacing: '0.3px', fontFamily: "'Georgia', serif" }),
   card: { background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '1rem 1.25rem', marginBottom: 10 },
   grid4: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px,1fr))', gap: 10, marginBottom: '1.25rem' },
   metric: { background: '#fff', borderRadius: 8, padding: '12px 14px', border: '1px solid #e5e0d8' },
@@ -101,10 +170,6 @@ const np = {
   featuredHeadline: { fontSize: 34, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Georgia', serif" },
   featuredByline: { fontSize: 11, color: '#777', marginBottom: 10, letterSpacing: '0.3px', fontFamily: "'DM Mono', monospace" },
   featuredSummary: { fontSize: 16, lineHeight: 1.75, color: '#333', fontFamily: "'Georgia', serif" },
-  secondaryGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1.25rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' },
-  secondaryHeadline: { fontSize: 15, fontWeight: 700, lineHeight: 1.3, color: '#111', marginBottom: 6, fontFamily: "'Georgia', serif" },
-  secondarySource: { fontSize: 11, color: '#777', fontFamily: "'DM Mono', monospace", marginBottom: 6 },
-  secondaryBody: { fontSize: 13, lineHeight: 1.65, color: '#444', fontFamily: "'Georgia', serif" },
   tagPill: (tag) => {
     const c = tagColor(tag);
     return { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3, background: c.bg, color: c.color, border: `1px solid ${c.border}`, marginBottom: 8, fontFamily: "'DM Mono', monospace" };
@@ -160,53 +225,406 @@ async function callClaude(prompt) {
   return data.content?.[0]?.text || 'Could not generate response.';
 }
 
-// ─── Analyst Rating Bar (Google Finance style) ───────────────────────────────
+// ─── Publication Card ─────────────────────────────────────────────────────────
+function PubCard({ pub, companyName, showCompany }) {
+  const [expanded, setExpanded] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+  const [loadingAI, setLoadingAI] = useState(false);
+  const badge = getSourceBadge(pub);
+  const congress = detectCongress(pub);
+  const isConference = congress !== null || (pub.pubType || '').toLowerCase().includes('conference') || (pub.pubType || '').toLowerCase().includes('abstract');
+
+  const doi = pub.doi;
+  const pubLink = doi
+    ? `https://doi.org/${doi}`
+    : pub.pmid
+    ? `https://pubmed.ncbi.nlm.nih.gov/${pub.pmid}/`
+    : null;
+
+  const handleAI = async () => {
+    if (aiSummary) return;
+    setLoadingAI(true);
+    try {
+      const text = await callClaude(
+        `You are a clinical data expert and biotech analyst. In 3 concise sentences, summarize the key findings and clinical significance of this publication for a pharma professional: "${pub.title}". Journal: ${pub.journalTitle || 'N/A'}. Be specific, avoid hedging, focus on what matters clinically or commercially.`
+      );
+      setAiSummary(text);
+    } catch {
+      setAiSummary('Could not generate summary.');
+    }
+    setLoadingAI(false);
+  };
+
+  return (
+    <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: 10, transition: 'box-shadow 0.15s' }}
+      onMouseOver={e => e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'}
+      onMouseOut={e => e.currentTarget.style.boxShadow = 'none'}
+    >
+      {/* Top row: badges + date */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+        {/* Congress / Journal badge */}
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontFamily: "'DM Mono', monospace" }}>
+          {isConference ? '🎤 ' : '📄 '}{badge.label}
+        </span>
+        {/* Publication type */}
+        {isConference && (
+          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(190,18,60,0.07)', color: '#be123c', border: '1px solid rgba(190,18,60,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600, letterSpacing: '0.5px' }}>
+            CONGRESS
+          </span>
+        )}
+        {/* Company tag (only in section 2) */}
+        {showCompany && companyName && (
+          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>
+            {companyName}
+          </span>
+        )}
+        {pub.isOpenAccess && (
+          <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(21,128,61,0.07)', color: '#15803d', border: '0.5px solid rgba(21,128,61,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>
+            OA
+          </span>
+        )}
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>
+          {pub.pubDate || pub.pubYear || ''}
+        </span>
+      </div>
+
+      {/* Title */}
+      <p style={{ fontSize: 14, fontWeight: 600, color: '#111', lineHeight: 1.4, margin: '0 0 6px 0', fontFamily: "'Georgia', serif", cursor: pubLink ? 'pointer' : 'default' }}
+        onClick={() => pubLink && window.open(pubLink, '_blank')}
+      >
+        {pub.title}
+        {pubLink && <span style={{ color: '#c8102e', fontSize: 11, marginLeft: 6, fontFamily: "'DM Mono', monospace" }}>↗</span>}
+      </p>
+
+      {/* Authors + journal */}
+      <div style={{ fontSize: 11, color: '#888', fontFamily: "'DM Mono', monospace", marginBottom: 8 }}>
+        {pub.authors && <span>{pub.authors.split(',').slice(0,3).join(', ')}{pub.authors.split(',').length > 3 ? ' et al.' : ''}</span>}
+        {pub.journalTitle && <span style={{ marginLeft: 8, color: '#bbb' }}>· {pub.journalTitle}</span>}
+        {pub.citedByCount > 0 && <span style={{ marginLeft: 8, color: '#aaa' }}>· {pub.citedByCount} citations</span>}
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <button
+          style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }}
+          onClick={handleAI}
+        >
+          {loadingAI ? <><Spinner />Analyzing…</> : aiSummary ? '✓ Analysis' : 'AI analysis →'}
+        </button>
+        {pub.abstract && (
+          <button
+            style={{ ...s.btnSm, fontSize: 11 }}
+            onClick={() => setExpanded(x => !x)}
+          >
+            {expanded ? 'Hide abstract' : 'Abstract ↓'}
+          </button>
+        )}
+        {pubLink && (
+          <a href={pubLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>
+            Full text ↗
+          </a>
+        )}
+      </div>
+
+      {/* Abstract */}
+      {expanded && pub.abstract && (
+        <div style={{ marginTop: 10, fontSize: 12, color: '#444', lineHeight: 1.7, fontFamily: "'Georgia', serif", background: '#faf8f4', borderRadius: 6, padding: '10px 14px', border: '1px solid #e5e0d8' }}>
+          {pub.abstract}
+        </div>
+      )}
+
+      {/* AI summary */}
+      {aiSummary && (
+        <div style={{ ...np.npAiBox, marginTop: 10, fontSize: 12 }}>
+          {aiSummary}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Publications Tab ─────────────────────────────────────────────────────────
+function PublicationsTab({ watchlist }) {
+  const [topicFilter, setTopicFilter] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [pubTypeFilter, setPubTypeFilter] = useState('all'); // all | journal | congress
+  const [watchlistPubs, setWatchlistPubs] = useState([]);
+  const [otherPubs, setOtherPubs] = useState([]);
+  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
+  const [loadingOther, setLoadingOther] = useState(false);
+  const [fetchedOnce, setFetchedOnce] = useState(false);
+  const [activeSection, setActiveSection] = useState('watchlist'); // 'watchlist' | 'other'
+
+  const fetchPublications = useCallback(async () => {
+    if (fetchedOnce) return;
+    setFetchedOnce(true);
+    setLoadingWatchlist(true);
+    setLoadingOther(true);
+
+    // Section 1: watchlist companies
+    const watchlistNames = watchlist.map(s => s.name);
+    const wResults = [];
+    for (const name of watchlistNames) {
+      const pubs = await fetchEuropePMC(`"${name}" AND (clinical trial OR phase OR cancer OR therapy OR treatment)`, 8);
+      pubs.forEach(p => wResults.push({ ...p, _company: name }));
+    }
+    // Sort by date desc
+    wResults.sort((a, b) => (b.pubDate || '').localeCompare(a.pubDate || ''));
+    setWatchlistPubs(wResults);
+    setLoadingWatchlist(false);
+
+    // Section 2: other companies
+    const oResults = [];
+    for (const co of OTHER_COMPANIES) {
+      const pubs = await fetchEuropePMC(`"${co.query}" AND (clinical trial OR phase OR cancer OR therapy OR treatment)`, 5);
+      pubs.forEach(p => oResults.push({ ...p, _company: co.name }));
+    }
+    oResults.sort((a, b) => (b.pubDate || '').localeCompare(a.pubDate || ''));
+    setOtherPubs(oResults);
+    setLoadingOther(false);
+  }, [watchlist, fetchedOnce]);
+
+  React.useEffect(() => {
+    fetchPublications();
+  }, [fetchPublications]);
+
+  const applyFilters = (pubs) => {
+    return pubs.filter(pub => {
+      // Topic
+      if (!matchesTopic(pub, topicFilter)) return false;
+      // Type
+      if (pubTypeFilter === 'congress') {
+        const isCong = detectCongress(pub) !== null || (pub.pubType || '').toLowerCase().includes('conference') || (pub.pubType || '').toLowerCase().includes('abstract');
+        if (!isCong) return false;
+      }
+      if (pubTypeFilter === 'journal') {
+        const isCong = detectCongress(pub) !== null;
+        if (isCong) return false;
+      }
+      // Search text
+      if (searchText) {
+        const hay = ((pub.title || '') + ' ' + (pub.authors || '') + ' ' + (pub.journalTitle || '') + ' ' + (pub._company || '')).toLowerCase();
+        if (!hay.includes(searchText.toLowerCase())) return false;
+      }
+      return true;
+    });
+  };
+
+  const filteredWatchlist = applyFilters(watchlistPubs);
+  const filteredOther = applyFilters(otherPubs);
+  const activePubs = activeSection === 'watchlist' ? filteredWatchlist : filteredOther;
+  const activeLoading = activeSection === 'watchlist' ? loadingWatchlist : loadingOther;
+
+  const totalWatchlist = watchlistPubs.length;
+  const totalOther = otherPubs.length;
+  const congressCount = (activeSection === 'watchlist' ? watchlistPubs : otherPubs).filter(p => detectCongress(p) !== null).length;
+
+  return (
+    <div>
+      {/* Header bar */}
+      <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>
+          Scientific Publications & Congress Abstracts
+        </span>
+        <span style={{ fontSize: 10, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>
+          via Europe PMC · PubMed · Preprints
+        </span>
+      </div>
+
+      {/* Metrics */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }}>
+        {[
+          { label: 'Watchlist pubs', val: loadingWatchlist ? '…' : totalWatchlist, color: '#1a1a1a' },
+          { label: 'Other sector', val: loadingOther ? '…' : totalOther, color: '#1a1a1a' },
+          { label: 'Congress abstracts', val: activeLoading ? '…' : congressCount, color: '#c8102e' },
+          { label: 'Showing', val: activeLoading ? '…' : activePubs.length, color: '#1d4ed8' },
+        ].map(m => (
+          <div key={m.label} style={s.metric}>
+            <div style={s.metricLabel}>{m.label}</div>
+            <div style={{ ...s.metricVal, color: m.color, fontSize: 26 }}>{m.val}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Section toggle */}
+      <div style={{ display: 'flex', gap: 0, marginBottom: '1.25rem', background: '#f5f2ed', borderRadius: 8, padding: 4, width: 'fit-content' }}>
+        {[
+          { key: 'watchlist', label: '📌 My Watchlist', count: filteredWatchlist.length },
+          { key: 'other', label: '🌐 Sector (Other)', count: filteredOther.length },
+        ].map(sec => (
+          <button
+            key={sec.key}
+            onClick={() => setActiveSection(sec.key)}
+            style={{
+              padding: '8px 18px',
+              borderRadius: 6,
+              border: 'none',
+              background: activeSection === sec.key ? '#fff' : 'transparent',
+              color: activeSection === sec.key ? '#1a1a1a' : '#888',
+              fontWeight: activeSection === sec.key ? 700 : 400,
+              fontSize: 12,
+              cursor: 'pointer',
+              fontFamily: "'DM Mono', monospace",
+              letterSpacing: '0.3px',
+              boxShadow: activeSection === sec.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              transition: 'all 0.15s',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {sec.label}
+            <span style={{ marginLeft: 6, fontSize: 10, color: activeSection === sec.key ? '#c8102e' : '#bbb', fontFamily: "'DM Mono', monospace" }}>
+              ({sec.count})
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── Filter bar ── */}
+      <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
+        {/* Topic pills */}
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Topic area</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {TOPIC_FILTERS.map(t => (
+              <button
+                key={t.key}
+                onClick={() => setTopicFilter(t.key)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: 20,
+                  border: topicFilter === t.key ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4',
+                  background: topicFilter === t.key ? '#1a1a1a' : 'transparent',
+                  color: topicFilter === t.key ? '#fff' : '#555',
+                  fontSize: 11,
+                  fontWeight: topicFilter === t.key ? 600 : 400,
+                  cursor: 'pointer',
+                  fontFamily: "'DM Mono', monospace",
+                  transition: 'all 0.15s',
+                  whiteSpace: 'nowrap',
+                }}
+              >{t.label}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Type filter */}
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Publication type</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[
+              { key: 'all', label: 'All' },
+              { key: 'congress', label: '🎤 Congresses only' },
+              { key: 'journal', label: '📄 Journals only' },
+            ].map(t => (
+              <button
+                key={t.key}
+                onClick={() => setPubTypeFilter(t.key)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: 20,
+                  border: pubTypeFilter === t.key ? '1.5px solid #c8102e' : '1px solid #d1ccc4',
+                  background: pubTypeFilter === t.key ? 'rgba(200,16,46,0.07)' : 'transparent',
+                  color: pubTypeFilter === t.key ? '#c8102e' : '#555',
+                  fontSize: 11,
+                  fontWeight: pubTypeFilter === t.key ? 700 : 400,
+                  cursor: 'pointer',
+                  fontFamily: "'DM Mono', monospace",
+                  transition: 'all 0.15s',
+                  whiteSpace: 'nowrap',
+                }}
+              >{t.label}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Text search */}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            style={{ ...np.filterInput, fontSize: 12 }}
+            value={searchText}
+            onChange={e => setSearchText(e.target.value)}
+            placeholder="Search by title, author, company…"
+          />
+          {searchText && <button style={s.btnSm} onClick={() => setSearchText('')}>✕</button>}
+        </div>
+      </div>
+
+      {/* ── Results ── */}
+      {activeLoading && (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
+          <Spinner />
+          <span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace" }}>
+            Fetching publications from Europe PMC…
+          </span>
+        </div>
+      )}
+
+      {!activeLoading && activePubs.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: "'DM Mono', monospace" }}>
+          No publications found for current filters.
+        </div>
+      )}
+
+      {!activeLoading && activePubs.length > 0 && (
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
+            {activeSection === 'watchlist' ? 'Publications from your watchlist companies' : 'Publications from sector leaders'}
+            {' '}· {activePubs.length} results
+          </div>
+
+          {activePubs.map((pub, i) => (
+            <PubCard
+              key={pub.id || i}
+              pub={pub}
+              companyName={pub._company}
+              showCompany={true}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Footer note */}
+      <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace", lineHeight: 1.6 }}>
+        Data sourced from <strong style={{ color: '#555' }}>Europe PMC</strong> (covers PubMed, Medline, preprints, and congress abstracts from ASCO, ESMO, EHA, ASH, AACR and others).
+        Publications are retrieved in real time. Congress abstracts may appear as preprints or supplemental issues.
+        <a href="https://europepmc.org" target="_blank" rel="noopener noreferrer" style={{ color: '#c8102e', marginLeft: 6, textDecoration: 'none' }}>europepmc.org ↗</a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Analyst Rating Bar ───────────────────────────────────────────────────────
 function AnalystRatingBar({ buy, hold, sell }) {
   const total = buy + hold + sell;
   if (total === 0) return null;
   const buyPct = Math.round((buy / total) * 100);
   const holdPct = Math.round((hold / total) * 100);
   const sellPct = 100 - buyPct - holdPct;
-
-  // Determine overall verdict
-  let verdict = 'Hold';
-  let verdictColor = '#a16207';
+  let verdict = 'Hold', verdictColor = '#a16207';
   if (buyPct >= 60) { verdict = 'Strong Buy'; verdictColor = '#15803d'; }
   else if (buyPct >= 45) { verdict = 'Buy'; verdictColor = '#16a34a'; }
   else if (sellPct >= 45) { verdict = 'Strong Sell'; verdictColor = '#c8102e'; }
   else if (sellPct >= 30) { verdict = 'Sell'; verdictColor = '#dc2626'; }
-
   return (
     <div style={{ marginTop: 14 }}>
-      {/* Verdict */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>Analyst Consensus</span>
         <span style={{ fontSize: 13, fontWeight: 700, color: verdictColor, fontFamily: "'DM Mono', monospace" }}>{verdict}</span>
       </div>
-
-      {/* Stacked bar */}
       <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
         <div style={{ width: `${buyPct}%`, background: '#16a34a', transition: 'width 0.6s ease' }} />
         <div style={{ width: `${holdPct}%`, background: '#d97706', transition: 'width 0.6s ease' }} />
         <div style={{ width: `${sellPct}%`, background: '#dc2626', transition: 'width 0.6s ease' }} />
       </div>
-
-      {/* Labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: "'DM Mono', monospace" }}>
         <span style={{ color: '#15803d' }}>Buy {buyPct}%</span>
         <span style={{ color: '#a16207' }}>Hold {holdPct}%</span>
         <span style={{ color: '#dc2626' }}>Sell {sellPct}%</span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", marginTop: 2 }}>
-        <span>{buy} analysts</span>
-        <span>{hold} analysts</span>
-        <span>{sell} analysts</span>
-      </div>
     </div>
   );
 }
 
-// ─── Price Target indicator ───────────────────────────────────────────────────
 function PriceTarget({ current, target }) {
   if (!target || !current || current === 0) return null;
   const upside = (((target - current) / current) * 100).toFixed(1);
@@ -227,7 +645,6 @@ function PriceTarget({ current, target }) {
   );
 }
 
-// ─── Investor Sentiment Pills ─────────────────────────────────────────────────
 function SentimentPills({ sentiments }) {
   if (!sentiments || sentiments.length === 0) return null;
   const colorMap = {
@@ -239,12 +656,12 @@ function SentimentPills({ sentiments }) {
   };
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-      {sentiments.map((s, i) => {
-        const tone = s.tone?.toLowerCase() || 'neutral';
+      {sentiments.map((sent, i) => {
+        const tone = sent.tone?.toLowerCase() || 'neutral';
         const c = colorMap[tone] || colorMap.neutral;
         return (
           <span key={i} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>
-            {c.icon} {s.label}
+            {c.icon} {sent.label}
           </span>
         );
       })}
@@ -252,7 +669,6 @@ function SentimentPills({ sentiments }) {
   );
 }
 
-// ─── Expandable Stock Card ────────────────────────────────────────────────────
 function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
   const [expanded, setExpanded] = useState(false);
   const [detail, setDetail] = useState(null);
@@ -266,20 +682,14 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
       try {
         const result = await onLoadDetail(stock, onStageUpdate);
         setDetail(result);
-      } catch (e) {
-        setDetail({ error: 'Could not load details.' });
-      }
+      } catch { setDetail({ error: 'Could not load details.' }); }
       setLoadingDetail(false);
     }
   };
 
   return (
     <div style={{ ...s.card, padding: 0, overflow: 'hidden', marginBottom: 12 }}>
-      {/* ── Header row (always visible) ── */}
-      <div
-        style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }} className="stock-card-header"
-        onClick={handleExpand}
-      >
+      <div style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }} className="stock-card-header" onClick={handleExpand}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
@@ -288,108 +698,53 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
               <span style={s.badge(stageBadge(stock.stage))}>{stock.stage}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {stock.price > 0 && (
-                <span style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', fontFamily: "'DM Mono', monospace" }}>
-                  ${stock.price.toFixed(2)}
-                </span>
-              )}
-              {stock.price > 0 && (
-                <span style={{ ...(stock.change >= 0 ? s.priceUp : s.priceDown), fontSize: 14, fontFamily: "'DM Mono', monospace" }}>
-                  {stock.change >= 0 ? '▲' : '▼'} {Math.abs(stock.change).toFixed(1)}%
-                </span>
-              )}
-              {stock.mktcap !== '—' && (
-                <span style={{ fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>Mkt cap: {stock.mktcap}</span>
-              )}
+              {stock.price > 0 && <span style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', fontFamily: "'DM Mono', monospace" }}>${stock.price.toFixed(2)}</span>}
+              {stock.price > 0 && <span style={{ ...(stock.change >= 0 ? s.priceUp : s.priceDown), fontSize: 14, fontFamily: "'DM Mono', monospace" }}>{stock.change >= 0 ? '▲' : '▼'} {Math.abs(stock.change).toFixed(1)}%</span>}
+              {stock.mktcap !== '—' && <span style={{ fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>Mkt cap: {stock.mktcap}</span>}
             </div>
             <p style={{ ...s.muted, marginTop: 6, fontSize: 12, lineHeight: 1.5 }}>{stock.note}</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <span style={{ fontSize: 18, color: '#bbb', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>⌄</span>
-            <button
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 20, lineHeight: 1, padding: '0 2px' }}
-              onClick={(e) => { e.stopPropagation(); onRemove(stock.ticker); }}
-            >×</button>
+            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 20, lineHeight: 1, padding: '0 2px' }} onClick={(e) => { e.stopPropagation(); onRemove(stock.ticker); }}>×</button>
           </div>
         </div>
       </div>
 
-      {/* ── Expanded detail panel ── */}
       {expanded && (
         <div style={{ padding: '16px 18px', background: '#fdfcfa' }} className="stock-card-detail">
-          {loadingDetail && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}>
-              <Spinner />Loading company intelligence…
-            </div>
-          )}
-
+          {loadingDetail && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}><Spinner />Loading company intelligence…</div>}
           {detail && !detail.error && (
             <div>
-              {/* About */}
-              {detail.about && (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>About</div>
-                  <p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0 }}>{detail.about}</p>
-                </div>
-              )}
-
+              {detail.about && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>About</div><p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0 }}>{detail.about}</p></div>}
               <hr style={s.divider} />
-
-              {/* Analyst Ratings */}
-              {detail.ratings && (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 4, fontFamily: "'DM Mono', monospace" }}>Analyst Ratings</div>
-                  <AnalystRatingBar buy={detail.ratings.buy} hold={detail.ratings.hold} sell={detail.ratings.sell} />
-                </div>
-              )}
-
-              {/* Price Target */}
-              {detail.priceTarget && stock.price > 0 && (
-                <div style={{ marginBottom: 16 }}>
-                  <PriceTarget current={stock.price} target={detail.priceTarget} />
-                </div>
-              )}
-
+              {detail.ratings && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 4, fontFamily: "'DM Mono', monospace" }}>Analyst Ratings</div><AnalystRatingBar buy={detail.ratings.buy} hold={detail.ratings.hold} sell={detail.ratings.sell} /></div>}
+              {detail.priceTarget && stock.price > 0 && <div style={{ marginBottom: 16 }}><PriceTarget current={stock.price} target={detail.priceTarget} /></div>}
               <hr style={s.divider} />
-
-              {/* Investor Sentiment */}
               {detail.sentiments && detail.sentiments.length > 0 && (
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 6, fontFamily: "'DM Mono', monospace" }}>Investor Sentiment</div>
                   <SentimentPills sentiments={detail.sentiments} />
-                  {detail.sentimentSummary && (
-                    <p style={{ fontSize: 12, color: '#666', lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>{detail.sentimentSummary}</p>
-                  )}
+                  {detail.sentimentSummary && <p style={{ fontSize: 12, color: '#666', lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>{detail.sentimentSummary}</p>}
                 </div>
               )}
-
-              {/* Key Risks */}
               {detail.risks && detail.risks.length > 0 && (
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>Key Risks</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {detail.risks.map((r, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#555', lineHeight: 1.5 }}>
-                        <span style={{ color: '#c8102e', flexShrink: 0, marginTop: 1 }}>▸</span>
-                        <span>{r}</span>
-                      </div>
-                    ))}
+                    {detail.risks.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#555', lineHeight: 1.5 }}><span style={{ color: '#c8102e', flexShrink: 0, marginTop: 1 }}>▸</span><span>{r}</span></div>)}
                   </div>
                 </div>
               )}
             </div>
           )}
-
-          {detail?.error && (
-            <div style={{ color: '#c8102e', fontSize: 13 }}>{detail.error}</div>
-          )}
+          {detail?.error && <div style={{ color: '#c8102e', fontSize: 13 }}>{detail.error}</div>}
         </div>
       )}
     </div>
   );
 }
 
-// ─── Smart Search Bar with Finnhub live lookup ────────────────────────────────
 function SearchBar({ onAdd, watchlist }) {
   const [val, setVal] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -403,20 +758,11 @@ function SearchBar({ onAdd, watchlist }) {
     if (!query || query.length < 2) { setSuggestions([]); setShowSugg(false); return; }
     setSearching(true);
     try {
-      // Use Finnhub symbol search — same API key your /api/stocks uses
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
-      // data should be array of { ticker, name }
-      if (Array.isArray(data) && data.length > 0) {
-        setSuggestions(data.slice(0, 7));
-        setShowSugg(true);
-      } else {
-        setSuggestions([]);
-        setShowSugg(true); // still show "no results" state
-      }
-    } catch {
-      setSuggestions([]);
-    }
+      if (Array.isArray(data) && data.length > 0) { setSuggestions(data.slice(0, 7)); setShowSugg(true); }
+      else { setSuggestions([]); setShowSugg(true); }
+    } catch { setSuggestions([]); }
     setSearching(false);
   };
 
@@ -425,24 +771,13 @@ function SearchBar({ onAdd, watchlist }) {
     setVal(v);
     setError('');
     clearTimeout(debounceRef.current);
-    if (v.trim().length >= 2) {
-      debounceRef.current = setTimeout(() => searchTickers(v.trim()), 350);
-    } else {
-      setSuggestions([]);
-      setShowSugg(false);
-    }
+    if (v.trim().length >= 2) debounceRef.current = setTimeout(() => searchTickers(v.trim()), 350);
+    else { setSuggestions([]); setShowSugg(false); }
   };
 
   const handleSelect = async (ticker, name) => {
-    setVal('');
-    setSuggestions([]);
-    setShowSugg(false);
-    setError('');
-    // Already in watchlist?
-    if (watchlist.find(s => s.ticker === ticker)) {
-      setError(`${ticker} is already in your watchlist.`);
-      return;
-    }
+    setVal(''); setSuggestions([]); setShowSugg(false); setError('');
+    if (watchlist.find(s => s.ticker === ticker)) { setError(`${ticker} is already in your watchlist.`); return; }
     setAdding(true);
     await onAdd(ticker, name);
     setAdding(false);
@@ -451,26 +786,17 @@ function SearchBar({ onAdd, watchlist }) {
   const handleManualAdd = async () => {
     const t = val.trim().toUpperCase();
     if (!t) return;
-    // Try to find it in current suggestions first
     const match = suggestions.find(s => s.ticker === t);
     if (match) { handleSelect(match.ticker, match.name); return; }
-    // Otherwise validate it exists via search
-    setAdding(true);
-    setError('');
+    setAdding(true); setError('');
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(t)}`);
       const data = await res.json();
       const exact = Array.isArray(data) && data.find(s => s.ticker === t);
-      if (exact) {
-        await handleSelect(exact.ticker, exact.name);
-      } else {
-        setError(`"${t}" not found. Check the ticker symbol and try again.`);
-      }
-    } catch {
-      setError('Search failed. Please try again.');
-    }
-    setAdding(false);
-    setVal('');
+      if (exact) await handleSelect(exact.ticker, exact.name);
+      else setError(`"${t}" not found. Check the ticker symbol and try again.`);
+    } catch { setError('Search failed. Please try again.'); }
+    setAdding(false); setVal('');
   };
 
   const tickerStyle = { fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)', flexShrink: 0 };
@@ -479,38 +805,15 @@ function SearchBar({ onAdd, watchlist }) {
     <div style={{ marginBottom: '1.25rem' }}>
       <div style={{ display: 'flex', gap: 8 }} className="search-row">
         <div style={{ position: 'relative', flex: 1 }}>
-          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: searching ? '#c8102e' : '#aaa', fontSize: 13, pointerEvents: 'none', transition: 'color 0.2s' }}>
-            {searching ? '⟳' : '🔍'}
-          </span>
-          <input
-            style={{ ...s.input, paddingLeft: 34, borderColor: error ? '#fca5a5' : undefined }}
-            value={val}
-            onChange={handleChange}
-            onKeyDown={e => e.key === 'Enter' && handleManualAdd()}
-            onBlur={() => setTimeout(() => setShowSugg(false), 200)}
-            onFocus={() => suggestions.length > 0 && setShowSugg(true)}
-            placeholder="Search by name or ticker: 'Moderna', 'CRSP', 'Gilead'…"
-            disabled={adding}
-          />
-
-          {/* Dropdown */}
+          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: searching ? '#c8102e' : '#aaa', fontSize: 13, pointerEvents: 'none' }}>{searching ? '⟳' : '🔍'}</span>
+          <input style={{ ...s.input, paddingLeft: 34, borderColor: error ? '#fca5a5' : undefined }} value={val} onChange={handleChange} onKeyDown={e => e.key === 'Enter' && handleManualAdd()} onBlur={() => setTimeout(() => setShowSugg(false), 200)} onFocus={() => suggestions.length > 0 && setShowSugg(true)} placeholder="Search by name or ticker: 'Moderna', 'CRSP', 'Gilead'…" disabled={adding} />
           {showSugg && (
             <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.1)', zIndex: 100, marginTop: 4, overflow: 'hidden' }}>
-              {suggestions.length === 0 && !searching && (
-                <div style={{ padding: '12px 14px', fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>
-                  No results found for "{val}"
-                </div>
-              )}
+              {suggestions.length === 0 && !searching && <div style={{ padding: '12px 14px', fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>No results for "{val}"</div>}
               {suggestions.map((item, i) => {
                 const alreadyIn = watchlist.find(s => s.ticker === item.ticker);
                 return (
-                  <div
-                    key={item.ticker}
-                    style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1, background: 'transparent', transition: 'background 0.1s' }}
-                    onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)}
-                    onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }}
-                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                  >
+                  <div key={item.ticker} style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1, background: 'transparent', transition: 'background 0.1s' }} onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)} onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                     <span style={tickerStyle}>{item.ticker}</span>
                     <span style={{ fontSize: 13, color: '#333', flex: 1 }}>{item.name}</span>
                     {alreadyIn && <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>already added</span>}
@@ -521,22 +824,11 @@ function SearchBar({ onAdd, watchlist }) {
             </div>
           )}
         </div>
-
-        <button
-          style={{ ...s.btn, minWidth: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: adding ? 0.7 : 1 }}
-          onClick={handleManualAdd}
-          disabled={adding || !val.trim()}
-        >
+        <button style={{ ...s.btn, minWidth: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: adding ? 0.7 : 1 }} onClick={handleManualAdd} disabled={adding || !val.trim()}>
           {adding ? <><Spinner />Adding…</> : 'Add →'}
         </button>
       </div>
-
-      {/* Error message */}
-      {error && (
-        <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#dc2626', fontFamily: "'DM Mono', monospace" }}>
-          <span>✕</span> {error}
-        </div>
-      )}
+      {error && <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#dc2626', fontFamily: "'DM Mono', monospace" }}><span>✕</span> {error}</div>}
     </div>
   );
 }
@@ -559,7 +851,7 @@ export default function App() {
         const res = await fetch('/api/rss');
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) setRealNews(data);
-      } catch (e) { console.error(e); }
+      } catch { }
       setLoadingNews(false);
     };
     fetchNews();
@@ -571,7 +863,7 @@ export default function App() {
         const res = await fetch('/api/press');
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) setPressReleases(data);
-      } catch (e) { console.error(e); }
+      } catch { }
     };
     fetchPress();
   }, []);
@@ -579,17 +871,10 @@ export default function App() {
   React.useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const res = await fetch('/api/stocks', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tickers: INITIAL_WATCHLIST.map(s => s.ticker) }),
-        });
+        const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers: INITIAL_WATCHLIST.map(s => s.ticker) }) });
         const data = await res.json();
-        setWatchlist(prev => prev.map(stock => {
-          const updated = data.find(d => d.ticker === stock.ticker);
-          return updated ? { ...stock, ...updated } : stock;
-        }));
-      } catch (e) { console.error(e); }
+        setWatchlist(prev => prev.map(stock => { const updated = data.find(d => d.ticker === stock.ticker); return updated ? { ...stock, ...updated } : stock; }));
+      } catch { }
     };
     fetchPrices();
   }, []);
@@ -598,27 +883,17 @@ export default function App() {
     if (!val || watchlist.find(s => s.ticker === val)) return;
     setWatchlist(prev => [...prev, { ticker: val, name: knownName || val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading price data…' }]);
     try {
-      const res = await fetch('/api/stocks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tickers: [val] }),
-      });
+      const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers: [val] }) });
       const data = await res.json();
-      if (data[0]) {
-        setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0], name: data[0].name || knownName || val } : s));
-      } else {
-        setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Price data unavailable.' } : s));
-      }
-    } catch (e) {
+      if (data[0]) setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0], name: data[0].name || knownName || val } : s));
+      else setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Price data unavailable.' } : s));
+    } catch {
       setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Could not fetch price data.' } : s));
     }
   }, [watchlist]);
 
   const removeTicker = (ticker) => setWatchlist(prev => prev.filter(s => s.ticker !== ticker));
-
-  const updateStage = useCallback((ticker, stage) => {
-    setWatchlist(prev => prev.map(s => s.ticker === ticker ? { ...s, stage } : s));
-  }, []);
+  const updateStage = useCallback((ticker, stage) => { setWatchlist(prev => prev.map(s => s.ticker === ticker ? { ...s, stage } : s)); }, []);
 
   const getSummary = useCallback(async (key, prompt) => {
     if (summaries[key]) return;
@@ -630,75 +905,49 @@ export default function App() {
     setLoading(prev => ({ ...prev, [key]: false }));
   }, [summaries]);
 
-  // Load detailed company intelligence via Claude
   const loadStockDetail = useCallback(async (stock, onStageUpdate) => {
     const prompt = `You are a financial data assistant. Return ONLY valid JSON, no markdown, no explanation.
-
 For the biotech/pharma company ${stock.ticker} (${stock.name}), return this exact JSON structure:
-
 {
   "stage": "one of exactly: Preclinical | Phase 1 | Phase 1/2 | Phase 2 | Phase 2/3 | Phase 3 | Commercial | Platform | Private | Unknown",
-  "about": "2-3 sentence description of what the company does, their main technology platform, and lead programs",
-  "ratings": {
-    "buy": <integer, estimated number of analysts with Buy rating, 0 if private or unknown>,
-    "hold": <integer, estimated number of analysts with Hold rating, 0 if private or unknown>,
-    "sell": <integer, estimated number of analysts with Sell rating, 0 if private or unknown>
-  },
-  "priceTarget": <number, consensus 12-month price target in USD, or null if private/not applicable>,
-  "sentiments": [
-    { "label": "short sentiment tag", "tone": "bullish|bearish|neutral|cautious|speculative" },
-    { "label": "another tag", "tone": "bullish|bearish|neutral|cautious|speculative" },
-    { "label": "another tag", "tone": "bullish|bearish|neutral|cautious|speculative" }
-  ],
-  "sentimentSummary": "1-2 sentence summary of what investors are saying about this company right now",
-  "risks": [
-    "Key risk 1",
-    "Key risk 2",
-    "Key risk 3"
-  ]
+  "about": "2-3 sentence description",
+  "ratings": { "buy": 0, "hold": 0, "sell": 0 },
+  "priceTarget": null,
+  "sentiments": [{ "label": "tag", "tone": "bullish|bearish|neutral|cautious|speculative" }],
+  "sentimentSummary": "1-2 sentences",
+  "risks": ["Risk 1", "Risk 2", "Risk 3"]
 }
-
-Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most accurate clinical stage from the company's actual pipeline status. Return ONLY the JSON object.`;
-
+Return ONLY the JSON object.`;
     const raw = await callClaude(prompt);
     try {
       const clean = raw.replace(/```json|```/g, '').trim();
       const parsed = JSON.parse(clean);
-      // Update stage in watchlist immediately if we got one
-      if (parsed.stage && parsed.stage !== 'Unknown' && onStageUpdate) {
-        onStageUpdate(stock.ticker, parsed.stage);
-      }
+      if (parsed.stage && parsed.stage !== 'Unknown' && onStageUpdate) onStageUpdate(stock.ticker, parsed.stage);
       return parsed;
-    } catch {
-      return { error: 'Could not parse company data.' };
-    }
+    } catch { return { error: 'Could not parse company data.' }; }
   }, []);
 
   const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
 
-  // Category → keywords to match against tag + headline
   const CATEGORY_KEYWORDS = {
-    'Pharma':          ['pharma', 'drug', 'medicine', 'therapeutic'],
-    'Biotech':         ['biotech', 'biologic', 'biosimilar', 'gene', 'cell therapy', 'crispr', 'mrna'],
-    'FDA':             ['fda', 'regulatory', 'approval', 'pdufa', 'ema', 'nda', 'bla'],
+    'Pharma': ['pharma', 'drug', 'medicine', 'therapeutic'],
+    'Biotech': ['biotech', 'biologic', 'biosimilar', 'gene', 'cell therapy', 'crispr', 'mrna'],
+    'FDA': ['fda', 'regulatory', 'approval', 'pdufa', 'ema', 'nda', 'bla'],
     'Clinical Trials': ['trial', 'phase', 'clinical', 'readout', 'efficacy', 'endpoint'],
-    'Deals':           ['deal', 'partner', 'acqui', 'merger', 'licens', 'collaboration'],
-    'Gene Therapy':    ['gene therapy', 'gene edit', 'crispr', 'aav', 'base edit', 'prime edit'],
-    'AI':              ['artificial intel', ' ai ', 'machine learn', 'algorithm', 'digital', 'data-driven'],
-    'Oncology':        ['cancer', 'oncol', 'tumor', 'immuno-oncol', 'checkpoint', 'car-t'],
-    'Finance':         ['ipo', 'funding', 'invest', 'earning', 'revenue', 'financ', 'stock'],
+    'Deals': ['deal', 'partner', 'acqui', 'merger', 'licens', 'collaboration'],
+    'Gene Therapy': ['gene therapy', 'gene edit', 'crispr', 'aav', 'base edit', 'prime edit'],
+    'AI': ['artificial intel', ' ai ', 'machine learn', 'algorithm', 'digital', 'data-driven'],
+    'Oncology': ['cancer', 'oncol', 'tumor', 'immuno-oncol', 'checkpoint', 'car-t'],
+    'Finance': ['ipo', 'funding', 'invest', 'earning', 'revenue', 'financ', 'stock'],
   };
 
   const filteredNews = newsSource.filter(n => {
-    // Category filter
     if (categoryFilter) {
       const kws = CATEGORY_KEYWORDS[categoryFilter] || [];
       const haystack = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
-      const matchesCat = kws.some(kw => haystack.includes(kw)) ||
-        (n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()));
+      const matchesCat = kws.some(kw => haystack.includes(kw)) || (n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()));
       if (!matchesCat) return false;
     }
-    // Text search
     if (newsFilter) {
       const haystack = (n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '')).toLowerCase();
       if (!haystack.includes(newsFilter.toLowerCase())) return false;
@@ -722,59 +971,22 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
         .np-secondary-card:hover { background: #faf8f4 !important; }
-
-        /* ── Mobile responsive ── */
         @media (max-width: 600px) {
           .app-root { padding: 1rem !important; }
-
-          /* Header */
-          .app-header { flex-direction: column; align-items: flex-start !important; gap: 8px; margin-bottom: 1rem !important; }
-          .app-title { font-size: 18px !important; }
-
-          /* Tabs */
-          .app-tabs button { padding: 8px 12px !important; font-size: 12px !important; }
-
-          /* Top story: stack vertically on mobile */
-          .featured-grid {
-            display: flex !important;
-            flex-direction: column-reverse !important;
-            gap: 1rem !important;
-          }
-          .featured-headline { font-size: 20px !important; line-height: 1.25 !important; }
-          .featured-image { width: 100% !important; height: 180px !important; }
-
-          /* Secondary grid: single column */
+          .app-header { flex-direction: column; align-items: flex-start !important; gap: 8px; }
+          .app-tabs button { padding: 8px 10px !important; font-size: 9px !important; }
+          .featured-grid { display: flex !important; flex-direction: column-reverse !important; }
           .secondary-grid { grid-template-columns: 1fr !important; }
-
-          /* Metrics grid: 2 cols */
           .metrics-grid { grid-template-columns: 1fr 1fr !important; }
-
-          /* Stock card padding */
-          .stock-card-header { padding: 12px 14px !important; }
-          .stock-card-detail { padding: 12px 14px !important; }
-
-          /* Date bar smaller text */
-          .datebar-text { font-size: 10px !important; }
-
-          /* Search bar */
           .search-row { flex-direction: column !important; }
-          .search-row button { width: 100% !important; }
-
-          /* News layout: stack on mobile */
           .news-layout { grid-template-columns: 1fr !important; }
-
-          /* Filter pills: smaller on mobile */
-          .filter-pills button { padding: 4px 10px !important; font-size: 11px !important; }
         }
       `}</style>
 
       {/* ── CATALYST HEADER ── */}
       <div style={{ borderBottom: '1px solid #e0dbd3', marginBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1rem', borderBottom: '1px solid #ece7df' }} className="app-header">
-
-          {/* Left — mark + wordmark */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {/* EKG pulse mark — dark bg */}
             <div style={{ width: 44, height: 44, background: '#0f1923', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <svg width="32" height="22" viewBox="0 0 44 28" fill="none">
                 <polyline points="2,20 9,20 13,5 20,23 25,13 29,17 34,8 40,8" stroke="#c8102e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
@@ -782,19 +994,11 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                 <circle cx="13" cy="5" r="2.2" fill="#c8102e"/>
               </svg>
             </div>
-
-            {/* Wordmark */}
             <div>
-              <div style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 24, fontWeight: 400, letterSpacing: '-0.3px', color: '#1a1a1a', lineHeight: 1 }}>
-                Catalyst
-              </div>
-              <div style={{ fontSize: 9, color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", marginTop: 3 }}>
-                Biotech &amp; Pharma Intelligence
-              </div>
+              <div style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 24, fontWeight: 400, letterSpacing: '-0.3px', color: '#1a1a1a', lineHeight: 1 }}>Catalyst</div>
+              <div style={{ fontSize: 9, color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", marginTop: 3 }}>Biotech &amp; Pharma Intelligence</div>
             </div>
           </div>
-
-          {/* Right — date + live */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", letterSpacing: '0.5px', textTransform: 'uppercase' }}>
               {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
@@ -806,11 +1010,11 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
           </div>
         </div>
 
-        {/* Nav tabs */}
+        {/* Nav tabs — now includes Publications */}
         <div style={{ display: 'flex', gap: 0 }} className="app-tabs">
-          {['news', 'watchlist', 'fda'].map(t => (
+          {['news', 'watchlist', 'publications', 'fda'].map(t => (
             <button key={t} style={{
-              padding: '10px 22px',
+              padding: '10px 20px',
               fontSize: 10,
               cursor: 'pointer',
               border: 'none',
@@ -822,8 +1026,11 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
               textTransform: 'uppercase',
               fontFamily: "'DM Mono', monospace",
               transition: 'color 0.15s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
             }} onClick={() => setTab(t)}>
-              {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : 'FDA Calendar'}
+              {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : t === 'publications' ? <>Publications <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, background: tab === t ? 'rgba(200,16,46,0.12)' : 'rgba(100,100,100,0.1)', color: tab === t ? '#c8102e' : '#aaa', fontWeight: 700 }}>NEW</span></> : 'FDA Calendar'}
             </button>
           ))}
         </div>
@@ -834,135 +1041,81 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
       {/* ══════════════ NEWS TAB ══════════════ */}
       {tab === 'news' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '2rem', alignItems: 'flex-start' }} className="news-layout">
-        <div style={np.wrapper}>
-          <div style={np.datebar}>
-            <span style={np.datebarText}>{today}</span>
-            <span style={{ ...np.datebarText, color: '#c8102e' }}>
-              {filteredNews.length} {filteredNews.length === 1 ? 'story' : 'stories'}
-              {realNews.length > 0 ? ' · Live feed' : ' · Sample data'}
-            </span>
-          </div>
-
-          {/* ── Category filter pills ── */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: '1rem' }} className="filter-pills">
-            {['All', 'Pharma', 'Biotech', 'FDA', 'Clinical Trials', 'Deals', 'Gene Therapy', 'AI', 'Oncology', 'Finance'].map(cat => (
-              <button
-                key={cat}
-                onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)}
-                style={{
-                  padding: '5px 14px',
-                  borderRadius: 20,
-                  border: (categoryFilter === cat || (cat === 'All' && !categoryFilter))
-                    ? '1.5px solid #1a1a1a'
-                    : '1px solid #d1ccc4',
-                  background: (categoryFilter === cat || (cat === 'All' && !categoryFilter))
-                    ? '#1a1a1a'
-                    : 'transparent',
-                  color: (categoryFilter === cat || (cat === 'All' && !categoryFilter))
-                    ? '#fff'
-                    : '#555',
-                  fontSize: 12,
-                  fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400,
-                  cursor: 'pointer',
-                  fontFamily: "'DM Mono', monospace",
-                  letterSpacing: '0.2px',
-                  transition: 'all 0.15s',
-                  whiteSpace: 'nowrap',
-                }}
-              >{cat}</button>
-            ))}
-          </div>
-
-          {/* ── Keyword search ── */}
-          <div style={np.filterBar}>
-            <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or ticker…" />
-            {newsFilter && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setNewsFilter('')}>✕ Clear</button>}
-          </div>
-
-          {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading news…</div>}
-          {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>No stories match your filter.</div>}
-
-          {!loadingNews && featured && (
-            <div style={{ marginBottom: '1.5rem' }}>
-              <div style={np.sectionLabel}>Top Story</div>
-              <div style={np.featuredWrap} className="featured-grid">
-                <div>
-                  <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
-                  <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
-                  <div style={np.featuredByline}>
-
-                    {featured.source} · {featured.date}
-                    {featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}
-                  </div>
-                  {featured.summary && <p style={np.featuredSummary}>{featured.summary}</p>}
-                  <div style={{ marginTop: 14 }}>
-                    <button style={s.btn} onClick={() => getSummary(`news-0`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${featured.headline}". Context: ${featured.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
-                      {loading['news-0'] ? <><Spinner />Analyzing…</> : 'AI analysis →'}
-                    </button>
-                  </div>
-                  {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
-                </div>
-                <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
-                  <NewsImage photoKeyword={featured.photoKeyword} seed={0} height={200} />
-                </div>
-              </div>
+          <div style={np.wrapper}>
+            <div style={np.datebar}>
+              <span style={np.datebarText}>{today}</span>
+              <span style={{ ...np.datebarText, color: '#c8102e' }}>{filteredNews.length} {filteredNews.length === 1 ? 'story' : 'stories'}{realNews.length > 0 ? ' · Live feed' : ' · Sample data'}</span>
             </div>
-          )}
-
-          {!loadingNews && secondary.length > 0 && (
-            <div>
-              <div style={np.sectionLabel}>More Stories</div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {secondary.map((n, i) => {
-                  const idx = i + 1;
-                  return (
-                    <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start', transition: 'background 0.15s', borderRadius: 4 }}
-                      onMouseOver={e => e.currentTarget.style.background = '#faf8f5'}
-                      onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <div style={{ flexShrink: 0, width: 130, height: 90, borderRadius: 6, overflow: 'hidden' }}>
-                        <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={74} />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
-                          <span style={np.tagPill(n.tag)}>{n.tag}</span>
-                          <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{n.source} · {n.date}</span>
-                          {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
-                        </div>
-                        <p style={{ ...np.secondaryHeadline, fontSize: 17, margin: '0 0 6px 0' }}>{n.headline}</p>
-                        {n.summary && <p style={{ fontSize: 14, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
-                        <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${n.headline}". Context: ${n.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
-                          {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
-                        </button>
-                        {summaries[`news-${idx}`] && <div style={{ ...np.npAiBox, marginTop: 8 }}>{summaries[`news-${idx}`]}</div>}
-                      </div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: '1rem' }}>
+              {['All', 'Pharma', 'Biotech', 'FDA', 'Clinical Trials', 'Deals', 'Gene Therapy', 'AI', 'Oncology', 'Finance'].map(cat => (
+                <button key={cat} onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 20, border: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#1a1a1a' : 'transparent', color: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#fff' : '#555', fontSize: 12, fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s', whiteSpace: 'nowrap' }}>{cat}</button>
+              ))}
+            </div>
+            <div style={np.filterBar}>
+              <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or ticker…" />
+              {newsFilter && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setNewsFilter('')}>✕ Clear</button>}
+            </div>
+            {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading news…</div>}
+            {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>No stories match your filter.</div>}
+            {!loadingNews && featured && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={np.sectionLabel}>Top Story</div>
+                <div style={np.featuredWrap} className="featured-grid">
+                  <div>
+                    <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
+                    <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
+                    <div style={np.featuredByline}>{featured.source} · {featured.date}{featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}</div>
+                    {featured.summary && <p style={np.featuredSummary}>{featured.summary}</p>}
+                    <div style={{ marginTop: 14 }}>
+                      <button style={s.btn} onClick={() => getSummary('news-0', `You are a clinical data expert and biotech analyst. Explain this news in 3-4 sentences: "${featured.headline}". Context: ${featured.summary}. Be direct.`)}>
+                        {loading['news-0'] ? <><Spinner />Analyzing…</> : 'AI analysis →'}
+                      </button>
                     </div>
-                  );
-                })}
+                    {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
+                  </div>
+                  <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}><NewsImage photoKeyword={featured.photoKeyword} seed={0} height={200} /></div>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── Press Releases Sidebar ── */}
-        <div style={{ position: 'sticky', top: '1rem' }}>
+            )}
+            {!loadingNews && secondary.length > 0 && (
+              <div>
+                <div style={np.sectionLabel}>More Stories</div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {secondary.map((n, i) => {
+                    const idx = i + 1;
+                    return (
+                      <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start', transition: 'background 0.15s', borderRadius: 4 }} onMouseOver={e => e.currentTarget.style.background = '#faf8f5'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
+                        <div style={{ flexShrink: 0, width: 130, height: 90, borderRadius: 6, overflow: 'hidden' }}><NewsImage photoKeyword={n.photoKeyword} seed={idx} height={74} /></div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
+                            <span style={np.tagPill(n.tag)}>{n.tag}</span>
+                            <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{n.source} · {n.date}</span>
+                            {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
+                          </div>
+                          <p style={{ ...np.secondaryHeadline, fontSize: 17, margin: '0 0 6px 0' }}>{n.headline}</p>
+                          {n.summary && <p style={{ fontSize: 14, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
+                          <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `Explain this biotech news in 3-4 sentences: "${n.headline}". Context: ${n.summary}.`)}>
+                            {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
+                          </button>
+                          {summaries[`news-${idx}`] && <div style={{ ...np.npAiBox, marginTop: 8 }}>{summaries[`news-${idx}`]}</div>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Sidebar */}
+          <div style={{ position: 'sticky', top: '1rem' }}>
             <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>Company Announcements</div>
             </div>
-            {pressReleases.length === 0 && (
-              <div style={{ fontSize: 12, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>Loading…</div>
-            )}
+            {pressReleases.length === 0 && <div style={{ fontSize: 12, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>Loading…</div>}
             {pressReleases.map((pr, i) => (
               <div key={i} style={{ paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid #e5e0d8' }}>
-                <a
-                  href={pr.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 5px 0', fontFamily: "'Georgia', serif" }}>
-                    {pr.headline}
-                  </p>
+                <a href={pr.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 5px 0', fontFamily: "'Georgia', serif" }}>{pr.headline}</p>
                 </a>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace" }}>From {pr.company || pr.source}</span>
@@ -970,43 +1123,30 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                 </div>
               </div>
             ))}
-            {pressReleases.length > 0 && (
-              <a href="https://www.biopharmadive.com/press-release/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>View all press releases ↗</a>
-            )}
+          </div>
         </div>
-      </div>
       )}
 
       {/* ══════════════ WATCHLIST TAB ══════════════ */}
       {tab === 'watchlist' && (
         <div>
-          {/* Search bar */}
           <SearchBar onAdd={addTicker} watchlist={watchlist} />
-
-          {/* Metrics row */}
           <div style={s.grid4} className="metrics-grid">
             <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#1a1a1a' }}>{watchlist.length}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Gainers</div><div style={{ ...s.metricVal, color: '#34d399' }}>{gainers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#faa19b' }}>{losers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>FDA events (30d)</div><div style={{ ...s.metricVal, color: '#fbbf24' }}>4</div></div>
           </div>
-
-          {/* Hint */}
-          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
-            ↓ Click any card to expand company details, analyst ratings & investor sentiment
-          </div>
-
-          {/* Stock cards */}
+          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>↓ Click any card to expand company details, analyst ratings & investor sentiment</div>
           {watchlist.map((stock) => (
-            <StockCard
-              key={stock.ticker}
-              stock={stock}
-              onRemove={removeTicker}
-              onLoadDetail={loadStockDetail}
-              onStageUpdate={updateStage}
-            />
+            <StockCard key={stock.ticker} stock={stock} onRemove={removeTicker} onLoadDetail={loadStockDetail} onStageUpdate={updateStage} />
           ))}
         </div>
+      )}
+
+      {/* ══════════════ PUBLICATIONS TAB ══════════════ */}
+      {tab === 'publications' && (
+        <PublicationsTab watchlist={watchlist} />
       )}
 
       {/* ══════════════ FDA CALENDAR TAB ══════════════ */}
@@ -1017,15 +1157,12 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
             <div key={i} style={s.card}>
               <div style={s.fdaDate}>📅 {f.date}</div>
               <div style={{ ...s.rowBetween, marginBottom: 6 }}>
-                <div style={s.row}>
-                  <span style={s.ticker}>{f.ticker}</span>
-                  <span style={{ fontSize: 14, fontWeight: 500 }}>{f.drug}</span>
-                </div>
+                <div style={s.row}><span style={s.ticker}>{f.ticker}</span><span style={{ fontSize: 14, fontWeight: 500 }}>{f.drug}</span></div>
                 <span style={s.badge(fdaBadge(f.type))}>{f.event}</span>
               </div>
               <p style={s.muted}>{f.note}</p>
               <div style={{ marginTop: 10 }}>
-                <button style={s.btn} onClick={() => getSummary(`fda-${i}`, `You are a biotech investment analyst. In 3 sentences, explain what investors should know about the upcoming ${f.event} for ${f.drug} by ${f.ticker} on ${f.date}. Be specific about risks and upside. No disclaimers.`)}>
+                <button style={s.btn} onClick={() => getSummary(`fda-${i}`, `You are a biotech investment analyst. In 3 sentences, explain what investors should know about the upcoming ${f.event} for ${f.drug} by ${f.ticker} on ${f.date}. Be specific.`)}>
                   {loading[`fda-${i}`] ? <><Spinner />Loading...</> : 'Investor context →'}
                 </button>
               </div>
