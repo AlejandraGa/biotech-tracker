@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import CatalystCalendar from './CatalystCalendar';
 
 const DEFAULT_WATCHLIST = [
   { ticker: 'MRNA', name: 'Moderna', price: 0, change: 0, mktcap: '—', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
@@ -849,9 +850,9 @@ Return ONLY the JSON object.`;
           </div>
         </div>
         <div style={{ display: 'flex', gap: 0 }} className="app-tabs">
-          {['news', 'watchlist', 'publications', 'fda'].map(t => (
+          {['news', 'watchlist', 'publications', 'calendar', 'fda'].map(t => (
             <button key={t} style={{ padding: '10px 20px', fontSize: 10, cursor: 'pointer', border: 'none', background: 'none', color: tab === t ? '#1a1a1a' : '#aaa', borderBottom: tab === t ? '2px solid #c8102e' : '2px solid transparent', fontWeight: tab === t ? 600 : 400, letterSpacing: '1.8px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", transition: 'color 0.15s', display: 'flex', alignItems: 'center', gap: 5 }} onClick={() => setTab(t)}>
-              {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : t === 'publications' ? <>Publications <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, background: tab === t ? 'rgba(200,16,46,0.12)' : 'rgba(100,100,100,0.1)', color: tab === t ? '#c8102e' : '#aaa', fontWeight: 700 }}>NEW</span></> : 'FDA Calendar'}
+              {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : t === 'publications' ? <>Publications</> : t === 'calendar' ? <>Catalyst Cal <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, background: tab === t ? 'rgba(200,16,46,0.12)' : 'rgba(100,100,100,0.1)', color: tab === t ? '#c8102e' : '#aaa', fontWeight: 700 }}>NEW</span></> : 'FDA'}
             </button>
           ))}
         </div>
@@ -977,6 +978,9 @@ Return ONLY the JSON object.`;
 
       {/* ══ PUBLICATIONS ══ */}
       {tab === 'publications' && <PublicationsTab watchlist={watchlist} />}
+
+      {/* ══ CATALYST CALENDAR ══ */}
+      {tab === 'calendar' && <CatalystCalendar watchlist={watchlist} callClaude={callClaude} />}
 
       {/* ══ FDA ══ */}
       {tab === 'fda' && (
