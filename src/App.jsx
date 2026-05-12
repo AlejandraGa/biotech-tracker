@@ -893,11 +893,9 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
             </div>
           )}
         </div>
-      )}
 
-        </div>
-          {/* ── Press Releases Sidebar ── */}
-          <div style={{ position: 'sticky', top: '1rem' }}>
+        {/* ── Press Releases Sidebar ── */}
+        <div style={{ position: 'sticky', top: '1rem' }}>
             <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>Company Announcements</div>
             </div>
@@ -925,8 +923,8 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
             {pressReleases.length > 0 && (
               <a href="https://www.biopharmadive.com/press-release/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>View all press releases ↗</a>
             )}
-          </div>
         </div>
+      </div>
       )}
 
       {/* ══════════════ WATCHLIST TAB ══════════════ */}
