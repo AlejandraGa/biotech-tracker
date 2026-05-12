@@ -715,7 +715,9 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
   return (
     <div style={s.app} className="app-root">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         body { background: #fefcf9; margin: 0; }
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
@@ -766,21 +768,68 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
         }
       `}</style>
 
-      <div style={s.header} className="app-header">
-        <div>
-          <div style={s.title} className="app-title">Biotech & Pharma Tracker</div>
-          <div style={s.subtitle}>Follow your picks · News · FDA catalysts</div>
+      {/* ── CATALYST HEADER ── */}
+      <div style={{ borderBottom: '1px solid #e0dbd3', marginBottom: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1rem', borderBottom: '1px solid #ece7df' }} className="app-header">
+
+          {/* Left — mark + wordmark */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* EKG pulse mark — dark bg */}
+            <div style={{ width: 44, height: 44, background: '#0f1923', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="32" height="22" viewBox="0 0 44 28" fill="none">
+                <polyline points="2,20 9,20 13,5 20,23 25,13 29,17 34,8 40,8" stroke="#c8102e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <circle cx="20" cy="23" r="2.2" fill="#c8102e"/>
+                <circle cx="13" cy="5" r="2.2" fill="#c8102e"/>
+              </svg>
+            </div>
+
+            {/* Wordmark */}
+            <div>
+              <div style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 24, fontWeight: 400, letterSpacing: '-0.3px', color: '#1a1a1a', lineHeight: 1 }}>
+                Catalyst
+              </div>
+              <div style={{ fontSize: 9, color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", marginTop: 3 }}>
+                Biotech &amp; Pharma Intelligence
+              </div>
+            </div>
+          </div>
+
+          {/* Right — date + live */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, padding: '5px 12px', borderRadius: 3, background: 'rgba(22,163,74,0.07)', color: '#15803d', border: '0.5px solid rgba(22,163,74,0.2)', fontWeight: 700, fontFamily: "'DM Mono', monospace", letterSpacing: '1px' }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16a34a', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              LIVE
+            </div>
+          </div>
         </div>
-        <span style={s.liveBadge}>● Live</span>
+
+        {/* Nav tabs */}
+        <div style={{ display: 'flex', gap: 0 }} className="app-tabs">
+          {['news', 'watchlist', 'fda'].map(t => (
+            <button key={t} style={{
+              padding: '10px 22px',
+              fontSize: 10,
+              cursor: 'pointer',
+              border: 'none',
+              background: 'none',
+              color: tab === t ? '#1a1a1a' : '#aaa',
+              borderBottom: tab === t ? '2px solid #c8102e' : '2px solid transparent',
+              fontWeight: tab === t ? 600 : 400,
+              letterSpacing: '1.8px',
+              textTransform: 'uppercase',
+              fontFamily: "'DM Mono', monospace",
+              transition: 'color 0.15s',
+            }} onClick={() => setTab(t)}>
+              {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : 'FDA Calendar'}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div style={s.tabs} className="app-tabs">
-        {['news', 'watchlist', 'fda'].map(t => (
-          <button key={t} style={s.tab(tab === t)} onClick={() => setTab(t)}>
-            {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : 'FDA Calendar'}
-          </button>
-        ))}
-      </div>
+      <div style={{ marginBottom: '1.75rem' }} />
 
       {/* ══════════════ NEWS TAB ══════════════ */}
       {tab === 'news' && (
