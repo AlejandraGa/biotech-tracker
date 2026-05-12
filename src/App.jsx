@@ -55,7 +55,7 @@ function fdaBadge(type) {
 }
 
 const s = {
-  app: { maxWidth: 1400, margin: '0 auto', padding: '2rem 2.5rem', minHeight: '100vh', background: '#faf8f5' },
+  app: { maxWidth: 1400, margin: '0 auto', padding: '2rem 2.5rem', minHeight: '100vh', background: '#fefcf9' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' },
   title: { fontSize: 22, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px', fontFamily: "'Georgia', serif" },
   subtitle: { fontSize: 12, color: '#888', marginTop: 2, letterSpacing: '0.3px' },
@@ -716,7 +716,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
     <div style={s.app} className="app-root">
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        body { background: #faf8f5; margin: 0; }
+        body { background: #fefcf9; margin: 0; }
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
         .np-secondary-card:hover { background: #faf8f4 !important; }
