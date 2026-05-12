@@ -30,7 +30,6 @@ const FDA_DATA = [
   { date: 'Oct 14, 2025', ticker: 'MRNA', drug: 'mRNA-1345 (RSV)', event: 'PDUFA date', type: 'approval', note: 'High stakes — crowded RSV market but strong data' },
 ];
 
-// Tag color mapping — light theme
 function tagColor(tag) {
   if (!tag) return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
   const t = tag.toLowerCase();
@@ -93,145 +92,28 @@ const s = {
   fdaDate: { fontSize: 11, color: '#888', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' },
 };
 
-// ─── Newspaper styles (light theme) ────────────────────────────────────────
 const np = {
-  wrapper: {
-    fontFamily: "'Georgia', 'Times New Roman', serif",
-  },
-  datebar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTop: '3px solid #1a1a1a',
-    borderBottom: '1px solid #1a1a1a',
-    paddingTop: '0.4rem',
-    paddingBottom: '0.4rem',
-    marginBottom: '1.25rem',
-  },
+  wrapper: { fontFamily: "'Georgia', 'Times New Roman', serif" },
+  datebar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', paddingTop: '0.4rem', paddingBottom: '0.4rem', marginBottom: '1.25rem' },
   datebarText: { fontSize: 11, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" },
-  sectionLabel: {
-    fontSize: 10,
-    fontWeight: 700,
-    letterSpacing: '2.5px',
-    textTransform: 'uppercase',
-    color: '#c8102e',
-    marginBottom: 8,
-    fontFamily: "'DM Mono', monospace",
-    borderBottom: '1px solid #e5e0d8',
-    paddingBottom: 4,
-  },
-  featuredWrap: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 280px',
-    gap: '1.5rem',
-    borderBottom: '1px solid #d1ccc4',
-    paddingBottom: '1.5rem',
-    marginBottom: '1.5rem',
-  },
-  featuredWrapMobile: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    borderBottom: '1px solid #d1ccc4',
-    paddingBottom: '1.5rem',
-    marginBottom: '1.5rem',
-  },
-  featuredHeadline: {
-    fontSize: 30,
-    fontWeight: 700,
-    lineHeight: 1.15,
-    color: '#111',
-    marginBottom: 10,
-    letterSpacing: '-0.3px',
-    fontFamily: "'Georgia', serif",
-  },
-  featuredByline: {
-    fontSize: 11,
-    color: '#777',
-    marginBottom: 10,
-    letterSpacing: '0.3px',
-    fontFamily: "'DM Mono', monospace",
-  },
-  featuredSummary: {
-    fontSize: 15,
-    lineHeight: 1.75,
-    color: '#333',
-    fontFamily: "'Georgia', serif",
-  },
-  imgPlaceholder: () => ({}), // unused — kept for compat
-  secondaryGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-    gap: '1.25rem',
-    borderBottom: '1px solid #d1ccc4',
-    paddingBottom: '1.5rem',
-    marginBottom: '1.5rem',
-  },
-  secondaryHeadline: {
-    fontSize: 15,
-    fontWeight: 700,
-    lineHeight: 1.3,
-    color: '#111',
-    marginBottom: 6,
-    fontFamily: "'Georgia', serif",
-  },
-  secondarySource: {
-    fontSize: 11,
-    color: '#777',
-    fontFamily: "'DM Mono', monospace",
-    marginBottom: 6,
-  },
-  secondaryBody: {
-    fontSize: 13,
-    lineHeight: 1.65,
-    color: '#444',
-    fontFamily: "'Georgia', serif",
-  },
+  sectionLabel: { fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 },
+  featuredWrap: { display: 'grid', gridTemplateColumns: '1fr 280px', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' },
+  featuredHeadline: { fontSize: 30, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Georgia', serif" },
+  featuredByline: { fontSize: 11, color: '#777', marginBottom: 10, letterSpacing: '0.3px', fontFamily: "'DM Mono', monospace" },
+  featuredSummary: { fontSize: 15, lineHeight: 1.75, color: '#333', fontFamily: "'Georgia', serif" },
+  secondaryGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1.25rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' },
+  secondaryHeadline: { fontSize: 15, fontWeight: 700, lineHeight: 1.3, color: '#111', marginBottom: 6, fontFamily: "'Georgia', serif" },
+  secondarySource: { fontSize: 11, color: '#777', fontFamily: "'DM Mono', monospace", marginBottom: 6 },
+  secondaryBody: { fontSize: 13, lineHeight: 1.65, color: '#444', fontFamily: "'Georgia', serif" },
   tagPill: (tag) => {
     const c = tagColor(tag);
-    return {
-      display: 'inline-block',
-      fontSize: 10,
-      fontWeight: 700,
-      letterSpacing: '1px',
-      textTransform: 'uppercase',
-      padding: '2px 8px',
-      borderRadius: 3,
-      background: c.bg,
-      color: c.color,
-      border: `1px solid ${c.border}`,
-      marginBottom: 8,
-      fontFamily: "'DM Mono', monospace",
-    };
+    return { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3, background: c.bg, color: c.color, border: `1px solid ${c.border}`, marginBottom: 8, fontFamily: "'DM Mono', monospace" };
   },
-  colDivider: { borderLeft: '1px solid #d1ccc4', margin: '0 0.25rem' },
   filterBar: { display: 'flex', gap: 8, marginBottom: '1.25rem', alignItems: 'center' },
-  filterInput: {
-    background: '#fff',
-    border: '1px solid #d1ccc4',
-    borderRadius: 6,
-    padding: '7px 12px',
-    color: '#1a1a1a',
-    fontSize: 12,
-    outline: 'none',
-    flex: 1,
-    fontFamily: "'DM Mono', monospace",
-  },
-  npAiBox: {
-    background: '#faf8f4',
-    borderRadius: 6,
-    padding: '10px 14px',
-    fontSize: 13,
-    color: '#333',
-    marginTop: 10,
-    lineHeight: 1.75,
-    border: '1px solid #e5e0d8',
-    fontFamily: "'Georgia', serif",
-    borderLeft: '3px solid #c8102e',
-  },
+  filterInput: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 6, padding: '7px 12px', color: '#1a1a1a', fontSize: 12, outline: 'none', flex: 1, fontFamily: "'DM Mono', monospace" },
+  npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Georgia', serif", borderLeft: '3px solid #c8102e' },
 };
 
-// Fallback SVG if image fails to load
 function FallbackGraphic({ seed }) {
   const palettes = [
     { bg: '#1a1033', lines: '#7c6af7', circles: '#a78bfa' },
@@ -249,46 +131,23 @@ function FallbackGraphic({ seed }) {
       <circle cx="130" cy="80" r="50" fill="none" stroke={p.lines} strokeOpacity="0.25" strokeWidth="1" />
       <circle cx="130" cy="80" r="30" fill="none" stroke={p.circles} strokeOpacity="0.2" strokeWidth="1" />
       <circle cx="130" cy="80" r="10" fill={p.lines} fillOpacity="0.3" />
-      <circle cx="20" cy="20" r="3" fill={p.circles} fillOpacity="0.5" />
-      <circle cx="240" cy="140" r="3" fill={p.circles} fillOpacity="0.5" />
-      <line x1="80" y1="0" x2="260" y2="130" stroke={p.lines} strokeOpacity="0.1" strokeWidth="0.5" />
     </svg>
   );
 }
 
-// NewsImage: uses photoKeyword from the RSS article for a relevant Picsum query.
-// When Pexels API key is added later, swap the imgUrl line only.
 function NewsImage({ photoKeyword, seed = 0, height = 160 }) {
   const [imgError, setImgError] = React.useState(false);
-
-  // Picsum with a stable seed so each article gets a consistent image.
-  // When you have the Pexels key, replace this URL with the Pexels API call.
   const imgUrl = `https://picsum.photos/seed/${encodeURIComponent(photoKeyword || seed)}/600/300`;
-
-  if (imgError) {
-    return (
-      <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden' }}>
-        <FallbackGraphic seed={seed} />
-      </div>
-    );
-  }
-
+  if (imgError) return <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden' }}><FallbackGraphic seed={seed} /></div>;
   return (
     <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden', background: '#f0ede8' }}>
-      <img
-        src={imgUrl}
-        alt=""
-        onError={() => setImgError(true)}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block', opacity: 0.85 }}
-      />
+      <img src={imgUrl} alt="" onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block', opacity: 0.85 }} />
     </div>
   );
 }
 
 function Spinner() {
-  return (
-    <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />
-  );
+  return <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />;
 }
 
 async function callClaude(prompt) {
@@ -301,12 +160,328 @@ async function callClaude(prompt) {
   return data.content?.[0]?.text || 'Could not generate response.';
 }
 
+// ─── Analyst Rating Bar (Google Finance style) ───────────────────────────────
+function AnalystRatingBar({ buy, hold, sell }) {
+  const total = buy + hold + sell;
+  if (total === 0) return null;
+  const buyPct = Math.round((buy / total) * 100);
+  const holdPct = Math.round((hold / total) * 100);
+  const sellPct = 100 - buyPct - holdPct;
+
+  // Determine overall verdict
+  let verdict = 'Hold';
+  let verdictColor = '#a16207';
+  if (buyPct >= 60) { verdict = 'Strong Buy'; verdictColor = '#15803d'; }
+  else if (buyPct >= 45) { verdict = 'Buy'; verdictColor = '#16a34a'; }
+  else if (sellPct >= 45) { verdict = 'Strong Sell'; verdictColor = '#c8102e'; }
+  else if (sellPct >= 30) { verdict = 'Sell'; verdictColor = '#dc2626'; }
+
+  return (
+    <div style={{ marginTop: 14 }}>
+      {/* Verdict */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>Analyst Consensus</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: verdictColor, fontFamily: "'DM Mono', monospace" }}>{verdict}</span>
+      </div>
+
+      {/* Stacked bar */}
+      <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
+        <div style={{ width: `${buyPct}%`, background: '#16a34a', transition: 'width 0.6s ease' }} />
+        <div style={{ width: `${holdPct}%`, background: '#d97706', transition: 'width 0.6s ease' }} />
+        <div style={{ width: `${sellPct}%`, background: '#dc2626', transition: 'width 0.6s ease' }} />
+      </div>
+
+      {/* Labels */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: "'DM Mono', monospace" }}>
+        <span style={{ color: '#15803d' }}>Buy {buyPct}%</span>
+        <span style={{ color: '#a16207' }}>Hold {holdPct}%</span>
+        <span style={{ color: '#dc2626' }}>Sell {sellPct}%</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", marginTop: 2 }}>
+        <span>{buy} analysts</span>
+        <span>{hold} analysts</span>
+        <span>{sell} analysts</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Price Target indicator ───────────────────────────────────────────────────
+function PriceTarget({ current, target }) {
+  if (!target || !current || current === 0) return null;
+  const upside = (((target - current) / current) * 100).toFixed(1);
+  const isUp = target >= current;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, padding: '8px 12px', background: isUp ? 'rgba(22,163,74,0.05)' : 'rgba(220,38,38,0.05)', borderRadius: 6, border: `1px solid ${isUp ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)'}` }}>
+      <div>
+        <div style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>12-mo Price Target</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>${target.toFixed(2)}</div>
+      </div>
+      <div style={{ borderLeft: '1px solid #e5e0d8', paddingLeft: 10 }}>
+        <div style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>vs Current</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: isUp ? '#16a34a' : '#dc2626' }}>
+          {isUp ? '▲' : '▼'} {Math.abs(upside)}%
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Investor Sentiment Pills ─────────────────────────────────────────────────
+function SentimentPills({ sentiments }) {
+  if (!sentiments || sentiments.length === 0) return null;
+  const colorMap = {
+    bullish: { bg: 'rgba(22,163,74,0.08)', color: '#15803d', border: 'rgba(22,163,74,0.25)', icon: '↑' },
+    bearish: { bg: 'rgba(220,38,38,0.08)', color: '#dc2626', border: 'rgba(220,38,38,0.25)', icon: '↓' },
+    neutral: { bg: 'rgba(100,100,100,0.08)', color: '#555', border: 'rgba(100,100,100,0.2)', icon: '→' },
+    cautious: { bg: 'rgba(161,98,7,0.08)', color: '#a16207', border: 'rgba(161,98,7,0.25)', icon: '⚠' },
+    speculative: { bg: 'rgba(109,40,217,0.08)', color: '#6d28d9', border: 'rgba(109,40,217,0.25)', icon: '◆' },
+  };
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+      {sentiments.map((s, i) => {
+        const tone = s.tone?.toLowerCase() || 'neutral';
+        const c = colorMap[tone] || colorMap.neutral;
+        return (
+          <span key={i} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>
+            {c.icon} {s.label}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Expandable Stock Card ────────────────────────────────────────────────────
+function StockCard({ stock, onRemove, onLoadDetail }) {
+  const [expanded, setExpanded] = useState(false);
+  const [detail, setDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  const handleExpand = async () => {
+    const next = !expanded;
+    setExpanded(next);
+    if (next && !detail) {
+      setLoadingDetail(true);
+      try {
+        const result = await onLoadDetail(stock);
+        setDetail(result);
+      } catch (e) {
+        setDetail({ error: 'Could not load details.' });
+      }
+      setLoadingDetail(false);
+    }
+  };
+
+  return (
+    <div style={{ ...s.card, padding: 0, overflow: 'hidden', marginBottom: 12 }}>
+      {/* ── Header row (always visible) ── */}
+      <div
+        style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }}
+        onClick={handleExpand}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+              <span style={s.ticker}>{stock.ticker}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>{stock.name}</span>
+              <span style={s.badge(stageBadge(stock.stage))}>{stock.stage}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              {stock.price > 0 && (
+                <span style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', fontFamily: "'DM Mono', monospace" }}>
+                  ${stock.price.toFixed(2)}
+                </span>
+              )}
+              {stock.price > 0 && (
+                <span style={{ ...(stock.change >= 0 ? s.priceUp : s.priceDown), fontSize: 14, fontFamily: "'DM Mono', monospace" }}>
+                  {stock.change >= 0 ? '▲' : '▼'} {Math.abs(stock.change).toFixed(1)}%
+                </span>
+              )}
+              {stock.mktcap !== '—' && (
+                <span style={{ fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>Mkt cap: {stock.mktcap}</span>
+              )}
+            </div>
+            <p style={{ ...s.muted, marginTop: 6, fontSize: 12, lineHeight: 1.5 }}>{stock.note}</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <span style={{ fontSize: 18, color: '#bbb', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>⌄</span>
+            <button
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 20, lineHeight: 1, padding: '0 2px' }}
+              onClick={(e) => { e.stopPropagation(); onRemove(stock.ticker); }}
+            >×</button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Expanded detail panel ── */}
+      {expanded && (
+        <div style={{ padding: '16px 18px', background: '#fdfcfa' }}>
+          {loadingDetail && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}>
+              <Spinner />Loading company intelligence…
+            </div>
+          )}
+
+          {detail && !detail.error && (
+            <div>
+              {/* About */}
+              {detail.about && (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>About</div>
+                  <p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0 }}>{detail.about}</p>
+                </div>
+              )}
+
+              <hr style={s.divider} />
+
+              {/* Analyst Ratings */}
+              {detail.ratings && (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 4, fontFamily: "'DM Mono', monospace" }}>Analyst Ratings</div>
+                  <AnalystRatingBar buy={detail.ratings.buy} hold={detail.ratings.hold} sell={detail.ratings.sell} />
+                </div>
+              )}
+
+              {/* Price Target */}
+              {detail.priceTarget && stock.price > 0 && (
+                <div style={{ marginBottom: 16 }}>
+                  <PriceTarget current={stock.price} target={detail.priceTarget} />
+                </div>
+              )}
+
+              <hr style={s.divider} />
+
+              {/* Investor Sentiment */}
+              {detail.sentiments && detail.sentiments.length > 0 && (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 6, fontFamily: "'DM Mono', monospace" }}>Investor Sentiment</div>
+                  <SentimentPills sentiments={detail.sentiments} />
+                  {detail.sentimentSummary && (
+                    <p style={{ fontSize: 12, color: '#666', lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>{detail.sentimentSummary}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Key Risks */}
+              {detail.risks && detail.risks.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>Key Risks</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {detail.risks.map((r, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#555', lineHeight: 1.5 }}>
+                        <span style={{ color: '#c8102e', flexShrink: 0, marginTop: 1 }}>▸</span>
+                        <span>{r}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {detail?.error && (
+            <div style={{ color: '#c8102e', fontSize: 13 }}>{detail.error}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Search suggestions dropdown ──────────────────────────────────────────────
+const POPULAR_BIOTECH = [
+  { ticker: 'NVAX', name: 'Novavax' }, { ticker: 'GILD', name: 'Gilead Sciences' },
+  { ticker: 'BIIB', name: 'Biogen' }, { ticker: 'REGN', name: 'Regeneron' },
+  { ticker: 'VRTX', name: 'Vertex Pharma' }, { ticker: 'ALNY', name: 'Alnylam' },
+  { ticker: 'SGEN', name: 'Seagen' }, { ticker: 'BMRN', name: 'BioMarin' },
+  { ticker: 'BLUE', name: 'bluebird bio' }, { ticker: 'CRSP', name: 'CRISPR Therapeutics' },
+  { ticker: 'NTLA', name: 'Intellia Therapeutics' }, { ticker: 'ARCT', name: 'Arctus Bio' },
+  { ticker: 'FATE', name: 'Fate Therapeutics' }, { ticker: 'SRRK', name: 'Scholar Rock' },
+  { ticker: 'PTGX', name: 'Protagonist Therapeutics' }, { ticker: 'FOLD', name: 'Amicus Therapeutics' },
+];
+
+function SearchBar({ onAdd, watchlist }) {
+  const [val, setVal] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSugg, setShowSugg] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const v = e.target.value.toUpperCase();
+    setVal(v);
+    if (v.length >= 1) {
+      const matches = POPULAR_BIOTECH.filter(s =>
+        s.ticker.startsWith(v) || s.name.toUpperCase().includes(v)
+      ).slice(0, 5);
+      setSuggestions(matches);
+      setShowSugg(true);
+    } else {
+      setShowSugg(false);
+    }
+  };
+
+  const handleAdd = async (ticker) => {
+    const t = (ticker || val).trim().toUpperCase();
+    if (!t) return;
+    setVal('');
+    setShowSugg(false);
+    setLoading(true);
+    await onAdd(t);
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa', fontSize: 14, pointerEvents: 'none' }}>🔍</span>
+          <input
+            style={{ ...s.input, paddingLeft: 34 }}
+            value={val}
+            onChange={handleChange}
+            onKeyDown={e => e.key === 'Enter' && handleAdd()}
+            onBlur={() => setTimeout(() => setShowSugg(false), 150)}
+            onFocus={() => val.length >= 1 && setShowSugg(true)}
+            placeholder="Search ticker or company name (e.g. NVAX, CRSP)..."
+          />
+          {showSugg && suggestions.length > 0 && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', zIndex: 100, marginTop: 4 }}>
+              {suggestions.map(s => (
+                <div
+                  key={s.ticker}
+                  style={{ padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid #f5f3ef' }}
+                  onMouseDown={() => handleAdd(s.ticker)}
+                  onMouseOver={e => e.currentTarget.style.background = '#faf8f4'}
+                  onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <span style={{ ...s.ticker, fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)' }}>{s.ticker}</span>
+                  <span style={{ fontSize: 13, color: '#444' }}>{s.name}</span>
+                </div>
+              ))}
+              {val.length >= 2 && !suggestions.find(s => s.ticker === val) && (
+                <div
+                  style={{ padding: '10px 14px', cursor: 'pointer', fontSize: 12, color: '#888', borderTop: '1px solid #f0ede8', fontFamily: "'DM Mono', monospace" }}
+                  onMouseDown={() => handleAdd(val)}
+                >
+                  + Add "{val}" manually
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <button style={{ ...s.btn, minWidth: 80, display: 'flex', alignItems: 'center', gap: 6 }} onClick={() => handleAdd()}>
+          {loading ? <Spinner /> : null}
+          {loading ? 'Adding…' : 'Add →'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
-  // ← NEWS is the default tab now
   const [tab, setTab] = useState('news');
-  const [darkMode, setDarkMode] = useState(true);
   const [watchlist, setWatchlist] = useState(INITIAL_WATCHLIST);
-  const [tickerInput, setTickerInput] = useState('');
   const [newsFilter, setNewsFilter] = useState('');
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
@@ -344,11 +519,9 @@ export default function App() {
     fetchPrices();
   }, []);
 
-  const addTicker = useCallback(async () => {
-    const val = tickerInput.trim().toUpperCase();
-    if (!val || watchlist.find(s => s.ticker === val)) { setTickerInput(''); return; }
-    setTickerInput('');
-    setWatchlist(prev => [...prev, { ticker: val, name: val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading...' }]);
+  const addTicker = useCallback(async (val) => {
+    if (!val || watchlist.find(s => s.ticker === val)) return;
+    setWatchlist(prev => [...prev, { ticker: val, name: val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading…' }]);
     try {
       const res = await fetch('/api/stocks', {
         method: 'POST',
@@ -362,7 +535,7 @@ export default function App() {
     } catch (e) {
       setWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Ticker not found — check the symbol and try again.' } : s));
     }
-  }, [tickerInput, watchlist]);
+  }, [watchlist]);
 
   const removeTicker = (ticker) => setWatchlist(prev => prev.filter(s => s.ticker !== ticker));
 
@@ -376,6 +549,44 @@ export default function App() {
     setLoading(prev => ({ ...prev, [key]: false }));
   }, [summaries]);
 
+  // Load detailed company intelligence via Claude
+  const loadStockDetail = useCallback(async (stock) => {
+    const prompt = `You are a financial data assistant. Return ONLY valid JSON, no markdown, no explanation.
+
+For the biotech/pharma company ${stock.ticker} (${stock.name}), return this exact JSON structure:
+
+{
+  "about": "2-3 sentence description of what the company does, their main technology platform, and lead programs",
+  "ratings": {
+    "buy": <integer, estimated number of analysts with Buy rating>,
+    "hold": <integer, estimated number of analysts with Hold rating>,
+    "sell": <integer, estimated number of analysts with Sell rating>
+  },
+  "priceTarget": <number, consensus 12-month price target in USD, or null if not applicable>,
+  "sentiments": [
+    { "label": "short sentiment tag", "tone": "bullish|bearish|neutral|cautious|speculative" },
+    { "label": "another tag", "tone": "bullish|bearish|neutral|cautious|speculative" },
+    { "label": "another tag", "tone": "bullish|bearish|neutral|cautious|speculative" }
+  ],
+  "sentimentSummary": "1-2 sentence summary of what investors are saying about this company right now",
+  "risks": [
+    "Key risk 1",
+    "Key risk 2",
+    "Key risk 3"
+  ]
+}
+
+Base this on your knowledge of ${stock.ticker}. The stage is "${stock.stage}" and their key focus is: ${stock.note}. Return ONLY the JSON object.`;
+
+    const raw = await callClaude(prompt);
+    try {
+      const clean = raw.replace(/```json|```/g, '').trim();
+      return JSON.parse(clean);
+    } catch {
+      return { error: 'Could not parse company data.' };
+    }
+  }, []);
+
   const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
   const filteredNews = newsSource.filter(n =>
     !newsFilter ||
@@ -386,10 +597,7 @@ export default function App() {
 
   const gainers = watchlist.filter(s => s.change >= 0).length;
   const losers = watchlist.filter(s => s.change < 0).length;
-
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  // Featured = first article; secondary = rest
   const featured = filteredNews[0];
   const secondary = filteredNews.slice(1);
 
@@ -403,19 +611,14 @@ export default function App() {
         .np-secondary-card:hover { background: #faf8f4 !important; }
       `}</style>
 
-      {/* ── App Header ── */}
       <div style={s.header}>
         <div>
           <div style={s.title}>Biotech & Pharma Tracker</div>
           <div style={s.subtitle}>Follow your picks · News · FDA catalysts</div>
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-
-          <span style={s.liveBadge}>● Live</span>
-        </div>
+        <span style={s.liveBadge}>● Live</span>
       </div>
 
-      {/* ── Tabs ── */}
       <div style={s.tabs}>
         {['news', 'watchlist', 'fda'].map(t => (
           <button key={t} style={s.tab(tab === t)} onClick={() => setTab(t)}>
@@ -424,13 +627,9 @@ export default function App() {
         ))}
       </div>
 
-      {/* ═══════════════════════════════════════════════════════
-          NEWS TAB — Newspaper layout
-      ═══════════════════════════════════════════════════════ */}
+      {/* ══════════════ NEWS TAB ══════════════ */}
       {tab === 'news' && (
         <div style={np.wrapper}>
-
-          {/* Date bar */}
           <div style={np.datebar}>
             <span style={np.datebarText}>{today}</span>
             <span style={{ ...np.datebarText, color: '#c8102e' }}>
@@ -439,68 +638,34 @@ export default function App() {
             </span>
           </div>
 
-          {/* Filter */}
           <div style={np.filterBar}>
-            <input
-              style={np.filterInput}
-              value={newsFilter}
-              onChange={e => setNewsFilter(e.target.value)}
-              placeholder="Filter by keyword, ticker or tag…"
-            />
-            {newsFilter && (
-              <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setNewsFilter('')}>✕ Clear</button>
-            )}
+            <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Filter by keyword, ticker or tag…" />
+            {newsFilter && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setNewsFilter('')}>✕ Clear</button>}
           </div>
 
-          {loadingNews && (
-            <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}>
-              <Spinner />Loading news…
-            </div>
-          )}
+          {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading news…</div>}
+          {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>No stories match your filter.</div>}
 
-          {!loadingNews && filteredNews.length === 0 && (
-            <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>
-              No stories match your filter.
-            </div>
-          )}
-
-          {/* ── Featured Article ── */}
           {!loadingNews && featured && (
             <div style={{ marginBottom: '1.5rem' }}>
               <div style={np.sectionLabel}>Top Story</div>
               <div style={np.featuredWrap}>
-                {/* Left: text */}
                 <div>
                   <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                   <h2 style={np.featuredHeadline}>{featured.headline}</h2>
                   <div style={np.featuredByline}>
-                    {featured.ticker && (
-                      <span style={{ fontFamily: "'DM Mono', monospace", color: '#c8102e', fontWeight: 600 }}>{featured.ticker} · </span>
-                    )}
-                    {featured.source}
-                    {' · '}
-                    {featured.date}
-                    {featured.link && (
-                      <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>
-                    )}
+                    {featured.ticker && <span style={{ fontFamily: "'DM Mono', monospace", color: '#c8102e', fontWeight: 600 }}>{featured.ticker} · </span>}
+                    {featured.source} · {featured.date}
+                    {featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}
                   </div>
-                  {featured.summary && (
-                    <p style={np.featuredSummary}>{featured.summary}</p>
-                  )}
+                  {featured.summary && <p style={np.featuredSummary}>{featured.summary}</p>}
                   <div style={{ marginTop: 14 }}>
-                    <button
-                      style={s.btn}
-                      onClick={() => getSummary(
-                        `news-0`,
-                        `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${featured.headline}". Context: ${featured.summary}. Focus on clinical and regulatory significance. Be direct.`
-                      )}
-                    >
+                    <button style={s.btn} onClick={() => getSummary(`news-0`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${featured.headline}". Context: ${featured.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
                       {loading['news-0'] ? <><Spinner />Analyzing…</> : 'AI analysis →'}
                     </button>
                   </div>
                   {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
                 </div>
-                {/* Right: real photo */}
                 <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
                   <NewsImage photoKeyword={featured.photoKeyword} seed={0} height={200} />
                 </div>
@@ -508,73 +673,24 @@ export default function App() {
             </div>
           )}
 
-          {/* ── Secondary Articles Grid ── */}
           {!loadingNews && secondary.length > 0 && (
             <div>
               <div style={np.sectionLabel}>More Stories</div>
               <div style={np.secondaryGrid}>
                 {secondary.map((n, i) => {
-                  const idx = i + 1; // offset for summaries key
-                  const tc = tagColor(n.tag);
+                  const idx = i + 1;
                   return (
-                    <div
-                      key={idx}
-                      className="np-secondary-card"
-                      style={{
-                        background: '#fff',
-                        border: '1px solid #e5e0d8',
-                        borderRadius: 10,
-                        padding: '1rem',
-                        transition: 'background 0.15s',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 0,
-                      }}
-                    >
-                      {/* Photo */}
-                      <div style={{ marginBottom: 12 }}>
-                        <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={140} />
-                      </div>
-
-                      {/* Tag + ticker row */}
+                    <div key={idx} className="np-secondary-card" style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 10, padding: '1rem', transition: 'background 0.15s', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                      <div style={{ marginBottom: 12 }}><NewsImage photoKeyword={n.photoKeyword} seed={idx} height={140} /></div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                         <span style={np.tagPill(n.tag)}>{n.tag}</span>
-                        {n.ticker && (
-                          <span style={{
-                            fontFamily: "'DM Mono', monospace",
-                            fontSize: 11,
-                            color: '#c8102e',
-                            background: 'rgba(200,16,46,0.07)',
-                            padding: '1px 6px',
-                            borderRadius: 3,
-                            border: '0.5px solid rgba(200,16,46,0.2)',
-                          }}>{n.ticker}</span>
-                        )}
+                        {n.ticker && <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '1px 6px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)' }}>{n.ticker}</span>}
                       </div>
-
-                      {/* Headline */}
                       <p style={np.secondaryHeadline}>{n.headline}</p>
-
-                      {/* Source + date */}
-                      <p style={np.secondarySource}>
-                        {n.source} · {n.date}
-                        {n.link && (
-                          <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>
-                        )}
-                      </p>
-
-                      {/* Body */}
+                      <p style={np.secondarySource}>{n.source} · {n.date}{n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}</p>
                       {n.summary && <p style={np.secondaryBody}>{n.summary}</p>}
-
-                      {/* AI button */}
                       <div style={{ marginTop: 'auto', paddingTop: 12 }}>
-                        <button
-                          style={{ ...s.btn, fontSize: 11, padding: '6px 12px' }}
-                          onClick={() => getSummary(
-                            `news-${idx}`,
-                            `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${n.headline}". Context: ${n.summary}. Focus on clinical and regulatory significance. Be direct.`
-                          )}
-                        >
+                        <button style={{ ...s.btn, fontSize: 11, padding: '6px 12px' }} onClick={() => getSummary(`news-${idx}`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${n.headline}". Context: ${n.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
                           {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain this →'}
                         </button>
                       </div>
@@ -588,52 +704,38 @@ export default function App() {
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════
-          WATCHLIST TAB
-      ═══════════════════════════════════════════════════════ */}
+      {/* ══════════════ WATCHLIST TAB ══════════════ */}
       {tab === 'watchlist' && (
         <div>
-          <div style={{ display: 'flex', gap: 8, marginBottom: '1.25rem' }}>
-            <input style={s.input} value={tickerInput} onChange={e => setTickerInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addTicker()} placeholder="Add ticker (e.g. NVAX, GILD)..." />
-            <button style={s.btn} onClick={addTicker}>Add →</button>
-          </div>
+          {/* Search bar */}
+          <SearchBar onAdd={addTicker} watchlist={watchlist} />
+
+          {/* Metrics row */}
           <div style={s.grid4}>
             <div style={s.metric}><div style={s.metricLabel}>Watching</div><div style={{ ...s.metricVal, color: '#1a1a1a' }}>{watchlist.length}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Gainers</div><div style={{ ...s.metricVal, color: '#34d399' }}>{gainers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>Losers</div><div style={{ ...s.metricVal, color: '#faa19b' }}>{losers}</div></div>
             <div style={s.metric}><div style={s.metricLabel}>FDA events (30d)</div><div style={{ ...s.metricVal, color: '#fbbf24' }}>4</div></div>
           </div>
+
+          {/* Hint */}
+          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
+            ↓ Click any card to expand company details, analyst ratings & investor sentiment
+          </div>
+
+          {/* Stock cards */}
           {watchlist.map((stock) => (
-            <div key={stock.ticker} style={s.card}>
-              <div style={{ ...s.rowBetween, marginBottom: 6 }}>
-                <div style={s.row}>
-                  <span style={s.ticker}>{stock.ticker}</span>
-                  <span style={s.muted}>{stock.name}</span>
-                  <span style={s.badge(stageBadge(stock.stage))}>{stock.stage}</span>
-                </div>
-                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: 18, lineHeight: 1 }} onClick={() => removeTicker(stock.ticker)}>×</button>
-              </div>
-              <div style={s.row}>
-                {stock.price > 0 && <span style={{ fontSize: 18, fontWeight: 500 }}>${stock.price.toFixed(2)}</span>}
-                {stock.price > 0 && <span style={stock.change >= 0 ? s.priceUp : s.priceDown}>{stock.change >= 0 ? '+' : ''}{stock.change.toFixed(1)}%</span>}
-                {stock.mktcap !== '—' && <span style={s.muted}>Mkt cap: {stock.mktcap}</span>}
-              </div>
-              <hr style={s.divider} />
-              <p style={s.muted}>{stock.note}</p>
-              <div style={{ ...s.row, marginTop: 10, flexWrap: 'wrap' }}>
-                <button style={s.btn} onClick={() => getSummary(`wl-${stock.ticker}`, `You are a biotech investment analyst. Give a concise 3-sentence summary of ${stock.ticker} (${stock.name}): current stage (${stock.stage}), main pipeline note (${stock.note}). Be factual and direct. No disclaimers.`)}>
-                  {loading[`wl-${stock.ticker}`] ? <><Spinner />Generating...</> : 'AI summary →'}
-                </button>
-              </div>
-              {summaries[`wl-${stock.ticker}`] && <div style={s.aiBox}>{summaries[`wl-${stock.ticker}`]}</div>}
-            </div>
+            <StockCard
+              key={stock.ticker}
+              stock={stock}
+              onRemove={removeTicker}
+              onLoadDetail={loadStockDetail}
+            />
           ))}
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════
-          FDA CALENDAR TAB
-      ═══════════════════════════════════════════════════════ */}
+      {/* ══════════════ FDA CALENDAR TAB ══════════════ */}
       {tab === 'fda' && (
         <div>
           <p style={{ ...s.muted, marginBottom: '1rem' }}>Upcoming PDUFA dates, advisory committee meetings & trial readouts</p>
