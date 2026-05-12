@@ -55,7 +55,7 @@ function fdaBadge(type) {
 }
 
 const s = {
-  app: { maxWidth: 960, margin: '0 auto', padding: '2rem 1.5rem', minHeight: '100vh', background: '#f7f4ef' },
+  app: { maxWidth: 1400, margin: '0 auto', padding: '2rem 2.5rem', minHeight: '100vh', background: '#faf8f5' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' },
   title: { fontSize: 22, fontWeight: 700, color: '#1a1a1a', letterSpacing: '-0.5px', fontFamily: "'Georgia', serif" },
   subtitle: { fontSize: 12, color: '#888', marginTop: 2, letterSpacing: '0.3px' },
@@ -716,7 +716,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
     <div style={s.app} className="app-root">
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        body { background: #f7f4ef; margin: 0; }
+        body { background: #faf8f5; margin: 0; }
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
         .np-secondary-card:hover { background: #faf8f4 !important; }
@@ -777,7 +777,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
       <div style={s.tabs} className="app-tabs">
         {['news', 'watchlist', 'fda'].map(t => (
           <button key={t} style={s.tab(tab === t)} onClick={() => setTab(t)}>
-            {t === 'news' ? '📰 News' : t === 'watchlist' ? '★ Watchlist' : '📅 FDA Calendar'}
+            {t === 'news' ? 'News' : t === 'watchlist' ? 'Watchlist' : 'FDA Calendar'}
           </button>
         ))}
       </div>
@@ -841,9 +841,7 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
                   <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                   <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
                   <div style={np.featuredByline}>
-                    {featured.companies && featured.companies.length > 0 && featured.companies.map(c => (
-                      <span key={c.ticker} style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '1px 6px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)', marginRight: 5 }}>{c.ticker}</span>
-                    ))}
+
                     {featured.source} · {featured.date}
                     {featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}
                   </div>
@@ -865,27 +863,30 @@ Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most a
           {!loadingNews && secondary.length > 0 && (
             <div>
               <div style={np.sectionLabel}>More Stories</div>
-              <div style={np.secondaryGrid} className="secondary-grid">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {secondary.map((n, i) => {
                   const idx = i + 1;
                   return (
-                    <div key={idx} className="np-secondary-card" style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 10, padding: '1rem', transition: 'background 0.15s', display: 'flex', flexDirection: 'column', gap: 0 }}>
-                      <div style={{ marginBottom: 12 }}><NewsImage photoKeyword={n.photoKeyword} seed={idx} height={140} /></div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
-                        <span style={np.tagPill(n.tag)}>{n.tag}</span>
-                        {n.companies && n.companies.map(c => (
-                          <span key={c.ticker} style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '1px 6px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)' }}>{c.ticker}</span>
-                        ))}
+                    <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start', transition: 'background 0.15s', borderRadius: 4 }}
+                      onMouseOver={e => e.currentTarget.style.background = '#f5f2ee'}
+                      onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <div style={{ flexShrink: 0, width: 110, height: 74, borderRadius: 6, overflow: 'hidden' }}>
+                        <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={74} />
                       </div>
-                      <p style={np.secondaryHeadline}>{n.headline}</p>
-                      <p style={np.secondarySource}>{n.source} · {n.date}{n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}</p>
-                      {n.summary && <p style={np.secondaryBody}>{n.summary}</p>}
-                      <div style={{ marginTop: 'auto', paddingTop: 12 }}>
-                        <button style={{ ...s.btn, fontSize: 11, padding: '6px 12px' }} onClick={() => getSummary(`news-${idx}`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${n.headline}". Context: ${n.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
-                          {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain this →'}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
+                          <span style={np.tagPill(n.tag)}>{n.tag}</span>
+                          <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{n.source} · {n.date}</span>
+                          {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
+                        </div>
+                        <p style={{ ...np.secondaryHeadline, fontSize: 15, margin: '0 0 5px 0' }}>{n.headline}</p>
+                        {n.summary && <p style={{ fontSize: 12, lineHeight: 1.6, color: '#666', margin: '0 0 8px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
+                        <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `You are a clinical data expert and biotech analyst. Explain this news to an informed pharma professional in 3–4 sentences: "${n.headline}". Context: ${n.summary}. Focus on clinical and regulatory significance. Be direct.`)}>
+                          {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
                         </button>
+                        {summaries[`news-${idx}`] && <div style={{ ...np.npAiBox, marginTop: 8 }}>{summaries[`news-${idx}`]}</div>}
                       </div>
-                      {summaries[`news-${idx}`] && <div style={np.npAiBox}>{summaries[`news-${idx}`]}</div>}
                     </div>
                   );
                 })}
