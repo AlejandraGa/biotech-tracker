@@ -253,7 +253,7 @@ function SentimentPills({ sentiments }) {
 }
 
 // ─── Expandable Stock Card ────────────────────────────────────────────────────
-function StockCard({ stock, onRemove, onLoadDetail }) {
+function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
   const [expanded, setExpanded] = useState(false);
   const [detail, setDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -264,7 +264,7 @@ function StockCard({ stock, onRemove, onLoadDetail }) {
     if (next && !detail) {
       setLoadingDetail(true);
       try {
-        const result = await onLoadDetail(stock);
+        const result = await onLoadDetail(stock, onStageUpdate);
         setDetail(result);
       } catch (e) {
         setDetail({ error: 'Could not load details.' });
@@ -603,6 +603,10 @@ export default function App() {
 
   const removeTicker = (ticker) => setWatchlist(prev => prev.filter(s => s.ticker !== ticker));
 
+  const updateStage = useCallback((ticker, stage) => {
+    setWatchlist(prev => prev.map(s => s.ticker === ticker ? { ...s, stage } : s));
+  }, []);
+
   const getSummary = useCallback(async (key, prompt) => {
     if (summaries[key]) return;
     setLoading(prev => ({ ...prev, [key]: true }));
@@ -614,19 +618,20 @@ export default function App() {
   }, [summaries]);
 
   // Load detailed company intelligence via Claude
-  const loadStockDetail = useCallback(async (stock) => {
+  const loadStockDetail = useCallback(async (stock, onStageUpdate) => {
     const prompt = `You are a financial data assistant. Return ONLY valid JSON, no markdown, no explanation.
 
 For the biotech/pharma company ${stock.ticker} (${stock.name}), return this exact JSON structure:
 
 {
+  "stage": "one of exactly: Preclinical | Phase 1 | Phase 1/2 | Phase 2 | Phase 2/3 | Phase 3 | Commercial | Platform | Private | Unknown",
   "about": "2-3 sentence description of what the company does, their main technology platform, and lead programs",
   "ratings": {
-    "buy": <integer, estimated number of analysts with Buy rating>,
-    "hold": <integer, estimated number of analysts with Hold rating>,
-    "sell": <integer, estimated number of analysts with Sell rating>
+    "buy": <integer, estimated number of analysts with Buy rating, 0 if private or unknown>,
+    "hold": <integer, estimated number of analysts with Hold rating, 0 if private or unknown>,
+    "sell": <integer, estimated number of analysts with Sell rating, 0 if private or unknown>
   },
-  "priceTarget": <number, consensus 12-month price target in USD, or null if not applicable>,
+  "priceTarget": <number, consensus 12-month price target in USD, or null if private/not applicable>,
   "sentiments": [
     { "label": "short sentiment tag", "tone": "bullish|bearish|neutral|cautious|speculative" },
     { "label": "another tag", "tone": "bullish|bearish|neutral|cautious|speculative" },
@@ -640,12 +645,17 @@ For the biotech/pharma company ${stock.ticker} (${stock.name}), return this exac
   ]
 }
 
-Base this on your knowledge of ${stock.ticker}. The stage is "${stock.stage}" and their key focus is: ${stock.note}. Return ONLY the JSON object.`;
+Base this on your knowledge of ${stock.ticker} (${stock.name}). Infer the most accurate clinical stage from the company's actual pipeline status. Return ONLY the JSON object.`;
 
     const raw = await callClaude(prompt);
     try {
       const clean = raw.replace(/```json|```/g, '').trim();
-      return JSON.parse(clean);
+      const parsed = JSON.parse(clean);
+      // Update stage in watchlist immediately if we got one
+      if (parsed.stage && parsed.stage !== 'Unknown' && onStageUpdate) {
+        onStageUpdate(stock.ticker, parsed.stage);
+      }
+      return parsed;
     } catch {
       return { error: 'Could not parse company data.' };
     }
@@ -794,6 +804,7 @@ Base this on your knowledge of ${stock.ticker}. The stage is "${stock.stage}" an
               stock={stock}
               onRemove={removeTicker}
               onLoadDetail={loadStockDetail}
+              onStageUpdate={updateStage}
             />
           ))}
         </div>
