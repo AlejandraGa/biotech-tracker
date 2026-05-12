@@ -9,12 +9,9 @@ const RSS_FEEDS = [
 
 // Strip ALL HTML and decode entities — aggressive clean
 function stripHTML(str) {
-  return str
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<figure[\s\S]*?<\/figure>/gi, '')
-    .replace(/<img[^>]*\/?>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
+  let s = str;
+  // First pass: decode escaped entities so &lt;figure&gt; becomes <figure>
+  s = s
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
@@ -22,9 +19,23 @@ function stripHTML(str) {
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, ' ')
     .replace(/&apos;/g, "'")
-    .replace(/&#\d+;/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+    .replace(/&#\d+;/g, '');
+  // Second pass: strip all HTML tags (including ones that were escaped)
+  s = s
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<figure[\s\S]*?<\/figure>/gi, '')
+    .replace(/<img[^>]*\/?>/gi, '')
+    .replace(/<[^>]+>/g, ' ');
+  // Third pass: decode again in case of double-encoding
+  s = s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+  return s.replace(/\s+/g, ' ').trim();
 }
 
 // Extract text content from an XML tag (handles CDATA too)
