@@ -1523,7 +1523,7 @@ Return ONLY the JSON object.`;
       {tab === 'hta' && <HTATab callClaude={callClaude} />}
 
       {/* ══ COMPETITIVE LANDSCAPE ══ */}
-      {tab === 'landscape' && <CompetitiveLandscapeTab callClaude={callClaude} />}
+      {tab === 'landscape' && <CompetitiveLandscape />}
     </div>
   );
 }
