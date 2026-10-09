@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import HivRegulatoryTracker from "./HivRegulatoryTracker";
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 async function searchClinicalTrials({ condition, intervention }) {
@@ -136,15 +137,16 @@ async function callClaude(prompt) {
   } catch { return "Could not reach AI."; }
 }
 
+const HIV_CONDITION = "HIV Infections";
 const QUICK = [
-  { label:"Alzheimer's · amyloid", condition:"Alzheimer Disease", intervention:"amyloid" },
-  { label:"Atopic Dermatitis · IL", condition:"Atopic Dermatitis", intervention:"interleukin" },
-  { label:"NSCLC · PD-1", condition:"Non-Small Cell Lung Carcinoma", intervention:"PD-1" },
-  { label:"Obesity · GLP-1", condition:"Obesity", intervention:"GLP-1" },
-  { label:"Sickle Cell · gene therapy", condition:"Sickle Cell Disease", intervention:"gene therapy" },
-  { label:"Haemophilia B", condition:"Hemophilia B", intervention:"gene therapy" },
-  { label:"Breast Cancer · PI3K", condition:"Breast Cancer", intervention:"PI3K" },
-  { label:"MS · BTK", condition:"Multiple Sclerosis", intervention:"BTK" },
+  { label:"Lenacapavir", condition:HIV_CONDITION, intervention:"lenacapavir" },
+  { label:"Cabotegravir", condition:HIV_CONDITION, intervention:"cabotegravir" },
+  { label:"Islatravir", condition:HIV_CONDITION, intervention:"islatravir" },
+  { label:"Bictegravir", condition:HIV_CONDITION, intervention:"bictegravir" },
+  { label:"Doravirine", condition:HIV_CONDITION, intervention:"doravirine" },
+  { label:"Long-acting injectables", condition:HIV_CONDITION, intervention:"long-acting injectable" },
+  { label:"Broadly neutralising antibodies", condition:HIV_CONDITION, intervention:"broadly neutralizing antibody" },
+  { label:"PrEP", condition:HIV_CONDITION, intervention:"pre-exposure prophylaxis" },
 ];
 
 // ─── DRAWER ──────────────────────────────────────────────────────────────────
@@ -210,7 +212,7 @@ function SponsorCard({ group, rank, spaceLabel }) {
     if (aiText) return;
     setLoadingAI(true);
     const lines = group.studies.slice(0,3).map(s=>`• ${s.phase} | ${s.status.replace(/_/g," ")} | ${s.countries.slice(0,3).join(", ")||"N/A"} | ${s.title.slice(0,65)}`).join("\n");
-    const t = await callClaude(`You are a market access strategist at a small pharma in: ${spaceLabel}.\nCompetitor: ${group.sponsor} — ${group.studies.length} trial(s):\n${lines}\n\nRespond in exactly 3 bullet points (use • as bullet, max 2 sentences each):\n• Development threat: their phase/timeline vs a late entrant\n• Geographic strategy: what their country list signals about HTA priorities\n• Your move: one specific differentiator or counter-strategy`);
+    const t = await callClaude(`You are a competitive intelligence analyst covering HIV treatment and prevention. Space: ${spaceLabel}.\nCompetitor: ${group.sponsor} — ${group.studies.length} trial(s):\n${lines}\n\nRespond in exactly 3 bullet points (use • as bullet, max 2 sentences each):\n• Development threat: their phase/timeline vs a late entrant\n• Geographic strategy: what their country list signals about regulatory and HTA priorities\n• Your move: one specific differentiator or counter-strategy`);
     setAiText(t);
     setLoadingAI(false);
   };
@@ -297,7 +299,8 @@ function SponsorCard({ group, rank, spaceLabel }) {
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function CompetitiveLandscape() {
-  const [condition, setCondition] = useState("");
+  const [section, setSection] = useState("regulatory");
+  const [condition, setCondition] = useState(HIV_CONDITION);
   const [intervention, setIntervention] = useState("");
   const [saved, setSaved] = useState([]);
   const [activeSpace, setActiveSpace] = useState(null);
@@ -329,7 +332,7 @@ export default function CompetitiveLandscape() {
     setStudies(extracted);
   }, []);
 
-  const applyQuick = (q) => { setCondition(q.condition); setIntervention(q.intervention||""); };
+  const applyQuick = (q) => { setCondition(q.condition); setIntervention(q.intervention||""); doSearch(q.condition, q.intervention||""); };
 
   const filtered = studies.filter(s => {
     if (phaseFilter!=="ALL") {
@@ -354,7 +357,7 @@ export default function CompetitiveLandscape() {
     if (aiOverview||!activeSpace) return;
     setLoadingOverview(true);
     const top = sorted.slice(0,6).map(g=>`${g.sponsor}: ${g.leadStudy.phase}, ${g.studies.length} trial(s), ${g.leadStudy.countries.slice(0,3).join(", ")||"N/A"}`).join("\n");
-    const t = await callClaude(`You are a market access director at a small pharma.\nSpace: ${activeSpace.condition}${activeSpace.intervention?" / "+activeSpace.intervention:""}\nTop competitors:\n${top}\nTotal: ${sorted.length} sponsors, ${filtered.length} trials\n\nWrite a 3-paragraph strategic briefing:\n1. Competitive intensity and development stage of the space\n2. Geographic patterns and what they signal for HTA/reimbursement strategy\n3. One concrete recommendation for a small/mid pharma entering this space\nNo hedging. Be direct and commercial.`);
+    const t = await callClaude(`You are a competitive intelligence lead covering HIV treatment and prevention.\nSpace: ${activeSpace.condition}${activeSpace.intervention?" / "+activeSpace.intervention:""}\nTop competitors:\n${top}\nTotal: ${sorted.length} sponsors, ${filtered.length} trials\n\nWrite a 3-paragraph strategic briefing:\n1. Competitive intensity and development stage of the space\n2. Geographic patterns and what they signal for HTA/reimbursement strategy\n3. One concrete implication for a company launching a new HIV regimen against these sponsors\nNo hedging. Be direct and commercial.`);
     setAiOverview(t);
     setLoadingOverview(false);
   };
@@ -369,22 +372,38 @@ export default function CompetitiveLandscape() {
       <style>{`@keyframes clspin{to{transform:rotate(360deg)}}`}</style>
 
       {/* Section header */}
-      <div style={{ borderTop:"3px solid #1a1a1a", borderBottom:"1px solid #1a1a1a", padding:"0.5rem 0", marginBottom:"1.25rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
-        <span style={{ fontSize:10, color:"#555", letterSpacing:"0.5px", textTransform:"uppercase", fontFamily:mono }}>Competitive Landscape · Live Data</span>
-        <span style={{ fontSize:10, color:"#065f46", fontFamily:mono, fontWeight:700 }}>ClinicalTrials.gov · v2 API</span>
+      <div style={{ borderTop:"3px solid #1a1a1a", borderBottom:"1px solid #1a1a1a", padding:"0.5rem 0", marginBottom:"1.1rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:6 }}>
+        <span style={{ fontSize:10, color:"#555", letterSpacing:"0.5px", textTransform:"uppercase", fontFamily:mono }}>Competitive Intelligence · HIV</span>
+        <span style={{ fontSize:10, color:"#555", fontFamily:mono }}>FDA · EMA · European Commission · Swissmedic</span>
       </div>
 
+      <div style={{ marginBottom:"1.25rem" }}>
+        <h2 style={{ fontSize:24, fontWeight:400, color:"#111", fontFamily:serif, margin:"0 0 6px", letterSpacing:"-0.3px" }}>HIV treatment and prevention: where each competitor stands with regulators</h2>
+        <p style={{ fontSize:13, color:"#666", fontFamily:serif, lineHeight:1.6, margin:0, maxWidth:760 }}>Regulatory milestones and agency opinions for marketed and late-stage HIV assets, with the clinical pipeline behind them.</p>
+      </div>
+
+      <div style={{ display:"flex", gap:0, borderBottom:"1px solid #e5e0d8", marginBottom:"1.25rem" }}>
+        {[{k:"regulatory",l:"Regulatory milestones"},{k:"pipeline",l:"Clinical pipeline · live"}].map(t=>(
+          <button key={t.k} onClick={()=>setSection(t.k)} style={{ padding:"9px 16px", fontSize:11, cursor:"pointer", border:"none", background:"none", fontFamily:mono, color:section===t.k?"#1a1a1a":"#999", fontWeight:section===t.k?500:400, borderBottom:section===t.k?"2px solid #c8102e":"2px solid transparent", marginBottom:-1 }}>
+            {t.l}
+          </button>
+        ))}
+      </div>
+
+      {section==="regulatory" && <HivRegulatoryTracker />}
+
+      {section==="pipeline" && (<>
       {/* ── SEARCH FORM (always visible) ── */}
       <div style={{ background:"#fff", border:"1px solid #e5e0d8", borderRadius:10, overflow:"hidden", marginBottom:"1.5rem" }}>
         <div style={{ padding:"18px 22px 14px", borderBottom:"1px solid #f0ede8" }}>
           <div style={{ fontSize:9, fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", color:"#c8102e", fontFamily:mono, marginBottom:6 }}>Configure search</div>
-          <div style={{ fontSize:17, fontWeight:700, color:"#111", fontFamily:serif, marginBottom:4 }}>Define your competitive space</div>
-          <div style={{ fontSize:12, color:"#777", fontFamily:serif, lineHeight:1.6 }}>Live data from ClinicalTrials.gov · No API key · No login</div>
+          <div style={{ fontSize:17, fontWeight:700, color:"#111", fontFamily:serif, marginBottom:4 }}>Search HIV trials by sponsor</div>
+          <div style={{ fontSize:12, color:"#777", fontFamily:serif, lineHeight:1.6 }}>Live data from ClinicalTrials.gov, grouped by sponsor and ranked by most advanced phase.</div>
         </div>
         <div style={{ padding:"18px 22px" }}>
           {/* Quick starts */}
           <div style={{ marginBottom:16 }}>
-            <div style={{ fontSize:9, color:"#aaa", fontFamily:mono, textTransform:"uppercase", letterSpacing:"1.5px", marginBottom:7 }}>Quick start</div>
+            <div style={{ fontSize:9, color:"#aaa", fontFamily:mono, textTransform:"uppercase", letterSpacing:"1.5px", marginBottom:7 }}>HIV quick searches</div>
             <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
               {QUICK.map(q=>(
                 <button key={q.label} onClick={()=>applyQuick(q)} style={{ padding:"4px 12px", borderRadius:20, fontSize:11, cursor:"pointer", fontFamily:mono, border: condition===q.condition&&intervention===q.intervention?"1.5px solid #1a1a1a":"1px solid #d1ccc4", background:condition===q.condition&&intervention===q.intervention?"#1a1a1a":"transparent", color:condition===q.condition&&intervention===q.intervention?"#fff":"#444", fontWeight:condition===q.condition&&intervention===q.intervention?700:400 }}>
@@ -400,14 +419,14 @@ export default function CompetitiveLandscape() {
               <input style={{ width:"100%", background:"#faf8f4", border:"1px solid #d1ccc4", borderRadius:6, padding:"9px 12px", fontSize:12, fontFamily:serif, outline:"none", boxSizing:"border-box" }}
                 value={condition} onChange={e=>{setCondition(e.target.value);setFormErr("");}}
                 onKeyDown={e=>e.key==="Enter"&&doSearch(condition,intervention)}
-                placeholder="e.g. Atopic Dermatitis, Hemophilia B…" />
+                placeholder="e.g. HIV Infections" />
             </div>
             <div>
               <div style={{ fontSize:9, color:"#aaa", fontFamily:mono, textTransform:"uppercase", letterSpacing:"1.5px", marginBottom:5 }}>Target / MoA / Intervention <span style={{ color:"#bbb", fontWeight:400 }}>(optional)</span></div>
               <input style={{ width:"100%", background:"#faf8f4", border:"1px solid #d1ccc4", borderRadius:6, padding:"9px 12px", fontSize:12, fontFamily:serif, outline:"none", boxSizing:"border-box" }}
                 value={intervention} onChange={e=>setIntervention(e.target.value)}
                 onKeyDown={e=>e.key==="Enter"&&doSearch(condition,intervention)}
-                placeholder="e.g. interleukin, gene therapy, PD-1…" />
+                placeholder="e.g. lenacapavir, capsid inhibitor, PrEP…" />
             </div>
           </div>
           {/* Saved */}
@@ -536,6 +555,7 @@ export default function CompetitiveLandscape() {
           </div>
         </>
       )}
+      </>)}
     </div>
   );
 }
