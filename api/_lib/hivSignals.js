@@ -42,6 +42,17 @@ const HIV_RE = /\bHIV\b|pre-exposure prophylaxis|\bPrEP\b|antiretroviral/i;
 const COMPANY_RE = /gilead|viiv|\bgsk\b|merck|\bmsd\b|janssen|johnson & johnson/i;
 const REG_RE = /\bFDA\b|\bEMA\b|\bCHMP\b|swissmedic|european commission|approv|authoris|authoriz|opinion|pdufa|\bNDA\b|\bsNDA\b|\bMAA\b|complete response|priority review|submission|filing|phase 3|phase III|topline/i;
 
+// Investor and stock-market coverage: not competitive intelligence.
+const FINANCE_PUBLISHER_RE = /simply wall|zacks|motley fool|seeking alpha|marketbeat|yahoo finance|investing\.com|tipranks|benzinga|insider monkey|barchart|stocktwits|investorplace|24\/7 wall|tradingview|nasdaq\.com|morningstar|barron|stock titan|defense world|ticker report|marketscreener|finviz|gurufocus|investor's business/i;
+const FINANCE_TITLE_RE = /\bstocks?\b|\bshares?\b(?! (data|results|findings|update|new|plans|pipeline|interim|week))|share price|price target|\banalysts?\b|valuation|\binvestors?\b|investment case|buy rating|\bupgrades?\b|\bdowngrades?\b|dividend|market cap|\bnasdaq\b|\bnyse\b|morgan stanley|goldman sachs|jefferies|wall street|growth phase|hedge fund|\bholdings?\b|stake in|\bbullish\b|\bbearish\b|outperform|underperform/i;
+export function isFinanceNoise(title, publisher = '') {
+  return FINANCE_PUBLISHER_RE.test(publisher) || FINANCE_TITLE_RE.test(title);
+}
+// Same story from several outlets: compare on the first significant words.
+function storyKey(title) {
+  return (title || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter((w) => w.length > 3).slice(0, 7).join(' ');
+}
+
 export function tagProduct(text) {
   const t = (text || '').toLowerCase();
   for (const [kw, product, company] of TRACKED) if (t.includes(kw)) return { product, company };
@@ -138,6 +149,22 @@ export function parseFda(json, since) {
   return out;
 }
 
+// Approval record per FDA application, used to keep the status table current.
+export function fdaLive(json) {
+  const out = [];
+  for (const app of json?.results || []) {
+    const appNo = app.application_number || '';
+    if (!/^(NDA|BLA)/.test(appNo)) continue;
+    const orig = (app.submissions || []).find((x) => x.submission_type === 'ORIG' && x.submission_status === 'AP');
+    const approvalDate = ymdToIso(orig?.submission_status_date);
+    if (!approvalDate) continue;
+    for (const brand of [...new Set((app.products || []).map((p) => (p.brand_name || '').toUpperCase()).filter(Boolean))]) {
+      out.push({ brand, approvalDate, url: `https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=${appNo.replace(/\D/g, '')}` });
+    }
+  }
+  return out;
+}
+
 // ─── EMA · medicines dataset + news feed ────────────────────────────────────
 export const EMA_JSON = 'https://www.ema.europa.eu/en/documents/report/medicines-output-medicines_json-report_en.json';
 export const EMA_NEWS = 'https://www.ema.europa.eu/en/news.xml';
@@ -166,6 +193,25 @@ export function parseEma(json, since) {
     if (r.european_commission_decision_date !== r.marketing_authorisation_date) {
       push('european_commission_decision_date', 'procedure', 'minor', `${name}: new European Commission decision`, r.latest_procedure_affecting_product_information || '');
     }
+  }
+  return out;
+}
+// Opinion and authorisation record per EMA medicine, used to keep the status table current.
+export function emaLive(json) {
+  const out = [];
+  const rows = Array.isArray(json) ? json : json?.data || [];
+  for (const r of rows) {
+    if (r.category && r.category !== 'Human') continue;
+    if (/^yes$/i.test(r.generic || '') || /^yes$/i.test(r.biosimilar || '')) continue;
+    const substances = `${r.active_substance} ${r.international_non_proprietary_name_common_name}`.toLowerCase();
+    if (!SUBSTANCES.some((x) => substances.includes(x))) continue;
+    out.push({
+      name: r.name_of_medicine || '', substances,
+      medicineStatus: r.medicine_status || '', opinionStatus: r.opinion_status || '',
+      opinionDate: dmyToIso(r.opinion_adopted_date), maDate: dmyToIso(r.marketing_authorisation_date),
+      refusalDate: dmyToIso(r.refusal_of_marketing_authorisation_date), withdrawalDate: dmyToIso(r.withdrawal_of_application_date),
+      url: r.medicine_url || '',
+    });
   }
   return out;
 }
@@ -228,6 +274,7 @@ export function parsePress(xml, feedName, since) {
     if (!t.product && !(HIV_RE.test(text) && COMPANY_RE.test(text))) continue;
     // Google News appends " - Publisher" to titles.
     const title = i.publisher && i.title.endsWith(` - ${i.publisher}`) ? i.title.slice(0, -(i.publisher.length + 3)) : i.title;
+    if (isFinanceNoise(title, i.publisher || feedName)) continue;
     out.push({ id: `press-${slug(title)}`, date: i.date, source: 'Press', kind: 'news', level: REG_RE.test(text) ? 'major' : 'minor', product: t.product, company: t.company, title, detail: i.publisher || feedName, url: i.link });
   }
   return out;
@@ -274,15 +321,22 @@ export function parseCtgov(json, since) {
 export async function collectSignals({ days = 90, fetchImpl = fetch, now = new Date() } = {}) {
   const since = isoDaysAgo(days, now);
   const opt = { fetchImpl };
+  // null means the dataset could not be read, so the table keeps its curated values.
+  const live = { fda: null, ema: null };
 
   const jobs = [
-    ['FDA', async () => parseFda(await get(fdaUrl(), { ...opt, as: 'json' }), since)],
+    ['FDA', async () => {
+      const json = await get(fdaUrl(), { ...opt, as: 'json' });
+      live.fda = fdaLive(json);
+      return parseFda(json, since);
+    }],
     ['EMA', async () => {
       const [data, news] = await Promise.allSettled([
         get(EMA_JSON, { ...opt, as: 'json', timeout: 25000 }),
         get(EMA_NEWS, opt),
       ]);
       if (data.status === 'rejected' && news.status === 'rejected') throw data.reason;
+      if (data.status === 'fulfilled') live.ema = emaLive(data.value);
       return [
         ...(data.status === 'fulfilled' ? parseEma(data.value, since) : []),
         ...(news.status === 'fulfilled' ? parseEmaNews(news.value, since) : []),
@@ -296,7 +350,10 @@ export async function collectSignals({ days = 90, fetchImpl = fetch, now = new D
     ['Press', async () => {
       const results = await Promise.allSettled(PRESS_FEEDS.map((f) => get(f.url, { ...opt, timeout: 9000 }).then((xml) => parsePress(xml, f.name, since))));
       if (results.every((r) => r.status === 'rejected')) throw results[0].reason;
-      return results.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
+      // Newest first, then keep one item per story.
+      const all = results.flatMap((r) => (r.status === 'fulfilled' ? r.value : [])).sort((a, b) => b.date.localeCompare(a.date));
+      const stories = new Set();
+      return all.filter((x) => { const k = storyKey(x.title); if (stories.has(k)) return false; stories.add(k); return true; });
     }],
     ['ClinicalTrials.gov', async () => parseCtgov(await get(ctgovUrl(since), { ...opt, as: 'json' }), since)],
   ];
@@ -313,5 +370,5 @@ export async function collectSignals({ days = 90, fetchImpl = fetch, now = new D
     sources.push({ name, ok: true, count });
   });
   signals.sort((a, b) => b.date.localeCompare(a.date) || (a.level === b.level ? 0 : a.level === 'major' ? -1 : 1));
-  return { generatedAt: now.toISOString(), since, days, sources, signals };
+  return { generatedAt: now.toISOString(), since, days, sources, signals, live };
 }

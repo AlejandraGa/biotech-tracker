@@ -44,7 +44,7 @@ async function ctgovFromBrowser(since) {
 
 // ─── DATA HOOK ───────────────────────────────────────────────────────────────
 export function useHivSignals() {
-  const [state, setState] = useState({ status: "loading", signals: [], sources: [], generatedAt: "" });
+  const [state, setState] = useState({ status: "loading", signals: [], sources: [], generatedAt: "", live: null });
   const [reviewed, setReviewed] = useState(loadReviewed);
 
   const load = useCallback(async () => {
@@ -62,9 +62,9 @@ export function useHivSignals() {
           sources = sources.map((s) => (s.name === "ClinicalTrials.gov" ? { name: s.name, ok: true, count: extra.length } : s));
         } catch { /* keep the server's failure report */ }
       }
-      setState({ status: "ready", signals, sources, generatedAt: data.generatedAt });
+      setState({ status: "ready", signals, sources, generatedAt: data.generatedAt, live: data.live || null });
     } catch (e) {
-      setState({ status: "error", signals: [], sources: [], generatedAt: "", error: e.message });
+      setState({ status: "error", signals: [], sources: [], generatedAt: "", live: null, error: e.message });
     }
   }, []);
 

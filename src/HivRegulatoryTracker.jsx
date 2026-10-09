@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AGENCIES, STATUS, PRODUCTS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRegulatoryData";
+import { applyLive } from "./liveStatus";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
 const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", Company: "Company update" };
@@ -49,7 +50,7 @@ function RegCell({ cell }) {
   const s = cell?.s || "none";
   const def = STATUS[s];
   if (s === "none" || s === "pending") {
-    return <div style={cellStyle}><span style={{ fontSize: 12.5, color: FAINT }}>{s === "pending" ? "Awaiting opinion" : cell?.note || "No public filing"}</span></div>;
+    return <div style={cellStyle}><span style={{ fontSize: 12.5, color: FAINT }}>{s === "pending" ? cell?.note || "Awaiting opinion" : cell?.note || "No public filing"}</span></div>;
   }
   return (
     <div style={cellStyle}>
@@ -58,6 +59,7 @@ function RegCell({ cell }) {
         {cell.date && <span style={{ fontSize: 12.5, color: TEXT, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{cell.expected ? "by " : ""}{fmtDate(cell.date)}</span>}
       </div>
       {cell.note && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 2, lineHeight: 1.4 }}>{cell.note}</div>}
+      {cell.auto && <div style={{ fontSize: 11.5, color: "#1e40af", marginTop: 2 }}>Updated automatically</div>}
     </div>
   );
 }
@@ -133,9 +135,11 @@ function Drawer({ p, onClose }) {
               <div key={a.key} style={{ display: "grid", gridTemplateColumns: "150px minmax(0,1fr)", gap: 10, padding: "8px 0", borderTop: `1px solid ${HAIR}`, fontSize: 13, alignItems: "baseline" }}>
                 <span style={{ color: MUTED }}>{a.label}</span>
                 <span>
-                  {quiet ? <span style={{ color: FAINT }}>{c.s === "pending" ? "Awaiting opinion" : c.note || "No public filing"}</span>
+                  {quiet ? <span style={{ color: FAINT }}>{c.s === "pending" ? c.note || "Awaiting opinion" : c.note || "No public filing"}</span>
                     : <><StatusText def={STATUS[c.s]} />{c.date && <span style={{ color: TEXT, marginLeft: 8, fontVariantNumeric: "tabular-nums" }}>{c.expected ? "by " : ""}{fmtDate(c.date)}</span>}</>}
                   {!quiet && c.note && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>{c.note}</span>}
+                  {c.auto && <span style={{ display: "block", fontSize: 12, color: "#1e40af", marginTop: 2, lineHeight: 1.45 }}>Updated automatically from {c.auto}.{c.was ? ` The curated entry said: ${STATUS[c.was.s].label.toLowerCase()}${c.was.date ? `, ${fmtDate(c.was.date)}` : ""}.` : ""}</span>}
+                  {c.confirmedBy && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>Confirmed against {c.confirmedBy}.</span>}
                   {c.src && <span style={{ display: "block", marginTop: 2 }}><SourceLink href={c.src} /></span>}
                 </span>
               </div>
@@ -199,16 +203,18 @@ function Timeline({ products }) {
 }
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
-export default function HivRegulatoryTracker() {
+export default function HivRegulatoryTracker({ live, liveStatus }) {
+  const liveResult = useMemo(() => applyLive(PRODUCTS, live), [live]);
+  const ALL = liveResult.products;
   const [view, setView] = useState("By agency");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
   const [openId, setOpenId] = useState(null);
 
-  const products = useMemo(() => PRODUCTS.filter((p) =>
+  const products = useMemo(() => ALL.filter((p) =>
     (segment === "All" || p.segment === segment) && (company === "All" || p.company.includes(company))
-  ), [segment, company]);
-  const open = PRODUCTS.find((p) => p.id === openId);
+  ), [ALL, segment, company]);
+  const open = ALL.find((p) => p.id === openId);
 
   // Headline numbers, computed from the dataset
   const today = todayIso();
@@ -325,8 +331,11 @@ export default function HivRegulatoryTracker() {
       )}
 
       <p style={{ marginTop: 18, fontSize: 12, color: FAINT, lineHeight: 1.6 }}>
-        This status table is curated by hand from EMA EPARs and CHMP agendas, Swissmedic SwissPARs, FDA approval records and company releases, and was last checked on {fmtDate(VERIFIED_ON)}.
-        "No public filing" means no announcement was found, not that none exists. New activity detected automatically appears in the panel at the top and in the activity log.
+        {liveResult.checked > 0
+          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA and EMA columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
+          : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
+        Swissmedic, filings under review and planned filings are curated by hand from SwissPARs, CHMP agendas and company releases, last checked on {fmtDate(VERIFIED_ON)}.
+        "No public filing" means no announcement was found, not that none exists.
       </p>
 
       {open && <Drawer p={open} onClose={() => setOpenId(null)} />}
