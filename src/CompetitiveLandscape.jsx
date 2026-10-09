@@ -389,7 +389,7 @@ export default function CompetitiveLandscape() {
         ))}
       </div>
 
-      {section==="regulatory" && <HivRegulatoryTracker />}
+      {section==="regulatory" && <HivRegulatoryTracker live={feed.live} liveStatus={feed.status} />}
       {section==="activity" && <ActivityLog feed={feed} />}
 
       {section==="pipeline" && (<>
