@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import CatalystCalendar from './CatalystCalendar';
+import CompetitiveLandscape from './CompetitiveLandscape';
 
 const DEFAULT_WATCHLIST = [
   { ticker: 'MRNA', name: 'Moderna', price: 0, change: 0, mktcap: '—', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
@@ -1322,7 +1323,7 @@ Return ONLY the JSON object.`;
     { key: 'publications', label: 'Publications' },
     { key: 'calendar', label: 'Calendar' },
     { key: 'hta', label: 'HTA & Reimbursement', isNew: true },
-    { key: 'landscape', label: 'Competitive Landscape', isNew: true },
+    { key: 'landscape', label: 'HIV Competitive Intel', isNew: true },
   ];
 
   return (
