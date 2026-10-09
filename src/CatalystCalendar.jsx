@@ -145,7 +145,7 @@ function VolatilityBar({ score }) {
       <div style={{ flex: 1, height: 4, background: '#f0ede8', borderRadius: 2, overflow: 'hidden' }}>
         <div style={{ width: `${score * 10}%`, height: '100%', background: color, borderRadius: 2, transition: 'width 0.5s ease' }} />
       </div>
-      <span style={{ fontSize: 10, fontWeight: 700, color, fontFamily: "'DM Mono', monospace", minWidth: 16 }}>{score}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", minWidth: 16 }}>{score}</span>
     </div>
   );
 }
@@ -161,7 +161,7 @@ function ImportanceDots({ score }) {
 }
 
 function ProbabilityRing({ prob }) {
-  if (prob === null) return <span style={{ fontSize: 11, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>N/A</span>;
+  if (prob === null) return <span style={{ fontSize: 12.5, color: '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>N/A</span>;
   const color = prob >= 75 ? '#15803d' : prob >= 55 ? '#d97706' : '#c8102e';
   const r = 18, circ = 2 * Math.PI * r;
   const dash = (prob / 100) * circ;
@@ -174,7 +174,7 @@ function ProbabilityRing({ prob }) {
           transform="rotate(-90 22 22)" style={{ transition: 'stroke-dasharray 0.6s ease' }} />
         <text x="22" y="26" textAnchor="middle" fontSize="10" fontWeight="700" fill={color} fontFamily="monospace">{prob}%</text>
       </svg>
-      <span style={{ fontSize: 8, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>Prob.</span>
+      <span style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>Prob.</span>
     </div>
   );
 }
@@ -218,53 +218,53 @@ function CatalystCard({ event, onAIAnalysis, aiData, loadingAI }) {
           <div style={{ flex: 1, minWidth: 0 }}>
             {/* Badges row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: style.bg, color: style.color, border: `1px solid ${style.border}`, fontFamily: "'DM Mono', monospace", letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 7px', borderRadius: 3, background: style.bg, color: style.color, border: `1px solid ${style.border}`, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap' }}>
                 {style.label}
               </span>
               {isWatchlist && (
-                <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'DM Mono', monospace", letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 11.5, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap' }}>
                   WATCHLIST
                 </span>
               )}
               {event.tags.slice(0,2).map(tag => (
-                <span key={tag} style={{ fontSize: 9, padding: '2px 6px', borderRadius: 3, background: '#f5f2ed', color: '#888', fontFamily: "'DM Mono', monospace", whiteSpace: 'nowrap' }}>{tag}</span>
+                <span key={tag} style={{ fontSize: 11.5, padding: '2px 6px', borderRadius: 3, background: '#f5f2ed', color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap' }}>{tag}</span>
               ))}
-              <span style={{ marginLeft: 'auto', fontSize: 10, color: days <= 14 ? '#c8102e' : days <= 30 ? '#d97706' : '#aaa', fontFamily: "'DM Mono', monospace", fontWeight: days <= 14 ? 700 : 400, whiteSpace: 'nowrap' }}>
+              <span style={{ marginLeft: 'auto', fontSize: 13, color: days <= 14 ? '#c8102e' : days <= 30 ? '#d97706' : '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: days <= 14 ? 700 : 400, whiteSpace: 'nowrap' }}>
                 {days <= 0 ? 'TODAY' : `${days}d`}
               </span>
             </div>
 
             {/* Ticker + drug */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)', whiteSpace: 'nowrap' }}>
+              <span style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontSize: 13, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 3, border: '0.5px solid rgba(200,16,46,0.2)', whiteSpace: 'nowrap' }}>
                 {event.ticker}
               </span>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', fontFamily: "'Georgia', serif" }}>{event.drug !== '—' ? event.drug : event.company}</span>
-              {event.indication !== '—' && <span style={{ fontSize: 12, color: '#666' }}>· {event.indication}</span>}
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{event.drug !== '—' ? event.drug : event.company}</span>
+              {event.indication !== '—' && <span style={{ fontSize: 13, color: '#666' }}>· {event.indication}</span>}
             </div>
 
             {/* Date */}
-            <div style={{ fontSize: 11, color: '#888', fontFamily: "'DM Mono', monospace", marginBottom: 8 }}>
+            <div style={{ fontSize: 12.5, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 8 }}>
               {formatDate(event.date)} · {event.phase}
             </div>
 
-            <p style={{ fontSize: 12, color: '#444', lineHeight: 1.65, margin: 0, fontFamily: "'Georgia', serif" }}>
+            <p style={{ fontSize: 13, color: '#444', lineHeight: 1.65, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
               {event.aiSummary}
             </p>
 
             {/* On mobile: show scores inline under summary */}
             <div className="mobile-scores" style={{ display: 'none', marginTop: 10, gap: 16, flexWrap: 'wrap' }}>
               <div>
-                <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Importance</div>
+                <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 4 }}>Importance</div>
                 <ImportanceDots score={event.importance} />
               </div>
               <div style={{ flex: 1, minWidth: 100 }}>
-                <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Volatility</div>
+                <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 4 }}>Volatility</div>
                 <VolatilityBar score={event.volatilityScore} />
               </div>
               <div>
-                <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>Sentiment</div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: sentimentColor, fontFamily: "'DM Mono', monospace", textTransform: 'uppercase' }}>{sentimentArrow} {event.sentiment}</span>
+                <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 2 }}>Sentiment</div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: sentimentColor, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>{sentimentArrow} {event.sentiment}</span>
               </div>
             </div>
           </div>
@@ -272,16 +272,16 @@ function CatalystCard({ event, onAIAnalysis, aiData, loadingAI }) {
           {/* Right scores — desktop only */}
           <div className="desktop-scores" style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10, minWidth: 80 }}>
             <div>
-              <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Importance</div>
+              <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 4 }}>Importance</div>
               <ImportanceDots score={event.importance} />
             </div>
             <div>
-              <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>Volatility</div>
+              <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 4 }}>Volatility</div>
               <VolatilityBar score={event.volatilityScore} />
             </div>
             <div>
-              <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>Sentiment</div>
-              <span style={{ fontSize: 10, fontWeight: 700, color: sentimentColor, fontFamily: "'DM Mono', monospace", textTransform: 'uppercase' }}>{sentimentArrow} {event.sentiment}</span>
+              <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 2 }}>Sentiment</div>
+              <span style={{ fontSize: 13, fontWeight: 700, color: sentimentColor, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>{sentimentArrow} {event.sentiment}</span>
             </div>
           </div>
         </div>
@@ -290,30 +290,30 @@ function CatalystCard({ event, onAIAnalysis, aiData, loadingAI }) {
       {expanded && (
         <div style={{ padding: '0 16px 16px', borderTop: '1px solid #f0ede8' }}>
           <div style={{ margin: '12px 0', padding: '10px 14px', background: '#faf8f4', borderRadius: 4, border: '1px solid #e5e0d8', borderLeft: '3px solid #d97706' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#a16207', fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>Historical Probability</div>
-            <p style={{ fontSize: 12, color: '#555', lineHeight: 1.6, margin: 0, fontFamily: "'Georgia', serif" }}>{event.historicalContext}</p>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: '#a16207', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Historical Probability</div>
+            <p style={{ fontSize: 13, color: '#555', lineHeight: 1.6, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{event.historicalContext}</p>
           </div>
 
           {event.keyRisks && event.keyRisks.length > 0 && (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#c8102e', fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>Key Risks</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Key Risks</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                 {event.keyRisks.map((r, i) => (
-                  <span key={i} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 3, background: 'rgba(200,16,46,0.05)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.15)', fontFamily: "'DM Mono', monospace" }}>▸ {r}</span>
+                  <span key={i} style={{ fontSize: 12.5, padding: '3px 8px', borderRadius: 3, background: 'rgba(200,16,46,0.05)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.15)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>▸ {r}</span>
                 ))}
               </div>
             </div>
           )}
 
           <button
-            style={{ background: '#0f1923', border: 'none', borderRadius: 3, padding: '7px 14px', color: '#fff', fontSize: 11, cursor: 'pointer', fontWeight: 600, fontFamily: "'DM Mono', monospace", display: 'flex', alignItems: 'center', gap: 6 }}
+            style={{ background: '#0f1923', border: 'none', borderRadius: 3, padding: '7px 14px', color: '#fff', fontSize: 12.5, cursor: 'pointer', fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", display: 'flex', alignItems: 'center', gap: 6 }}
             onClick={() => onAIAnalysis(event)}
           >
             {loadingAI ? <><Spinner /> Analyzing…</> : aiData ? 'Analysis loaded' : 'Deep AI analysis →'}
           </button>
 
           {aiData && (
-            <div style={{ marginTop: 10, padding: '12px 14px', background: '#faf8f4', borderRadius: 4, border: '1px solid #e5e0d8', borderLeft: '3px solid #c8102e', fontSize: 12, color: '#333', lineHeight: 1.7, fontFamily: "'Georgia', serif" }}>
+            <div style={{ marginTop: 10, padding: '12px 14px', background: '#faf8f4', borderRadius: 4, border: '1px solid #e5e0d8', borderLeft: '3px solid #c8102e', fontSize: 13, color: '#333', lineHeight: 1.7, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
               {aiData}
             </div>
           )}
@@ -328,7 +328,7 @@ function CatalystHeatmap({ weeks, onWeekClick, selectedWeek }) {
   const max = Math.max(...weeks.map(w => w.intensity), 1);
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 6, padding: '14px 16px', marginBottom: '1.25rem' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
         Catalyst Heatmap — Next 12 Weeks
       </div>
       {/* Scrollable on mobile */}
@@ -355,10 +355,10 @@ function CatalystHeatmap({ weeks, onWeekClick, selectedWeek }) {
                 }}
                 title={`${week.label}: ${week.events.length} events`}
               >
-                <div style={{ fontSize: 16, fontWeight: 700, color: isSelected ? '#fff' : intensity > 0.5 ? '#fff' : intensity > 0.2 ? '#c8102e' : '#ccc', fontFamily: "'DM Mono', monospace", lineHeight: 1 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: isSelected ? '#fff' : intensity > 0.5 ? '#fff' : intensity > 0.2 ? '#c8102e' : '#ccc', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1 }}>
                   {week.events.length}
                 </div>
-                <div style={{ fontSize: 8, color: isSelected ? '#aaa' : '#bbb', fontFamily: "'DM Mono', monospace", marginTop: 3, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                <div style={{ fontSize: 11.5, color: isSelected ? '#aaa' : '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginTop: 3, whiteSpace: 'nowrap', overflow: 'hidden' }}>
                   {week.label}
                 </div>
               </div>
@@ -367,12 +367,12 @@ function CatalystHeatmap({ weeks, onWeekClick, selectedWeek }) {
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 9, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>LOW</span>
+        <span style={{ fontSize: 11.5, color: '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>LOW</span>
         {[0.1, 0.3, 0.5, 0.7, 0.9].map(v => (
           <div key={v} style={{ width: 16, height: 10, borderRadius: 2, background: `rgba(200,16,46,${0.08 + v * 0.65})` }} />
         ))}
-        <span style={{ fontSize: 9, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>HIGH</span>
-        <span style={{ marginLeft: 'auto', fontSize: 9, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>Tap week to filter</span>
+        <span style={{ fontSize: 11.5, color: '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>HIGH</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11.5, color: '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Tap week to filter</span>
       </div>
     </div>
   );
@@ -382,23 +382,23 @@ function CatalystHeatmap({ weeks, onWeekClick, selectedWeek }) {
 function MostWatchedSection() {
   return (
     <div style={{ background: '#0f1923', borderRadius: 6, padding: '14px 16px', marginBottom: '1.25rem', border: '1px solid #1e2d3d' }}>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
         Most Watched Catalysts
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
         {MOST_WATCHED.map((item, i) => (
           <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 4, padding: '10px 12px', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 700, color: '#c8102e' }}>{item.ticker}</span>
-              <span style={{ fontSize: 10, color: item.sentiment === 'bullish' ? '#34d399' : '#f59e0b', fontFamily: "'DM Mono', monospace" }}>
+              <span style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontSize: 13, fontWeight: 700, color: '#c8102e' }}>{item.ticker}</span>
+              <span style={{ fontSize: 13, color: item.sentiment === 'bullish' ? '#34d399' : '#f59e0b', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
                 {item.sentiment === 'bullish' ? '↑' : '→'}
               </span>
             </div>
-            <div style={{ fontSize: 11, color: '#aaa', fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>{item.event}</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: "'DM Mono', monospace", lineHeight: 1 }}>
+            <div style={{ fontSize: 12.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>{item.event}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1 }}>
               {item.watchers.toLocaleString()}
             </div>
-            <div style={{ fontSize: 9, color: '#34d399', fontFamily: "'DM Mono', monospace", marginTop: 2 }}>{item.change}</div>
+            <div style={{ fontSize: 11.5, color: '#34d399', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginTop: 2 }}>{item.change}</div>
           </div>
         ))}
       </div>
@@ -465,26 +465,26 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
 
   const FilterPanel = () => (
     <div>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 6 }}>Filters</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 6 }}>Filters</div>
 
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>Show</div>
+        <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Show</div>
         <button
           onClick={() => setWatchlistOnly(x => !x)}
-          style={{ width: '100%', padding: '7px 10px', borderRadius: 3, border: watchlistOnly ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: watchlistOnly ? 'rgba(200,16,46,0.07)' : 'transparent', color: watchlistOnly ? '#c8102e' : '#555', fontSize: 11, cursor: 'pointer', fontFamily: "'DM Mono', monospace", fontWeight: watchlistOnly ? 700 : 400, textAlign: 'left', transition: 'all 0.15s' }}
+          style={{ width: '100%', padding: '7px 10px', borderRadius: 3, border: watchlistOnly ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: watchlistOnly ? 'rgba(200,16,46,0.07)' : 'transparent', color: watchlistOnly ? '#c8102e' : '#555', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: watchlistOnly ? 700 : 400, textAlign: 'left', transition: 'all 0.15s' }}
         >
           {watchlistOnly ? 'Watchlist only' : 'All companies'}
         </button>
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>Event type</div>
+        <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Event type</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <button onClick={() => setTypeFilter('')} style={{ padding: '6px 10px', borderRadius: 3, border: !typeFilter ? '1.5px solid #1a1a1a' : '1px solid #e5e0d8', background: !typeFilter ? '#1a1a1a' : 'transparent', color: !typeFilter ? '#fff' : '#555', fontSize: 11, cursor: 'pointer', fontFamily: "'DM Mono', monospace", textAlign: 'left', transition: 'all 0.15s' }}>All types</button>
+          <button onClick={() => setTypeFilter('')} style={{ padding: '6px 10px', borderRadius: 3, border: !typeFilter ? '1.5px solid #1a1a1a' : '1px solid #e5e0d8', background: !typeFilter ? '#1a1a1a' : 'transparent', color: !typeFilter ? '#fff' : '#555', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", textAlign: 'left', transition: 'all 0.15s' }}>All types</button>
           {eventTypes.map(type => {
             const st = getEventStyle(type);
             return (
-              <button key={type} onClick={() => setTypeFilter(typeFilter === type ? '' : type)} style={{ padding: '6px 10px', borderRadius: 3, border: typeFilter === type ? `1.5px solid ${st.color}` : '1px solid #e5e0d8', background: typeFilter === type ? st.bg : 'transparent', color: typeFilter === type ? st.color : '#555', fontSize: 11, cursor: 'pointer', fontFamily: "'DM Mono', monospace", textAlign: 'left', transition: 'all 0.15s' }}>
+              <button key={type} onClick={() => setTypeFilter(typeFilter === type ? '' : type)} style={{ padding: '6px 10px', borderRadius: 3, border: typeFilter === type ? `1.5px solid ${st.color}` : '1px solid #e5e0d8', background: typeFilter === type ? st.bg : 'transparent', color: typeFilter === type ? st.color : '#555', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", textAlign: 'left', transition: 'all 0.15s' }}>
                 {st.label}
               </button>
             );
@@ -493,10 +493,10 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 9, color: '#aaa', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: "'DM Mono', monospace", marginBottom: 6 }}>Sort by</div>
+        <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Sort by</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {[{ key: 'date', label: 'Date' }, { key: 'importance', label: 'Importance' }, { key: 'volatility', label: 'Volatility' }].map(opt => (
-            <button key={opt.key} onClick={() => setSortBy(opt.key)} style={{ padding: '6px 10px', borderRadius: 3, border: sortBy === opt.key ? '1.5px solid #1a1a1a' : '1px solid #e5e0d8', background: sortBy === opt.key ? '#1a1a1a' : 'transparent', color: sortBy === opt.key ? '#fff' : '#555', fontSize: 11, cursor: 'pointer', fontFamily: "'DM Mono', monospace", textAlign: 'left', transition: 'all 0.15s' }}>{opt.label}</button>
+            <button key={opt.key} onClick={() => setSortBy(opt.key)} style={{ padding: '6px 10px', borderRadius: 3, border: sortBy === opt.key ? '1.5px solid #1a1a1a' : '1px solid #e5e0d8', background: sortBy === opt.key ? '#1a1a1a' : 'transparent', color: sortBy === opt.key ? '#fff' : '#555', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", textAlign: 'left', transition: 'all 0.15s' }}>{opt.label}</button>
           ))}
         </div>
       </div>
@@ -504,7 +504,7 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
       {hasActiveFilters && (
         <button
           onClick={() => { setTypeFilter(''); setWatchlistOnly(false); setSelectedWeek(null); }}
-          style={{ width: '100%', padding: '7px 10px', borderRadius: 3, border: '1px solid #d1ccc4', background: 'transparent', color: '#888', fontSize: 11, cursor: 'pointer', fontFamily: "'DM Mono', monospace" }}
+          style={{ width: '100%', padding: '7px 10px', borderRadius: 3, border: '1px solid #d1ccc4', background: 'transparent', color: '#888', fontSize: 12.5, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}
         >
           Clear filters
         </button>
@@ -533,10 +533,10 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
 
       {/* Header */}
       <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>
+        <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
           Biotech Catalyst Intelligence · {filtered.length} events tracked
         </span>
-        <span style={{ fontSize: 10, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>
+        <span style={{ fontSize: 13, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>
           {upcomingCount} catalysts in next 30 days
         </span>
       </div>
@@ -548,7 +548,7 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
       <button
         className="cal-mobile-filter-btn"
         onClick={() => setFiltersOpen(x => !x)}
-        style={{ display: 'none', width: '100%', padding: '10px 14px', marginBottom: 12, borderRadius: 4, border: hasActiveFilters ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: hasActiveFilters ? 'rgba(200,16,46,0.05)' : '#fff', color: hasActiveFilters ? '#c8102e' : '#555', fontSize: 12, fontFamily: "'DM Mono', monospace", cursor: 'pointer', fontWeight: hasActiveFilters ? 700 : 400, alignItems: 'center', justifyContent: 'space-between' }}
+        style={{ display: 'none', width: '100%', padding: '10px 14px', marginBottom: 12, borderRadius: 4, border: hasActiveFilters ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: hasActiveFilters ? 'rgba(200,16,46,0.05)' : '#fff', color: hasActiveFilters ? '#c8102e' : '#555', fontSize: 13, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", cursor: 'pointer', fontWeight: hasActiveFilters ? 700 : 400, alignItems: 'center', justifyContent: 'space-between' }}
       >
         <span>Filters {hasActiveFilters ? '(active)' : ''}</span>
         <span>{filtersOpen ? '↑' : '↓'}</span>
@@ -571,11 +571,11 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
 
         {/* Center: timeline */}
         <div>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 6 }}>
             Catalyst Timeline · {filtered.length} events
           </div>
           {filtered.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#aaa', fontSize: 13, fontFamily: "'DM Mono', monospace" }}>No catalysts match current filters.</div>
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#aaa', fontSize: 13, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>No catalysts match current filters.</div>
           )}
           {filtered.map(event => (
             <CatalystCard
@@ -590,19 +590,19 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
 
         {/* Right: AI insights — desktop only */}
         <div className="cal-sidebar-right" style={{ position: 'sticky', top: '1rem' }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 6 }}>AI Insights</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 6 }}>AI Insights</div>
 
           <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
-            <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8 }}>Next 30 Days</div>
+            <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 8 }}>Next 30 Days</div>
             {CATALYST_EVENTS.filter(e => daysUntil(e.date) > 0 && daysUntil(e.date) <= 30).sort((a,b) => new Date(a.date)-new Date(b.date)).map(e => {
               const st = getEventStyle(e.eventType);
               return (
                 <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: '1px solid #f5f2ed' }}>
-                  <span style={{ fontSize: 9, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700, minWidth: 28 }}>{daysUntil(e.date)}d</span>
+                  <span style={{ fontSize: 11.5, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700, minWidth: 28 }}>{daysUntil(e.date)}d</span>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: st.color, flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#1a1a1a', fontFamily: "'DM Mono', monospace" }}>{e.ticker}</div>
-                    <div style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.eventType}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 600, color: '#1a1a1a', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{e.ticker}</div>
+                    <div style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e.eventType}</div>
                   </div>
                 </div>
               );
@@ -610,12 +610,12 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
           </div>
 
           <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
-            <div style={{ fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8 }}>Top Volatility Events</div>
+            <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 8 }}>Top Volatility Events</div>
             {[...CATALYST_EVENTS].sort((a,b) => b.volatilityScore - a.volatilityScore).slice(0,4).map(e => (
               <div key={e.id} style={{ marginBottom: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#1a1a1a', fontFamily: "'DM Mono', monospace" }}>{e.ticker} · {e.drug !== '—' ? e.drug : e.eventType}</span>
-                  <span style={{ fontSize: 10, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>{e.volatilityScore}/10</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 600, color: '#1a1a1a', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{e.ticker} · {e.drug !== '—' ? e.drug : e.eventType}</span>
+                  <span style={{ fontSize: 13, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>{e.volatilityScore}/10</span>
                 </div>
                 <VolatilityBar score={e.volatilityScore} />
               </div>
@@ -623,8 +623,8 @@ Cover: (1) what this trial is really testing scientifically, (2) the bull case i
           </div>
 
           <div style={{ background: '#faf8f4', border: '1px solid #e5e0d8', borderRadius: 6, padding: '12px 14px', borderLeft: '3px solid #d97706' }}>
-            <div style={{ fontSize: 9, color: '#a16207', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Note</div>
-            <p style={{ fontSize: 11, color: '#666', lineHeight: 1.6, margin: 0, fontFamily: "'Georgia', serif" }}>
+            <div style={{ fontSize: 11.5, color: '#a16207', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Note</div>
+            <p style={{ fontSize: 12.5, color: '#666', lineHeight: 1.6, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
               Probability estimates and historical data are AI-generated for informational purposes only. Not financial advice. Binary biotech events carry high risk of significant loss.
             </p>
           </div>

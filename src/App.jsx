@@ -286,15 +286,15 @@ const COMPETITIVE_LANDSCAPE_DATA = [
 ];
 
 const s = {
-  app: { maxWidth: 1400, margin: '0 auto', padding: '2rem 2.5rem', minHeight: '100vh', background: '#fefcf9' },
+  app: { maxWidth: 1400, margin: '0 auto', padding: '1.75rem 2.5rem 3rem', minHeight: '100vh', background: '#fbfaf7', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", color: '#1a1a1a' },
   card: { background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '1rem 1.25rem', marginBottom: 10 },
   grid4: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px,1fr))', gap: 10, marginBottom: '1.25rem' },
   metric: { background: '#fff', borderRadius: 8, padding: '12px 14px', border: '1px solid #e5e0d8' },
-  metricLabel: { fontSize: 11, color: '#888', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.5px' },
+  metricLabel: { fontSize: 12.5, color: '#888', marginBottom: 4, },
   metricVal: { fontSize: 22, fontWeight: 700, color: '#1a1a1a' },
   row: { display: 'flex', alignItems: 'center', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  ticker: { fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)' },
+  ticker: { fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontSize: 13, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)' },
   muted: { fontSize: 13, color: '#555' },
   badge: (type) => {
     const map = {
@@ -306,11 +306,11 @@ const s = {
       teal: ['rgba(5,150,105,0.08)', '#065f46', 'rgba(5,150,105,0.25)'],
     };
     const [bg, color, border] = map[type] || map.blue;
-    return { fontSize: 11, padding: '3px 8px', borderRadius: 20, background: bg, color, border: `0.5px solid ${border}`, fontWeight: 600, whiteSpace: 'nowrap' };
+    return { fontSize: 12.5, padding: '3px 8px', borderRadius: 20, background: bg, color, border: `0.5px solid ${border}`, fontWeight: 600, whiteSpace: 'nowrap' };
   },
   input: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 8, padding: '9px 14px', color: '#1a1a1a', fontSize: 13, outline: 'none', width: '100%' },
-  btn: { background: '#1a1a1a', border: 'none', borderRadius: 3, padding: '8px 14px', color: '#fff', fontSize: 12, cursor: 'pointer', fontWeight: 600 },
-  btnSm: { background: 'transparent', border: '1px solid #d1ccc4', borderRadius: 3, padding: '5px 10px', color: '#555', fontSize: 11, cursor: 'pointer' },
+  btn: { background: '#1a1a1a', border: 'none', borderRadius: 3, padding: '8px 14px', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600 },
+  btnSm: { background: 'transparent', border: '1px solid #d1ccc4', borderRadius: 3, padding: '5px 10px', color: '#555', fontSize: 12.5, cursor: 'pointer' },
   aiBox: { background: '#faf8f4', borderRadius: 8, padding: '12px 14px', fontSize: 13, color: '#444', marginTop: 10, lineHeight: 1.7, border: '1px solid #e5e0d8' },
   divider: { border: 'none', borderTop: '1px solid #e5e0d8', margin: '10px 0' },
   priceUp: { color: '#16a34a', fontWeight: 600 },
@@ -318,20 +318,20 @@ const s = {
 };
 
 const np = {
-  wrapper: { fontFamily: "'Georgia', 'Times New Roman', serif" },
+  wrapper: { fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
   datebar: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', paddingTop: '0.4rem', paddingBottom: '0.4rem', marginBottom: '1.25rem', flexWrap: 'wrap', gap: 6 },
-  datebarText: { fontSize: 11, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" },
-  sectionLabel: { fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 },
-  featuredHeadline: { fontSize: 28, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Georgia', serif" },
-  featuredByline: { fontSize: 11, color: '#777', marginBottom: 10, letterSpacing: '0.3px', fontFamily: "'DM Mono', monospace" },
-  featuredSummary: { fontSize: 15, lineHeight: 1.75, color: '#333', fontFamily: "'Georgia', serif" },
+  datebarText: { fontSize: 12.5, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
+  sectionLabel: { fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 },
+  featuredHeadline: { fontSize: 28, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
+  featuredByline: { fontSize: 12.5, color: '#777', marginBottom: 10, letterSpacing: '0.3px', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
+  featuredSummary: { fontSize: 15, lineHeight: 1.75, color: '#333', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
   tagPill: (tag) => {
     const c = tagColor(tag);
-    return { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3, background: c.bg, color: c.color, border: `1px solid ${c.border}`, marginBottom: 8, fontFamily: "'DM Mono', monospace" };
+    return { display: 'inline-block', fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 3, background: c.bg, color: c.color, border: `1px solid ${c.border}`, marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" };
   },
   filterBar: { display: 'flex', gap: 8, marginBottom: '1.25rem', alignItems: 'center' },
-  filterInput: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 6, padding: '7px 12px', color: '#1a1a1a', fontSize: 12, outline: 'none', flex: 1, fontFamily: "'DM Mono', monospace" },
-  npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Georgia', serif", borderLeft: '3px solid #c8102e' },
+  filterInput: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 6, padding: '7px 12px', color: '#1a1a1a', fontSize: 13, outline: 'none', flex: 1, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
+  npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
 
 function FallbackGraphic({ seed }) {
@@ -436,31 +436,31 @@ function HTACard({ item, callClaude }) {
       <div style={{ padding: '14px 18px', borderBottom: expanded ? '1px solid #f0ede8' : 'none' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
           {/* Body badge */}
-          <div style={{ flexShrink: 0, background: bodyStyle.bg, color: bodyStyle.text, fontFamily: "'DM Mono', monospace", fontWeight: 700, fontSize: 13, padding: '6px 12px', borderRadius: 6, letterSpacing: '0.5px', minWidth: 56, textAlign: 'center' }}>
+          <div style={{ flexShrink: 0, background: bodyStyle.bg, color: bodyStyle.text, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700, fontSize: 13, padding: '6px 12px', borderRadius: 6, minWidth: 56, textAlign: 'center' }}>
             {item.body}
-            <div style={{ fontSize: 9, opacity: 0.75, fontWeight: 400, marginTop: 1 }}>{item.country}</div>
+            <div style={{ fontSize: 11.5, opacity: 0.75, fontWeight: 400, marginTop: 1 }}>{item.country}</div>
           </div>
           {/* Main info */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-              <span style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: "'Georgia', serif" }}>{item.product}</span>
-              <span style={{ fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>· {item.company}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.product}</span>
+              <span style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>· {item.company}</span>
             </div>
-            <div style={{ fontSize: 12, color: '#555', marginBottom: 8, lineHeight: 1.4 }}>{item.indication}</div>
+            <div style={{ fontSize: 13, color: '#555', marginBottom: 8, lineHeight: 1.4 }}>{item.indication}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: outcome.bg, color: outcome.color, border: `0.5px solid ${outcome.border}`, fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>
+              <span style={{ fontSize: 12.5, padding: '3px 10px', borderRadius: 20, background: outcome.bg, color: outcome.color, border: `0.5px solid ${outcome.border}`, fontWeight: 700, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
                 {outcome.label}
               </span>
-              <span style={{ fontSize: 11, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>{item.date}</span>
-              <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace", background: '#f5f2ed', padding: '2px 8px', borderRadius: 10 }}>{item.mechanism}</span>
+              <span style={{ fontSize: 12.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.date}</span>
+              <span style={{ fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", background: '#f5f2ed', padding: '2px 8px', borderRadius: 10 }}>{item.mechanism}</span>
             </div>
           </div>
           {/* Actions */}
           <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
-            <button style={{ ...s.btn, fontSize: 10, padding: '5px 12px', background: '#065f46' }} onClick={handleAI}>
+            <button style={{ ...s.btn, fontSize: 13, padding: '5px 12px', background: '#065f46' }} onClick={handleAI}>
               {loadingAI ? <><Spinner />Analyzing…</> : aiAnalysis ? 'MA Analysis ✓' : 'MA Analysis →'}
             </button>
-            <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setExpanded(x => !x)}>
+            <button style={{ ...s.btnSm, fontSize: 12.5 }} onClick={() => setExpanded(x => !x)}>
               {expanded ? '▲' : '▼'}
             </button>
           </div>
@@ -471,22 +471,22 @@ function HTACard({ item, callClaude }) {
       {expanded && (
         <div style={{ padding: '16px 18px', background: '#fdfcfa' }}>
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 6, fontFamily: "'DM Mono', monospace" }}>Committee Rationale</div>
-            <p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0, fontFamily: "'Georgia', serif" }}>{item.rationale}</p>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 6, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Committee Rationale</div>
+            <p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.rationale}</p>
           </div>
           <div style={{ marginBottom: aiAnalysis ? 12 : 0, padding: '10px 14px', background: 'rgba(5,150,105,0.05)', borderRadius: 6, border: '1px solid rgba(5,150,105,0.15)', borderLeft: '3px solid #065f46' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#065f46', marginBottom: 5, fontFamily: "'DM Mono', monospace" }}>Market Access Signal</div>
-            <p style={{ fontSize: 13, color: '#2d4a3e', lineHeight: 1.65, margin: 0, fontFamily: "'Georgia', serif" }}>{item.maSignal}</p>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Market Access Signal</div>
+            <p style={{ fontSize: 13, color: '#2d4a3e', lineHeight: 1.65, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.maSignal}</p>
           </div>
           {loadingAI && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}><Spinner />Generating market access analysis…</div>}
           {aiAnalysis && (
             <div style={{ ...np.npAiBox, marginTop: 12, borderLeft: '3px solid #065f46', whiteSpace: 'pre-line' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#065f46', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>AI · Market Access Analysis</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>AI · Market Access Analysis</div>
               {aiAnalysis}
             </div>
           )}
           {item.source && (
-            <a href={item.source} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 10, fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>
+            <a href={item.source} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 10, fontSize: 12.5, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", textDecoration: 'none', fontWeight: 600 }}>
               Source: {item.body} ↗
             </a>
           )}
@@ -543,8 +543,8 @@ function HTATab({ callClaude }) {
     <div>
       {/* Header */}
       <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>HTA & Reimbursement Decisions · Europe</span>
-        <span style={{ fontSize: 10, color: '#065f46', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>NICE · G-BA · HAS · EUnetHTA · SMC</span>
+        <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>HTA & Reimbursement Decisions · Europe</span>
+        <span style={{ fontSize: 13, color: '#065f46', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>NICE · G-BA · HAS · EUnetHTA · SMC</span>
       </div>
 
       {/* Metrics */}
@@ -564,7 +564,7 @@ function HTATab({ callClaude }) {
 
       {/* AI Overview button */}
       <div style={{ marginBottom: '1.25rem' }}>
-        <button style={{ ...s.btn, background: '#065f46', fontSize: 11, padding: '8px 16px' }} onClick={handleOverview}>
+        <button style={{ ...s.btn, background: '#065f46', fontSize: 12.5, padding: '8px 16px' }} onClick={handleOverview}>
           {loadingOverview ? <><Spinner />Analyzing trends…</> : aiOverview ? 'Strategic Overview ✓' : '→ Generate strategic overview for small pharma'}
         </button>
         {aiOverview && <div style={{ ...np.npAiBox, marginTop: 10, borderLeft: '3px solid #065f46' }}>{aiOverview}</div>}
@@ -573,20 +573,20 @@ function HTATab({ callClaude }) {
       {/* Filters */}
       <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>HTA body</div>
+          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>HTA body</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {['', ...bodies].map(b => (
-              <button key={b} onClick={() => setBodyFilter(b)} style={{ padding: '4px 12px', borderRadius: 4, border: bodyFilter === b ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: bodyFilter === b ? '#1a1a1a' : 'transparent', color: bodyFilter === b ? '#fff' : '#555', fontSize: 11, fontWeight: bodyFilter === b ? 700 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace', transition: 'all 0.15s'" }}>
+              <button key={b} onClick={() => setBodyFilter(b)} style={{ padding: '4px 12px', borderRadius: 4, border: bodyFilter === b ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: bodyFilter === b ? '#1a1a1a' : 'transparent', color: bodyFilter === b ? '#fff' : '#555', fontSize: 12.5, fontWeight: bodyFilter === b ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s' }}>
                 {b || 'All'}
               </button>
             ))}
           </div>
         </div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Outcome</div>
+          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Outcome</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[{ key: '', label: 'All' }, { key: 'positive', label: '✓ Recommended' }, { key: 'negative', label: '✕ Not recommended' }, { key: 'conditional', label: '◐ Conditional' }].map(o => (
-              <button key={o.key} onClick={() => setOutcomeFilter(o.key)} style={{ padding: '4px 12px', borderRadius: 4, border: outcomeFilter === o.key ? `1.5px solid ${o.key === 'positive' ? '#15803d' : o.key === 'negative' ? '#c8102e' : o.key === 'conditional' ? '#a16207' : '#1a1a1a'}` : '1px solid #d1ccc4', background: outcomeFilter === o.key ? (o.key === 'positive' ? 'rgba(22,163,74,0.08)' : o.key === 'negative' ? 'rgba(200,16,46,0.08)' : o.key === 'conditional' ? 'rgba(161,98,7,0.08)' : '#1a1a1a') : 'transparent', color: outcomeFilter === o.key ? (o.key === 'positive' ? '#15803d' : o.key === 'negative' ? '#c8102e' : o.key === 'conditional' ? '#a16207' : '#fff') : '#555', fontSize: 11, fontWeight: outcomeFilter === o.key ? 700 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace" }}>
+              <button key={o.key} onClick={() => setOutcomeFilter(o.key)} style={{ padding: '4px 12px', borderRadius: 4, border: outcomeFilter === o.key ? `1.5px solid ${o.key === 'positive' ? '#15803d' : o.key === 'negative' ? '#c8102e' : o.key === 'conditional' ? '#a16207' : '#1a1a1a'}` : '1px solid #d1ccc4', background: outcomeFilter === o.key ? (o.key === 'positive' ? 'rgba(22,163,74,0.08)' : o.key === 'negative' ? 'rgba(200,16,46,0.08)' : o.key === 'conditional' ? 'rgba(161,98,7,0.08)' : '#1a1a1a') : 'transparent', color: outcomeFilter === o.key ? (o.key === 'positive' ? '#15803d' : o.key === 'negative' ? '#c8102e' : o.key === 'conditional' ? '#a16207' : '#fff') : '#555', fontSize: 12.5, fontWeight: outcomeFilter === o.key ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
                 {o.label}
               </button>
             ))}
@@ -599,12 +599,12 @@ function HTATab({ callClaude }) {
       </div>
 
       {/* Decisions list */}
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
         Recent decisions · {filtered.length} shown
       </div>
       {filtered.map(item => <HTACard key={item.id} item={item} callClaude={callClaude} />)}
 
-      <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace", lineHeight: 1.6 }}>
+      <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1.6 }}>
         Decisions sourced from <strong style={{ color: '#555' }}>NICE, G-BA, HAS, SMC, EUnetHTA</strong> public databases. Updated weekly. Production version would pull live from official RSS/APIs.
       </div>
     </div>
@@ -625,29 +625,29 @@ function stagePill(stage) {
 function CompetitorRow({ entry, isLast }) {
   const sp = stagePill(entry.stage);
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '160px 140px auto 1fr 180px', gap: 12, padding: '10px 16px', borderBottom: isLast ? 'none' : '1px solid #f0ede8', alignItems: 'start', fontSize: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '160px 140px auto 1fr 180px', gap: 12, padding: '10px 16px', borderBottom: isLast ? 'none' : '1px solid #f0ede8', alignItems: 'start', fontSize: 13 }}>
       <div>
-        <div style={{ fontWeight: 600, color: '#1a1a1a', fontSize: 12 }}>{entry.company}</div>
-        <div style={{ color: '#888', fontSize: 11, fontFamily: "'DM Mono', monospace" }}>{entry.product}</div>
+        <div style={{ fontWeight: 600, color: '#1a1a1a', fontSize: 13 }}>{entry.company}</div>
+        <div style={{ color: '#888', fontSize: 12.5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{entry.product}</div>
       </div>
       <div>
-        <span style={{ display: 'inline-block', padding: '2px 9px', borderRadius: 10, background: sp.bg, color: sp.color, fontSize: 10, fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>{sp.label}</span>
+        <span style={{ display: 'inline-block', padding: '2px 9px', borderRadius: 10, background: sp.bg, color: sp.color, fontSize: 13, fontWeight: 700, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{sp.label}</span>
       </div>
       <div>
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {entry.markets.length > 0 ? entry.markets.map(m => (
-            <span key={m} style={{ fontSize: 10, padding: '1px 6px', borderRadius: 4, background: '#f0ede8', color: '#555', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>{m}</span>
-          )) : <span style={{ fontSize: 10, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>Not yet marketed</span>}
+            <span key={m} style={{ fontSize: 13, padding: '1px 6px', borderRadius: 4, background: '#f0ede8', color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>{m}</span>
+          )) : <span style={{ fontSize: 13, color: '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Not yet marketed</span>}
         </div>
       </div>
       <div>
-        <div style={{ fontSize: 11, color: '#555', lineHeight: 1.5 }}>{entry.notes}</div>
-        <div style={{ fontSize: 10, color: '#999', fontFamily: "'DM Mono', monospace", marginTop: 3 }}>MoA: {entry.mechanism}</div>
+        <div style={{ fontSize: 12.5, color: '#555', lineHeight: 1.5 }}>{entry.notes}</div>
+        <div style={{ fontSize: 13, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginTop: 3 }}>MoA: {entry.mechanism}</div>
       </div>
       <div>
         {entry.htaStatus !== '—'
-          ? <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: 'rgba(5,150,105,0.07)', color: '#065f46', border: '0.5px solid rgba(5,150,105,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>{entry.htaStatus}</span>
-          : <span style={{ fontSize: 10, color: '#ccc', fontFamily: "'DM Mono', monospace" }}>No HTA yet</span>
+          ? <span style={{ fontSize: 13, padding: '2px 8px', borderRadius: 4, background: 'rgba(5,150,105,0.07)', color: '#065f46', border: '0.5px solid rgba(5,150,105,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>{entry.htaStatus}</span>
+          : <span style={{ fontSize: 13, color: '#ccc', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>No HTA yet</span>
         }
       </div>
     </div>
@@ -693,18 +693,18 @@ function CompetitiveLandscapeCard({ item, callClaude }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: areaColor, fontFamily: "'DM Mono', monospace", background: `rgba(${areaColor === '#c8102e' ? '200,16,46' : areaColor === '#7c3aed' ? '124,58,237' : areaColor === '#1d4ed8' ? '29,78,216' : '3,105,161'},0.07)`, padding: '2px 8px', borderRadius: 4 }}>{item.area}</span>
-              <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>· {item.target}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: areaColor, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", background: `rgba(${areaColor === '#c8102e' ? '200,16,46' : areaColor === '#7c3aed' ? '124,58,237' : areaColor === '#1d4ed8' ? '29,78,216' : '3,105,161'},0.07)`, padding: '2px 8px', borderRadius: 4 }}>{item.area}</span>
+              <span style={{ fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>· {item.target}</span>
             </div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111', margin: '0 0 6px 0', fontFamily: "'Georgia', serif" }}>{item.indication}</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111', margin: '0 0 6px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.indication}</h3>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 11, color: '#888', fontFamily: "'DM Mono', monospace" }}>{item.entries.length} competitors tracked</span>
-              {commercialCount > 0 && <span style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#15803d', fontWeight: 600 }}>· {commercialCount} commercial</span>}
-              {lateStageCount > 0 && <span style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", color: '#a16207', fontWeight: 600 }}>· {lateStageCount} late-stage pipeline</span>}
+              <span style={{ fontSize: 12.5, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.entries.length} competitors tracked</span>
+              {commercialCount > 0 && <span style={{ fontSize: 12.5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", color: '#15803d', fontWeight: 600 }}>· {commercialCount} commercial</span>}
+              {lateStageCount > 0 && <span style={{ fontSize: 12.5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", color: '#a16207', fontWeight: 600 }}>· {lateStageCount} late-stage pipeline</span>}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-            <button style={{ ...s.btn, fontSize: 10, padding: '5px 12px', background: areaColor }} onClick={e => { e.stopPropagation(); handleAI(); }}>
+            <button style={{ ...s.btn, fontSize: 13, padding: '5px 12px', background: areaColor }} onClick={e => { e.stopPropagation(); handleAI(); }}>
               {loadingAI ? <><Spinner />Analyzing…</> : aiAnalysis ? 'MA Strategy ✓' : 'MA Strategy →'}
             </button>
             <span style={{ fontSize: 18, color: '#bbb', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>⌄</span>
@@ -716,7 +716,7 @@ function CompetitiveLandscapeCard({ item, callClaude }) {
       {expanded && (
         <div style={{ borderTop: '1px solid #f0ede8' }}>
           {/* Table header */}
-          <div style={{ display: 'grid', gridTemplateColumns: '160px 140px auto 1fr 180px', gap: 12, padding: '8px 16px', background: '#f8f6f2', borderBottom: '1px solid #e5e0d8', fontSize: 9, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '160px 140px auto 1fr 180px', gap: 12, padding: '8px 16px', background: '#f8f6f2', borderBottom: '1px solid #e5e0d8', fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>
             <span>Company / Product</span><span>Stage</span><span>Markets</span><span>Notes</span><span>HTA Status</span>
           </div>
           {item.entries.map((entry, i) => <CompetitorRow key={i} entry={entry} isLast={i === item.entries.length - 1} />)}
@@ -727,7 +727,7 @@ function CompetitiveLandscapeCard({ item, callClaude }) {
               {loadingAI && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13 }}><Spinner />Generating market access strategy analysis…</div>}
               {aiAnalysis && (
                 <div style={{ ...np.npAiBox, marginTop: 0, borderLeft: `3px solid ${areaColor}`, whiteSpace: 'pre-line' }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: areaColor, marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>AI · Competitive MA Strategy</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: areaColor, marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>AI · Competitive MA Strategy</div>
                   {aiAnalysis}
                 </div>
               )}
@@ -761,8 +761,8 @@ function CompetitiveLandscapeTab({ callClaude }) {
   return (
     <div>
       <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Competitive Landscape · Market Access View</span>
-        <span style={{ fontSize: 10, color: '#1d4ed8', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>Pipeline · HTA · Pricing signals</span>
+        <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Competitive Landscape · Market Access View</span>
+        <span style={{ fontSize: 13, color: '#1d4ed8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>Pipeline · HTA · Pricing signals</span>
       </div>
 
       {/* Metrics */}
@@ -783,10 +783,10 @@ function CompetitiveLandscapeTab({ callClaude }) {
       {/* Filters */}
       <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Therapy area</div>
+          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Therapy area</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {['', ...areas].map(a => (
-              <button key={a} onClick={() => setAreaFilter(a)} style={{ padding: '4px 12px', borderRadius: 4, border: areaFilter === a ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: areaFilter === a ? '#1a1a1a' : 'transparent', color: areaFilter === a ? '#fff' : '#555', fontSize: 11, fontWeight: areaFilter === a ? 700 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace" }}>
+              <button key={a} onClick={() => setAreaFilter(a)} style={{ padding: '4px 12px', borderRadius: 4, border: areaFilter === a ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: areaFilter === a ? '#1a1a1a' : 'transparent', color: areaFilter === a ? '#fff' : '#555', fontSize: 12.5, fontWeight: areaFilter === a ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
                 {a || 'All areas'}
               </button>
             ))}
@@ -798,12 +798,12 @@ function CompetitiveLandscapeTab({ callClaude }) {
         </div>
       </div>
 
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
         Landscape snapshots · {filtered.length} areas
       </div>
       {filtered.map(item => <CompetitiveLandscapeCard key={item.id} item={item} callClaude={callClaude} />)}
 
-      <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace", lineHeight: 1.6 }}>
+      <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1.6 }}>
         Data sourced from <strong style={{ color: '#555' }}>ClinicalTrials.gov, EMA, company press releases, HTA body databases</strong>. Production version would pull live pipeline data and HTA decisions automatically.
       </div>
     </div>
@@ -833,29 +833,29 @@ function PubCard({ pub, companyName, showCompany }) {
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontFamily: "'DM Mono', monospace" }}>{badge.label}</span>
-        {isConference && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(190,18,60,0.07)', color: '#be123c', border: '1px solid rgba(190,18,60,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>CONGRESS</span>}
-        {showCompany && companyName && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>{companyName}</span>}
-        {pub.isOpenAccess && <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 3, background: 'rgba(21,128,61,0.07)', color: '#15803d', border: '0.5px solid rgba(21,128,61,0.2)', fontFamily: "'DM Mono', monospace", fontWeight: 600 }}>OA</span>}
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{pub.pubDate || pub.pubYear || ''}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 3, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{badge.label}</span>
+        {isConference && <span style={{ fontSize: 13, padding: '2px 7px', borderRadius: 3, background: 'rgba(190,18,60,0.07)', color: '#be123c', border: '1px solid rgba(190,18,60,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>CONGRESS</span>}
+        {showCompany && companyName && <span style={{ fontSize: 13, padding: '2px 7px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>{companyName}</span>}
+        {pub.isOpenAccess && <span style={{ fontSize: 13, padding: '2px 7px', borderRadius: 3, background: 'rgba(21,128,61,0.07)', color: '#15803d', border: '0.5px solid rgba(21,128,61,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>OA</span>}
+        <span style={{ marginLeft: 'auto', fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{pub.pubDate || pub.pubYear || ''}</span>
       </div>
-      <p style={{ fontSize: 14, fontWeight: 600, color: '#111', lineHeight: 1.4, margin: '0 0 6px 0', fontFamily: "'Georgia', serif", cursor: pubLink ? 'pointer' : 'default' }} onClick={() => pubLink && window.open(pubLink, '_blank')}>
-        {pub.title}{pubLink && <span style={{ color: '#c8102e', fontSize: 11, marginLeft: 6, fontFamily: "'DM Mono', monospace" }}>↗</span>}
+      <p style={{ fontSize: 14, fontWeight: 600, color: '#111', lineHeight: 1.4, margin: '0 0 6px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", cursor: pubLink ? 'pointer' : 'default' }} onClick={() => pubLink && window.open(pubLink, '_blank')}>
+        {pub.title}{pubLink && <span style={{ color: '#c8102e', fontSize: 12.5, marginLeft: 6, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>↗</span>}
       </p>
-      <div style={{ fontSize: 11, color: '#888', fontFamily: "'DM Mono', monospace", marginBottom: 8 }}>
+      <div style={{ fontSize: 12.5, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 8 }}>
         {pub.authors && <span>{pub.authors.split(',').slice(0,3).join(', ')}{pub.authors.split(',').length > 3 ? ' et al.' : ''}</span>}
         {pub.journalTitle && <span style={{ marginLeft: 8, color: '#bbb' }}>· {pub.journalTitle}</span>}
         {pub.citedByCount > 0 && <span style={{ marginLeft: 8, color: '#aaa' }}>· {pub.citedByCount} citations</span>}
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={handleAI}>
+        <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={handleAI}>
           {loadingAI ? <><Spinner />Analyzing…</> : aiSummary ? 'Analysis' : 'AI analysis →'}
         </button>
-        {pub.abstract && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setExpanded(x => !x)}>{expanded ? 'Hide abstract' : 'Abstract ↓'}</button>}
-        {pubLink && <a href={pubLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace", textDecoration: 'none', fontWeight: 600 }}>Full text ↗</a>}
+        {pub.abstract && <button style={{ ...s.btnSm, fontSize: 12.5 }} onClick={() => setExpanded(x => !x)}>{expanded ? 'Hide abstract' : 'Abstract ↓'}</button>}
+        {pubLink && <a href={pubLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", textDecoration: 'none', fontWeight: 600 }}>Full text ↗</a>}
       </div>
-      {expanded && pub.abstract && <div style={{ marginTop: 10, fontSize: 12, color: '#444', lineHeight: 1.7, fontFamily: "'Georgia', serif", background: '#faf8f4', borderRadius: 6, padding: '10px 14px', border: '1px solid #e5e0d8' }}>{pub.abstract}</div>}
-      {aiSummary && <div style={{ ...np.npAiBox, marginTop: 10, fontSize: 12 }}>{aiSummary}</div>}
+      {expanded && pub.abstract && <div style={{ marginTop: 10, fontSize: 13, color: '#444', lineHeight: 1.7, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", background: '#faf8f4', borderRadius: 6, padding: '10px 14px', border: '1px solid #e5e0d8' }}>{pub.abstract}</div>}
+      {aiSummary && <div style={{ ...np.npAiBox, marginTop: 10, fontSize: 13 }}>{aiSummary}</div>}
     </div>
   );
 }
@@ -914,8 +914,8 @@ function PublicationsTab({ watchlist }) {
   return (
     <div>
       <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.5px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Scientific Publications & Congress Abstracts</span>
-        <span style={{ fontSize: 10, color: '#c8102e', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>via Europe PMC · PubMed · Preprints</span>
+        <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Scientific Publications & Congress Abstracts</span>
+        <span style={{ fontSize: 13, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>via Europe PMC · PubMed · Preprints</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }}>
         {[
@@ -932,38 +932,38 @@ function PublicationsTab({ watchlist }) {
       </div>
       <div style={{ display: 'flex', gap: 0, marginBottom: '1.25rem', background: '#f5f2ed', borderRadius: 8, padding: 4 }}>
         {[{ key: 'watchlist', label: 'My Watchlist', count: filteredWatchlist.length }, { key: 'other', label: 'Sector (Other)', count: filteredOther.length }].map(sec => (
-          <button key={sec.key} onClick={() => setActiveSection(sec.key)} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: activeSection === sec.key ? '#fff' : 'transparent', color: activeSection === sec.key ? '#1a1a1a' : '#888', fontWeight: activeSection === sec.key ? 700 : 400, fontSize: 12, cursor: 'pointer', fontFamily: "'DM Mono', monospace", boxShadow: activeSection === sec.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
-            {sec.label}<span style={{ marginLeft: 6, fontSize: 10, color: activeSection === sec.key ? '#c8102e' : '#bbb' }}>({sec.count})</span>
+          <button key={sec.key} onClick={() => setActiveSection(sec.key)} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: activeSection === sec.key ? '#fff' : 'transparent', color: activeSection === sec.key ? '#1a1a1a' : '#888', fontWeight: activeSection === sec.key ? 700 : 400, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", boxShadow: activeSection === sec.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
+            {sec.label}<span style={{ marginLeft: 6, fontSize: 13, color: activeSection === sec.key ? '#c8102e' : '#bbb' }}>({sec.count})</span>
           </button>
         ))}
       </div>
       <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Topic area</div>
+          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Topic area</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {TOPIC_FILTERS.map(t => (
-              <button key={t.key} onClick={() => setTopicFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: topicFilter === t.key ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: topicFilter === t.key ? '#1a1a1a' : 'transparent', color: topicFilter === t.key ? '#fff' : '#555', fontSize: 11, fontWeight: topicFilter === t.key ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s' }}>{t.label}</button>
+              <button key={t.key} onClick={() => setTopicFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: topicFilter === t.key ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: topicFilter === t.key ? '#1a1a1a' : 'transparent', color: topicFilter === t.key ? '#fff' : '#555', fontSize: 12.5, fontWeight: topicFilter === t.key ? 600 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s' }}>{t.label}</button>
             ))}
           </div>
         </div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 6 }}>Publication type</div>
+          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Publication type</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[{ key: 'all', label: 'All' }, { key: 'congress', label: 'Congresses only' }, { key: 'journal', label: 'Journals only' }].map(t => (
-              <button key={t.key} onClick={() => setPubTypeFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: pubTypeFilter === t.key ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: pubTypeFilter === t.key ? 'rgba(200,16,46,0.07)' : 'transparent', color: pubTypeFilter === t.key ? '#c8102e' : '#555', fontSize: 11, fontWeight: pubTypeFilter === t.key ? 700 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s' }}>{t.label}</button>
+              <button key={t.key} onClick={() => setPubTypeFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: pubTypeFilter === t.key ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: pubTypeFilter === t.key ? 'rgba(200,16,46,0.07)' : 'transparent', color: pubTypeFilter === t.key ? '#c8102e' : '#555', fontSize: 12.5, fontWeight: pubTypeFilter === t.key ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s' }}>{t.label}</button>
             ))}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <input style={{ ...np.filterInput, fontSize: 12 }} value={searchText} onChange={e => setSearchText(e.target.value)} placeholder="Search by title, author, company…" />
+          <input style={{ ...np.filterInput, fontSize: 13 }} value={searchText} onChange={e => setSearchText(e.target.value)} placeholder="Search by title, author, company…" />
           {searchText && <button style={s.btnSm} onClick={() => setSearchText('')}>Clear</button>}
         </div>
       </div>
-      {activeLoading && <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}><Spinner /><span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace" }}>Fetching publications from Europe PMC…</span></div>}
-      {!activeLoading && activePubs.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: "'DM Mono', monospace" }}>No publications found for current filters.</div>}
+      {activeLoading && <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}><Spinner /><span style={{ fontSize: 13, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Fetching publications from Europe PMC…</span></div>}
+      {!activeLoading && activePubs.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>No publications found for current filters.</div>}
       {!activeLoading && activePubs.length > 0 && (
         <div>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 12, fontFamily: "'DM Mono', monospace", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
             {activeSection === 'watchlist' ? 'Publications from your watchlist companies' : 'Publications from sector leaders'} · {activePubs.length} results
           </div>
           {activePubs.map((pub, i) => <PubCard key={pub.id || i} pub={pub} companyName={pub._company} showCompany={true} />)}
@@ -987,15 +987,15 @@ function AnalystRatingBar({ buy, hold, sell }) {
   return (
     <div style={{ marginTop: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>Analyst Consensus</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: verdictColor, fontFamily: "'DM Mono', monospace" }}>{verdict}</span>
+        <span style={{ fontSize: 12.5, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Analyst Consensus</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: verdictColor, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{verdict}</span>
       </div>
       <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
         <div style={{ width: `${buyPct}%`, background: '#16a34a' }} />
         <div style={{ width: `${holdPct}%`, background: '#d97706' }} />
         <div style={{ width: `${sellPct}%`, background: '#dc2626' }} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontFamily: "'DM Mono', monospace" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
         <span style={{ color: '#15803d' }}>Buy {buyPct}%</span>
         <span style={{ color: '#a16207' }}>Hold {holdPct}%</span>
         <span style={{ color: '#dc2626' }}>Sell {sellPct}%</span>
@@ -1011,11 +1011,11 @@ function PriceTarget({ current, target }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, padding: '8px 12px', background: isUp ? 'rgba(22,163,74,0.05)' : 'rgba(220,38,38,0.05)', borderRadius: 6, border: `1px solid ${isUp ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)'}`, flexWrap: 'wrap' }}>
       <div>
-        <div style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>12-mo Price Target</div>
+        <div style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>12-mo Price Target</div>
         <div style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>${target.toFixed(2)}</div>
       </div>
       <div style={{ borderLeft: '1px solid #e5e0d8', paddingLeft: 10 }}>
-        <div style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.5px' }}>vs Current</div>
+        <div style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>vs Current</div>
         <div style={{ fontSize: 15, fontWeight: 700, color: isUp ? '#16a34a' : '#dc2626' }}>{isUp ? '▲' : '▼'} {Math.abs(upside)}%</div>
       </div>
     </div>
@@ -1033,7 +1033,7 @@ function SentimentPills({ sentiments }) {
   };
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-      {sentiments.map((sent, i) => { const c = colorMap[sent.tone?.toLowerCase()] || colorMap.neutral; return <span key={i} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>{c.icon} {sent.label}</span>; })}
+      {sentiments.map((sent, i) => { const c = colorMap[sent.tone?.toLowerCase()] || colorMap.neutral; return <span key={i} style={{ fontSize: 12.5, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{c.icon} {sent.label}</span>; })}
     </div>
   );
 }
@@ -1065,11 +1065,11 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
               <span style={s.badge(stageBadge(stock.stage))}>{stock.stage}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {stock.price > 0 && <span style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', fontFamily: "'DM Mono', monospace" }}>${stock.price.toFixed(2)}</span>}
-              {stock.price > 0 && <span style={{ ...(stock.change >= 0 ? s.priceUp : s.priceDown), fontSize: 14, fontFamily: "'DM Mono', monospace" }}>{stock.change >= 0 ? '▲' : '▼'} {Math.abs(stock.change).toFixed(1)}%</span>}
-              {stock.mktcap !== '—' && <span style={{ fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>Mkt cap: {stock.mktcap}</span>}
+              {stock.price > 0 && <span style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>${stock.price.toFixed(2)}</span>}
+              {stock.price > 0 && <span style={{ ...(stock.change >= 0 ? s.priceUp : s.priceDown), fontSize: 14, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{stock.change >= 0 ? '▲' : '▼'} {Math.abs(stock.change).toFixed(1)}%</span>}
+              {stock.mktcap !== '—' && <span style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Mkt cap: {stock.mktcap}</span>}
             </div>
-            <p style={{ ...s.muted, marginTop: 6, fontSize: 12, lineHeight: 1.5 }}>{stock.note}</p>
+            <p style={{ ...s.muted, marginTop: 6, fontSize: 13, lineHeight: 1.5 }}>{stock.note}</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <span style={{ fontSize: 18, color: '#bbb', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>⌄</span>
@@ -1082,23 +1082,23 @@ function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
           {loadingDetail && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}><Spinner />Loading company intelligence…</div>}
           {detail && !detail.error && (
             <div>
-              {detail.about && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>About</div><p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0 }}>{detail.about}</p></div>}
+              {detail.about && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>About</div><p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0 }}>{detail.about}</p></div>}
               <hr style={s.divider} />
-              {detail.ratings && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 4, fontFamily: "'DM Mono', monospace" }}>Analyst Ratings</div><AnalystRatingBar buy={detail.ratings.buy} hold={detail.ratings.hold} sell={detail.ratings.sell} /></div>}
+              {detail.ratings && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 4, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Analyst Ratings</div><AnalystRatingBar buy={detail.ratings.buy} hold={detail.ratings.hold} sell={detail.ratings.sell} /></div>}
               {detail.priceTarget && stock.price > 0 && <div style={{ marginBottom: 16 }}><PriceTarget current={stock.price} target={detail.priceTarget} /></div>}
               <hr style={s.divider} />
               {detail.sentiments && detail.sentiments.length > 0 && (
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 6, fontFamily: "'DM Mono', monospace" }}>Investor Sentiment</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 6, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Investor Sentiment</div>
                   <SentimentPills sentiments={detail.sentiments} />
-                  {detail.sentimentSummary && <p style={{ fontSize: 12, color: '#666', lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>{detail.sentimentSummary}</p>}
+                  {detail.sentimentSummary && <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>{detail.sentimentSummary}</p>}
                 </div>
               )}
               {detail.risks && detail.risks.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#c8102e', marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>Key Risks</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Key Risks</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {detail.risks.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: '#555', lineHeight: 1.5 }}><span style={{ color: '#c8102e', flexShrink: 0 }}>▸</span><span>{r}</span></div>)}
+                    {detail.risks.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: '#555', lineHeight: 1.5 }}><span style={{ color: '#c8102e', flexShrink: 0 }}>▸</span><span>{r}</span></div>)}
                   </div>
                 </div>
               )}
@@ -1160,7 +1160,7 @@ function SearchBar({ onAdd, watchlist }) {
     setAdding(false); setVal('');
   };
 
-  const tickerStyle = { fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)', flexShrink: 0 };
+  const tickerStyle = { fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontSize: 13, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)', flexShrink: 0 };
 
   return (
     <div style={{ marginBottom: '1.25rem' }}>
@@ -1169,13 +1169,13 @@ function SearchBar({ onAdd, watchlist }) {
           <input style={{ ...s.input, borderColor: error ? '#fca5a5' : undefined }} value={val} onChange={handleChange} onKeyDown={e => e.key === 'Enter' && handleManualAdd()} onBlur={() => setTimeout(() => setShowSugg(false), 200)} onFocus={() => suggestions.length > 0 && setShowSugg(true)} placeholder="Search: 'Moderna', 'CRSP', 'Gilead'…" disabled={adding} />
           {showSugg && (
             <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.1)', zIndex: 100, marginTop: 4, overflow: 'hidden' }}>
-              {suggestions.length === 0 && !searching && <div style={{ padding: '12px 14px', fontSize: 12, color: '#888', fontFamily: "'DM Mono', monospace" }}>No results for "{val}"</div>}
+              {suggestions.length === 0 && !searching && <div style={{ padding: '12px 14px', fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>No results for "{val}"</div>}
               {suggestions.map((item, i) => {
                 const alreadyIn = watchlist.find(s => s.ticker === item.ticker);
                 return <div key={item.ticker} style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1 }} onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)} onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                   <span style={tickerStyle}>{item.ticker}</span>
                   <span style={{ fontSize: 13, color: '#333', flex: 1 }}>{item.name}</span>
-                  {alreadyIn ? <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>already added</span> : <span style={{ fontSize: 11, color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>+ Add</span>}
+                  {alreadyIn ? <span style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>already added</span> : <span style={{ fontSize: 12.5, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>+ Add</span>}
                 </div>;
               })}
             </div>
@@ -1185,7 +1185,7 @@ function SearchBar({ onAdd, watchlist }) {
           {adding ? <><Spinner />Adding…</> : 'Add →'}
         </button>
       </div>
-      {error && <div style={{ marginTop: 8, fontSize: 12, color: '#dc2626', fontFamily: "'DM Mono', monospace" }}>— {error}</div>}
+      {error && <div style={{ marginTop: 8, fontSize: 13, color: '#dc2626', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>— {error}</div>}
     </div>
   );
 }
@@ -1322,8 +1322,8 @@ Return ONLY the JSON object.`;
     { key: 'watchlist', label: 'Watchlist' },
     { key: 'publications', label: 'Publications' },
     { key: 'calendar', label: 'Calendar' },
-    { key: 'hta', label: 'HTA & Reimbursement', isNew: true },
-    { key: 'landscape', label: 'HIV Competitive Intel', isNew: true },
+    { key: 'hta', label: 'HTA & Reimbursement' },
+    { key: 'landscape', label: 'HIV Competitive Intelligence' },
   ];
 
   return (
@@ -1333,7 +1333,7 @@ Return ONLY the JSON object.`;
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         * { box-sizing: border-box; }
-        body { background: #fefcf9; margin: 0; }
+        body { background: #fbfaf7; margin: 0; }
         input:focus { border-color: #c8102e !important; }
         button:hover { opacity: 0.85; }
 
@@ -1342,7 +1342,7 @@ Return ONLY the JSON object.`;
           .app-header { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
           .app-tabs { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; width: 100% !important; }
           .app-tabs::-webkit-scrollbar { display: none; }
-          .app-tabs button { padding: 10px 14px !important; font-size: 9px !important; white-space: nowrap !important; flex-shrink: 0 !important; }
+          .app-tabs button { padding: 10px 12px !important; font-size: 13px !important; white-space: nowrap !important; flex-shrink: 0 !important; }
           .news-layout { grid-template-columns: 1fr !important; }
           .news-sidebar { position: static !important; margin-top: 2rem; }
           .featured-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
@@ -1359,38 +1359,31 @@ Return ONLY the JSON object.`;
       `}</style>
 
       {/* ── HEADER ── */}
-      <div style={{ borderBottom: '1px solid #e0dbd3', marginBottom: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1rem', borderBottom: '1px solid #ece7df' }} className="app-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 48, height: 48, background: '#0f1923', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="34" height="24" viewBox="0 0 44 28" fill="none">
+      <div style={{ borderBottom: '1px solid #e6e2db' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1.1rem' }} className="app-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 40, height: 40, background: '#0f1923', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="28" height="20" viewBox="0 0 44 28" fill="none">
                 <polyline points="2,20 9,20 13,5 20,23 25,13 29,17 34,8 40,8" stroke="#c8102e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
                 <circle cx="20" cy="23" r="2.2" fill="#c8102e"/>
                 <circle cx="13" cy="5" r="2.2" fill="#c8102e"/>
               </svg>
             </div>
             <div>
-              <div style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: 30, fontWeight: 400, letterSpacing: '-0.5px', color: '#1a1a1a', lineHeight: 1 }}>Catalyst</div>
-              <div style={{ fontSize: 9, color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", marginTop: 4 }}>Biotech &amp; Pharma Intelligence</div>
+              <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.3px', color: '#1a1a1a', lineHeight: 1.1 }}>Catalyst</div>
+              <div style={{ fontSize: 12.5, color: '#6b6760', marginTop: 2 }}>Biotech and pharma intelligence</div>
             </div>
           </div>
-          <div className="app-header-right" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 10, color: '#aaa', fontFamily: "'DM Mono', monospace", letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, padding: '5px 12px', borderRadius: 3, background: 'rgba(22,163,74,0.07)', color: '#15803d', border: '0.5px solid rgba(22,163,74,0.2)', fontWeight: 700, fontFamily: "'DM Mono', monospace", letterSpacing: '1px', flexShrink: 0 }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16a34a', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              LIVE
-            </div>
-          </div>
+          <span className="app-header-right" style={{ fontSize: 12.5, color: '#6b6760' }}>
+            {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
         </div>
 
         {/* Tab bar */}
-        <div style={{ display: 'flex', gap: 0 }} className="app-tabs">
+        <div style={{ display: 'flex', gap: 4 }} className="app-tabs" role="tablist">
           {TABS.map(t => (
-            <button key={t.key} style={{ padding: '10px 18px', fontSize: 10, cursor: 'pointer', border: 'none', background: 'none', color: tab === t.key ? '#1a1a1a' : '#aaa', borderBottom: tab === t.key ? '2px solid #c8102e' : '2px solid transparent', fontWeight: tab === t.key ? 600 : 400, letterSpacing: '1.8px', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", transition: 'color 0.15s', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }} onClick={() => setTab(t.key)}>
+            <button key={t.key} role="tab" aria-selected={tab === t.key} style={{ padding: '10px 14px', fontSize: 13.5, cursor: 'pointer', border: 'none', background: 'none', color: tab === t.key ? '#1a1a1a' : '#6b6760', borderBottom: tab === t.key ? '2px solid #c8102e' : '2px solid transparent', marginBottom: -1, fontWeight: tab === t.key ? 600 : 400, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap' }} onClick={() => setTab(t.key)}>
               {t.label}
-              {t.isNew && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, background: tab === t.key ? 'rgba(200,16,46,0.12)' : 'rgba(100,100,100,0.1)', color: tab === t.key ? '#c8102e' : '#aaa', fontWeight: 700 }}>NEW</span>}
             </button>
           ))}
         </div>
@@ -1408,12 +1401,12 @@ Return ONLY the JSON object.`;
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: '1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 4 }} className="cat-filter-bar">
               {['All', 'Pharma', 'Biotech', 'Regulatory', 'HTA / Reimbursement', 'Clinical Trials', 'Deals', 'Gene Therapy', 'AI', 'Oncology'].map(cat => (
-                <button key={cat} onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 4, border: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#1a1a1a' : 'transparent', color: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#fff' : '#555', fontSize: 12, fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400, cursor: 'pointer', fontFamily: "'DM Mono', monospace", transition: 'all 0.15s', whiteSpace: 'nowrap', flexShrink: 0 }}>{cat}</button>
+                <button key={cat} onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 4, border: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#1a1a1a' : 'transparent', color: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#fff' : '#555', fontSize: 13, fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s', whiteSpace: 'nowrap', flexShrink: 0 }}>{cat}</button>
               ))}
             </div>
             <div style={np.filterBar}>
               <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or ticker…" />
-              {newsFilter && <button style={{ ...s.btnSm, fontSize: 11 }} onClick={() => setNewsFilter('')}>Clear</button>}
+              {newsFilter && <button style={{ ...s.btnSm, fontSize: 12.5 }} onClick={() => setNewsFilter('')}>Clear</button>}
             </div>
             {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading news…</div>}
             {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>No stories match your filter.</div>}
@@ -1424,7 +1417,7 @@ Return ONLY the JSON object.`;
                   <div>
                     <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                     <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
-                    <div style={np.featuredByline}>{featured.source} · {featured.date}{featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 11, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}</div>
+                    <div style={np.featuredByline}>{featured.source} · {featured.date}{featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 12.5, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}</div>
                     {featured.summary && <p style={np.featuredSummary}>{featured.summary}</p>}
                     <div style={{ marginTop: 14 }}>
                       <button style={s.btn} onClick={() => getSummary('news-0', `You are a clinical data expert and biotech analyst. Explain this news in 3-4 sentences: "${featured.headline}". Context: ${featured.summary}. Be direct.`)}>
@@ -1455,12 +1448,12 @@ Return ONLY the JSON object.`;
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
                             <span style={np.tagPill(n.tag)}>{n.tag}</span>
-                            <span style={{ fontSize: 11, color: '#999', fontFamily: "'DM Mono', monospace" }}>{n.source} · {n.date}</span>
-                            {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
+                            <span style={{ fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.source} · {n.date}</span>
+                            {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
                           </div>
-                          <p style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: '#111', margin: '0 0 6px 0', fontFamily: "'Georgia', serif" }}>{n.headline}</p>
-                          {n.summary && <p style={{ fontSize: 13, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Georgia', serif" }}>{n.summary}</p>}
-                          <button style={{ ...s.btn, fontSize: 10, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `Explain this biotech news in 3-4 sentences: "${n.headline}". Context: ${n.summary}.`)}>
+                          <p style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: '#111', margin: '0 0 6px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.headline}</p>
+                          {n.summary && <p style={{ fontSize: 13, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.summary}</p>}
+                          <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `Explain this biotech news in 3-4 sentences: "${n.headline}". Context: ${n.summary}.`)}>
                             {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
                           </button>
                           {summaries[`news-${idx}`] && <div style={{ ...np.npAiBox, marginTop: 8 }}>{summaries[`news-${idx}`]}</div>}
@@ -1474,17 +1467,17 @@ Return ONLY the JSON object.`;
           </div>
           <div style={{ position: 'sticky', top: '1rem' }} className="news-sidebar">
             <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#c8102e', fontFamily: "'DM Mono', monospace" }}>Company Announcements</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Company Announcements</div>
             </div>
-            {pressReleases.length === 0 && <div style={{ fontSize: 12, color: '#aaa', fontFamily: "'DM Mono', monospace" }}>Loading…</div>}
+            {pressReleases.length === 0 && <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Loading…</div>}
             {pressReleases.map((pr, i) => (
               <div key={i} style={{ paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid #e5e0d8' }}>
                 <a href={pr.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 5px 0', fontFamily: "'Georgia', serif" }}>{pr.headline}</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 5px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{pr.headline}</p>
                 </a>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 10, color: '#888', fontFamily: "'DM Mono', monospace" }}>{pr.company || pr.source}</span>
-                  {pr.date && <span style={{ fontSize: 10, color: '#bbb', fontFamily: "'DM Mono', monospace" }}>· {pr.date}</span>}
+                  <span style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{pr.company || pr.source}</span>
+                  {pr.date && <span style={{ fontSize: 13, color: '#bbb', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>· {pr.date}</span>}
                 </div>
               </div>
             ))}
@@ -1500,16 +1493,16 @@ Return ONLY the JSON object.`;
             <div style={{ display: 'flex', gap: 12, background: '#f0ede8', borderRadius: 6, padding: '8px 14px', border: '1px solid #e5e0d8', alignItems: 'center', flexShrink: 0 }} className="watchlist-stats">
               {[{ label: 'Watching', val: watchlist.length, color: '#555' }, { label: 'Gainers', val: gainers, color: '#16a34a' }, { label: 'Losers', val: losers, color: '#c8102e' }].map((m, i) => (
                 <React.Fragment key={m.label}>
-                  {i > 0 && <span style={{ color: '#ddd', fontSize: 12 }}>|</span>}
+                  {i > 0 && <span style={{ color: '#ddd', fontSize: 13 }}>|</span>}
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: "'DM Mono', monospace", lineHeight: 1 }}>{m.val}</div>
-                    <div style={{ fontSize: 9, color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace", marginTop: 2 }}>{m.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1 }}>{m.val}</div>
+                    <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginTop: 2 }}>{m.label}</div>
                   </div>
                 </React.Fragment>
               ))}
             </div>
           </div>
-          <div style={{ fontSize: 11, color: '#aaa', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>Click any card to expand company details, analyst ratings &amp; investor sentiment</div>
+          <div style={{ fontSize: 12.5, color: '#aaa', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Click any card to expand company details, analyst ratings &amp; investor sentiment</div>
           {watchlist.map(stock => <StockCard key={stock.ticker} stock={stock} onRemove={removeTicker} onLoadDetail={loadStockDetail} onStageUpdate={updateStage} />)}
         </div>
       )}
