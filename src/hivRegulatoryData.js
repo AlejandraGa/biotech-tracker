@@ -17,7 +17,7 @@ export const AGENCIES = [
 export const STATUS = {
   approved:    { label: 'Approved',          glyph: '✓', color: '#166534', bg: 'rgba(22,101,52,0.08)',  border: 'rgba(22,101,52,0.25)' },
   positive:    { label: 'Positive opinion',  glyph: '▲', color: '#166534', bg: 'rgba(22,101,52,0.08)',  border: 'rgba(22,101,52,0.25)' },
-  review:      { label: 'Under review',      glyph: '◔', color: '#92580a', bg: 'rgba(146,88,10,0.08)',  border: 'rgba(146,88,10,0.28)' },
+  review:      { label: 'Under review',      glyph: '●', color: '#92580a', bg: 'rgba(146,88,10,0.08)',  border: 'rgba(146,88,10,0.28)' },
   negative:    { label: 'Negative',          glyph: '✕', color: '#b3122b', bg: 'rgba(179,18,43,0.07)',  border: 'rgba(179,18,43,0.28)' },
   notapproved: { label: 'Not approved',      glyph: '○', color: '#6b6b6b', bg: '#f3f0ea',               border: '#d8d2c8' },
   planned:     { label: 'Filing planned',    glyph: '→', color: '#1e40af', bg: 'rgba(30,64,175,0.07)',  border: 'rgba(30,64,175,0.25)' },
