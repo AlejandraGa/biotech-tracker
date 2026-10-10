@@ -35,13 +35,15 @@ const S = {
   // Live Spezialitätenliste search; prices read on ACCESS_VERIFIED_ON.
   sl: (name) => `https://sl.bag.admin.ch/sl?search=${name}`,
   ekoDovato: 'https://www.ris.bka.gv.at/Dokumente/Avsv/AVSV_2020_0022/AVSV_2020_0022.html',
+  // Official look-up tool of the Austrian social insurers; entries read on ACCESS_VERIFIED_ON (data status Oct 2026).
+  ekoTool: 'https://www.sozialversicherung.at/oeko/views/index.xhtml',
   ekoVocabria: 'https://www.medmedia.at/aerzte-krone/langwirksame-injizierbare-hiv-therapie-in-der-gelben-box/',
 };
 
 const NONE = { s: 'none', note: 'No assessment found' };
 const NOT_CHECKED = { s: 'none', note: 'Not verified' };
 const NOT_AUTH = { s: 'none', note: 'Not authorised here' };
-const EKO_UNKNOWN = { s: 'none', note: 'Not verified' };
+const EKO_NOT_LISTED = (why) => ({ s: 'none', note: `Not listed · ${why}`, src: S.ekoTool });
 
 // Per asset: `mhra` joins the regulatory view; the rest form the reimbursement view.
 export const ACCESS = {
@@ -51,7 +53,7 @@ export const ACCESS = {
     gba: { s: 'noadded', date: '2018-12-20', src: S.gbaBiktarvy },
     has: { s: 'favourable', date: '2018-09-05', note: 'SMR important · ASMR V', src: S.hasBiktarvy },
     sl: { s: 'listed', note: 'No limitation · CHF 1,110.05 for 30 tablets', src: S.sl('Biktarvy') },
-    eko: EKO_UNKNOWN,
+    eko: { s: 'limited', label: 'Listed, yellow box', note: 'RE1 (prior approval) · EUR 731.20 for 30 tablets', src: S.ekoTool },
     events: [
       { date: '2018-09-05', agency: 'HAS', outcome: 'favourable', text: 'Listing opinion: SMR important, ASMR V (no improvement, non-inferior to Triumeq).', src: S.hasBiktarvy },
       { date: '2018-12-20', agency: 'G-BA', outcome: 'noadded', text: 'Added benefit not proven, in therapy-naive and therapy-experienced adults.', src: S.gbaBiktarvy },
@@ -65,7 +67,7 @@ export const ACCESS = {
     gba: NONE,
     has: { s: 'favourable', date: '2022-11-09', note: 'SMR important · ASMR III', src: S.hasSunlenca },
     sl: { s: 'limited', date: '2024-11-01', note: 'Time-limited to 31 Oct 2026 · CHF 20,360.15 for 2 vials', src: S.slSunlenca },
-    eko: EKO_UNKNOWN,
+    eko: EKO_NOT_LISTED('no lenacapavir product in the Erstattungskodex'),
     events: [
       { date: '2022-11-09', agency: 'HAS', outcome: 'favourable', text: 'Favourable to reimbursement: SMR important, ASMR III (moderate improvement).', src: S.hasSunlenca },
       { date: '2024-11-01', agency: 'BAG', outcome: 'limited', text: 'Added to the Spezialitätenliste with a limitation (multidrug-resistant HIV-1, specialist centres, insurer approval). Listing is time-limited.', src: S.slSunlenca },
@@ -78,7 +80,7 @@ export const ACCESS = {
     gba: { s: 'noadded', date: '2020-02-06', src: S.gbaDovato },
     has: { s: 'restricted', label: 'Favourable, restricted', date: '2020-01-08', note: 'ASMR IV naive · V switch', src: S.hasDovato },
     sl: { s: 'listed', note: 'No limitation · CHF 778.20 for 30 tablets', src: S.sl('Dovato') },
-    eko: { s: 'limited', label: 'Listed, yellow box', date: '2020-03-01', note: 'Prior approval, valid 6 months (L6)', src: S.ekoDovato },
+    eko: { s: 'limited', label: 'Listed, yellow box', date: '2020-03-01', note: 'RE1 (prior approval) · EUR 620.60 for 30 tablets', src: S.ekoTool },
     events: [
       { date: '2020-01-08', agency: 'HAS', outcome: 'restricted', text: 'SMR important in a restricted population, insufficient elsewhere. ASMR IV in treatment-naive patients, ASMR V in switch.', src: S.hasDovato },
       { date: '2020-02-06', agency: 'G-BA', outcome: 'noadded', text: 'Added benefit not proven in any of four patient groups.', src: S.gbaDovato },
@@ -92,7 +94,7 @@ export const ACCESS = {
     gba: { s: 'noadded', date: '2021-10-21', src: S.gbaCab },
     has: { s: 'restricted', label: 'Favourable, restricted', date: '2021-04-21', note: 'SMR important · ASMR V', src: S.hasVocabria },
     sl: { s: 'limited', date: '2022-03-01', note: 'Every-2-month schedule only · CHF 1,256.30 + CHF 547.05 per injection pair', src: S.slVocabria },
-    eko: { s: 'limited', label: 'Listed, yellow box', date: '2023-01-01', src: S.ekoVocabria },
+    eko: { s: 'limited', label: 'Listed, yellow box', date: '2023-01-01', note: 'RE1 · EUR 1,038.65 + EUR 435.70 per injection pair', src: S.ekoTool },
     events: [
       { date: '2021-04-21', agency: 'HAS', outcome: 'restricted', text: 'Initial listing: SMR important in a restricted adult population, insufficient elsewhere. ASMR V.', src: S.hasVocabria },
       { date: '2021-10-21', agency: 'G-BA', outcome: 'noadded', text: 'Added benefit not proven in virologically suppressed adults; no suitable data submitted.', src: S.gbaCab },
@@ -110,7 +112,7 @@ export const ACCESS = {
     gba: { s: 'none', note: 'No assessment found · see Gilead Germany statement', src: S.gileadDe },
     has: { s: 'none', note: 'No opinion found' },
     sl: { s: 'none', note: 'Not listed · awaiting Swissmedic', src: S.sl('Lenacapavir') },
-    eko: EKO_UNKNOWN,
+    eko: EKO_NOT_LISTED('no lenacapavir product in the Erstattungskodex'),
     events: [
       { date: '2025-12-19', agency: 'MHRA', outcome: 'approved', text: 'Yeytuo approved in the UK for PrEP in adults and adolescents.', src: S.mhraLen },
       { date: '2026-09-09', agency: 'NICE', outcome: 'unfavourable', text: 'Draft guidance: lenacapavir "should not be used". Cost-effectiveness estimates are above the range NICE accepts; the draft also cites uncertainty in the clinical evidence and the economic model.', src: S.niceLen },
@@ -126,7 +128,7 @@ export const ACCESS = {
     gba: NONE,
     has: { s: 'favourable', date: '2024-05-29', note: 'SMR important · ASMR IV', src: S.hasApretude },
     sl: { s: 'none', note: 'Not listed · not authorised in Switzerland', src: S.sl('Apretude') },
-    eko: EKO_UNKNOWN,
+    eko: EKO_NOT_LISTED('only Vocabria is listed for cabotegravir'),
     events: [
       { date: '2024-05-03', agency: 'MHRA', outcome: 'approved', text: 'Apretude approved in the UK for PrEP in adults and adolescents weighing at least 35 kg.', src: S.mhraCab },
       { date: '2024-05-29', agency: 'HAS', outcome: 'favourable', text: 'Favourable: SMR important, ASMR IV versus daily oral PrEP. Positioned for people who cannot take or adhere to oral PrEP.', src: S.hasApretude },
