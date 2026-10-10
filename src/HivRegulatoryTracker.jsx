@@ -1,15 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
 import { AGENCIES, STATUS, PRODUCTS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRegulatoryData";
+import { ACCESS_BODIES, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
 import { applyLive } from "./liveStatus";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
-const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", Company: "Company update" };
+const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Company: "Company update" };
+const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
+const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", hint: "Marketing authorisation" }];
+const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
+const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
+
+// Curated regulatory data joined with the market-access data for each asset.
+const BASE = PRODUCTS.map((p) => {
+  const a = ACCESS[p.id];
+  if (!a) return { ...p, access: {} };
+  const { mhra, events, watch, ...access } = a;
+  return { ...p, reg: { ...p.reg, mhra }, access, events: [...p.events, ...events], watch: watch || p.watch };
+});
 const OUTCOME = {
   approved: STATUS.approved,
   positive: STATUS.positive,
   negative: { ...STATUS.negative, label: "Complete response letter" },
   review: STATUS.review,
   expected: { label: "Expected", glyph: "◇", color: "#1e40af" },
+  favourable: ACCESS_STATUS.favourable,
+  restricted: { ...ACCESS_STATUS.restricted, label: "Favourable, restricted" },
+  limited: ACCESS_STATUS.limited,
+  noadded: ACCESS_STATUS.noadded,
+  unfavourable: ACCESS_STATUS.unfavourable,
   info: { label: "", glyph: "", color: MUTED },
 };
 
@@ -44,11 +62,10 @@ function Segmented({ value, onChange, options, label }) {
 }
 
 // ─── MATRIX ──────────────────────────────────────────────────────────────────
-const GRID = "minmax(240px,1.25fr) minmax(160px,0.95fr) minmax(215px,1.1fr) minmax(160px,0.95fr) minmax(170px,1fr)";
 
 function RegCell({ cell }) {
   const s = cell?.s || "none";
-  const def = STATUS[s];
+  const def = statusOf(cell);
   if (s === "none" || s === "pending") {
     return <div style={cellStyle}><span style={{ fontSize: 12.5, color: FAINT }}>{s === "pending" ? cell?.note || "Awaiting opinion" : cell?.note || "No public filing"}</span></div>;
   }
@@ -65,22 +82,49 @@ function RegCell({ cell }) {
 }
 const cellStyle = { padding: "11px 14px", borderLeft: `1px solid ${HAIR}`, minWidth: 0 };
 
-function ProductRow({ p, active, onOpen }) {
+function ProductRow({ p, active, onOpen, cols, pick }) {
+  const showInn = p.inn && p.inn.toLowerCase().replace(/\s/g, "") !== p.name.toLowerCase().replace(/\s/g, "");
   return (
     <div role="button" tabIndex={0} onClick={onOpen} className="hiv-row"
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
-      style={{ display: "grid", gridTemplateColumns: GRID, borderTop: `1px solid ${LINE}`, cursor: "pointer", background: active ? PAPER : "#fff" }}>
+      style={{ display: "grid", gridTemplateColumns: gridFor(cols.length), borderTop: `1px solid ${LINE}`, cursor: "pointer", background: active ? PAPER : "#fff" }}>
       <div className="hiv-sticky" style={{ padding: "11px 16px", minWidth: 0, background: "inherit" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: INK }}>{p.name}</span>
           <span style={{ fontSize: 11.5, color: FAINT }}>{p.stage}</span>
         </div>
-        <div style={{ fontSize: 12, color: MUTED, marginTop: 2, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+        {showInn && <div style={{ fontSize: 12.5, color: TEXT, marginTop: 1, lineHeight: 1.4 }}>{p.inn}</div>}
+        <div style={{ fontSize: 12, color: MUTED, marginTop: 3, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
           <Dot company={p.company} />{p.company}<span style={{ color: "#cfcac2", margin: "0 6px" }}>·</span>{p.dosing.replace(" · ", ", ")}
         </div>
       </div>
-      {AGENCIES.map((a) => <RegCell key={a.key} cell={p.reg[a.key]} />)}
+      {cols.map((a) => <RegCell key={a.key} cell={pick(p, a.key)} />)}
     </div>
+  );
+}
+
+function StatusSection({ title, cols, pick }) {
+  return (
+    <>
+      <h3 style={{ fontSize: 13, fontWeight: 600, color: INK, margin: "22px 0 6px" }}>{title}</h3>
+          {cols.map((a) => {
+            const c = pick(a.key) || { s: "none" };
+            const quiet = c.s === "none" || c.s === "pending";
+            return (
+              <div key={a.key} style={{ display: "grid", gridTemplateColumns: "150px minmax(0,1fr)", gap: 10, padding: "8px 0", borderTop: `1px solid ${HAIR}`, fontSize: 13, alignItems: "baseline" }}>
+                <span style={{ color: MUTED }}>{a.label}</span>
+                <span>
+                  {quiet ? <span style={{ color: FAINT }}>{c.s === "pending" ? c.note || "Awaiting opinion" : c.note || "No public filing"}</span>
+                    : <><StatusText def={statusOf(c)} />{c.date && <span style={{ color: TEXT, marginLeft: 8, fontVariantNumeric: "tabular-nums" }}>{c.expected ? "by " : ""}{fmtDate(c.date)}</span>}</>}
+                  {!quiet && c.note && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>{c.note}</span>}
+                  {c.auto && <span style={{ display: "block", fontSize: 12, color: "#1e40af", marginTop: 2, lineHeight: 1.45 }}>Updated automatically from {c.auto}.{c.was ? ` The curated entry said: ${ALL_STATUS[c.was.s].label.toLowerCase()}${c.was.date ? `, ${fmtDate(c.was.date)}` : ""}.` : ""}</span>}
+                  {c.confirmedBy && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>Confirmed against {c.confirmedBy}.</span>}
+                  {c.src && <span style={{ display: "block", marginTop: 2 }}><SourceLink href={c.src} /></span>}
+                </span>
+              </div>
+            );
+          })}
+    </>
   );
 }
 
@@ -127,24 +171,8 @@ function Drawer({ p, onClose }) {
             </div>
           )}
 
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: INK, margin: "22px 0 6px" }}>Status by agency</h3>
-          {AGENCIES.map((a) => {
-            const c = p.reg[a.key] || { s: "none" };
-            const quiet = c.s === "none" || c.s === "pending";
-            return (
-              <div key={a.key} style={{ display: "grid", gridTemplateColumns: "150px minmax(0,1fr)", gap: 10, padding: "8px 0", borderTop: `1px solid ${HAIR}`, fontSize: 13, alignItems: "baseline" }}>
-                <span style={{ color: MUTED }}>{a.label}</span>
-                <span>
-                  {quiet ? <span style={{ color: FAINT }}>{c.s === "pending" ? c.note || "Awaiting opinion" : c.note || "No public filing"}</span>
-                    : <><StatusText def={STATUS[c.s]} />{c.date && <span style={{ color: TEXT, marginLeft: 8, fontVariantNumeric: "tabular-nums" }}>{c.expected ? "by " : ""}{fmtDate(c.date)}</span>}</>}
-                  {!quiet && c.note && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>{c.note}</span>}
-                  {c.auto && <span style={{ display: "block", fontSize: 12, color: "#1e40af", marginTop: 2, lineHeight: 1.45 }}>Updated automatically from {c.auto}.{c.was ? ` The curated entry said: ${STATUS[c.was.s].label.toLowerCase()}${c.was.date ? `, ${fmtDate(c.was.date)}` : ""}.` : ""}</span>}
-                  {c.confirmedBy && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>Confirmed against {c.confirmedBy}.</span>}
-                  {c.src && <span style={{ display: "block", marginTop: 2 }}><SourceLink href={c.src} /></span>}
-                </span>
-              </div>
-            );
-          })}
+          <StatusSection title="Regulatory status" cols={REG_COLS} pick={(k) => p.reg[k]} />
+          <StatusSection title="Reimbursement and HTA" cols={ACCESS_BODIES} pick={(k) => p.access?.[k]} />
 
           <h3 style={{ fontSize: 13, fontWeight: 600, color: INK, margin: "22px 0 6px" }}>Milestone history</h3>
           {events.map((e, i) => (
@@ -204,9 +232,9 @@ function Timeline({ products }) {
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function HivRegulatoryTracker({ live, liveStatus }) {
-  const liveResult = useMemo(() => applyLive(PRODUCTS, live), [live]);
+  const liveResult = useMemo(() => applyLive(BASE, live), [live]);
   const ALL = liveResult.products;
-  const [view, setView] = useState("By agency");
+  const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
   const [openId, setOpenId] = useState(null);
@@ -218,10 +246,10 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
   // Headline numbers, computed from the dataset
   const today = todayIso();
-  const cells = products.flatMap((p) => AGENCIES.map((a) => ({ p, a, c: p.reg[a.key] })));
+  const cells = products.flatMap((p) => REG_COLS.map((a) => ({ p, a, c: p.reg[a.key] })));
   const underReview = cells.filter((x) => x.c?.s === "review");
   const events = products.flatMap((p) => p.events.map((e) => ({ ...e, product: p.name })));
-  const decisions12m = events.filter((e) => ["approved", "positive", "negative"].includes(e.outcome) && e.date <= today && daysBetween(e.date, today) <= 365)
+  const decisions12m = events.filter((e) => ["approved", "positive", "negative", "favourable", "restricted", "limited", "noadded", "unfavourable"].includes(e.outcome) && e.date <= today && daysBetween(e.date, today) <= 365)
     .sort((a, b) => b.date.localeCompare(a.date));
   const nextDated = events.filter((e) => e.date > today).sort((a, b) => a.date.localeCompare(b.date))[0];
 
@@ -232,6 +260,8 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
     { label: "Next dated decision", value: nextDated ? fmtDate(nextDated.date) : "None", sub: nextDated ? `${nextDated.product}, ${AGENCY_TAG[nextDated.agency]}` : "No published dates" },
   ];
 
+  const cols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
+  const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
 
@@ -264,7 +294,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
       {/* Controls */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        <Segmented label="View" value={view} onChange={setView} options={["By agency", "Timeline"]} />
+        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Timeline"]} />
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
@@ -272,16 +302,16 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
       {products.length === 0 && <div style={{ padding: "2rem", textAlign: "center", fontSize: 13.5, color: MUTED, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6 }}>No assets match these filters.</div>}
 
       {/* Matrix */}
-      {view === "By agency" && products.length > 0 && (
+      {view !== "Timeline" && products.length > 0 && (
         <>
           <div className="hiv-matrix" style={{ border: `1px solid ${LINE}`, borderRadius: 6, background: "#fff" }}>
-            <div style={{ minWidth: 960 }}>
-              <div style={{ display: "grid", gridTemplateColumns: GRID, position: "sticky", top: 0, zIndex: 3, background: PAPER, boxShadow: `0 1px 0 ${LINE}`, borderRadius: "6px 6px 0 0" }}>
+            <div style={{ minWidth: 250 + cols.length * 172 }}>
+              <div style={{ display: "grid", gridTemplateColumns: gridFor(cols.length), position: "sticky", top: 0, zIndex: 3, background: PAPER, boxShadow: `0 1px 0 ${LINE}`, borderRadius: "6px 6px 0 0" }}>
                 <div className="hiv-sticky" style={{ padding: "10px 16px", fontSize: 12, fontWeight: 600, color: MUTED, background: PAPER }}>Asset</div>
-                {AGENCIES.map((a) => (
+                {cols.map((a) => (
                   <div key={a.key} style={{ padding: "10px 14px", borderLeft: `1px solid ${HAIR}` }}>
                     <div style={{ fontSize: 12, fontWeight: 600, color: INK }}>{a.label}</div>
-                    <div style={{ fontSize: 11.5, color: FAINT, marginTop: 1 }}>{a.hint}</div>
+                    <div style={{ fontSize: 11.5, color: FAINT, marginTop: 1 }}>{a.region} · {a.hint}</div>
                   </div>
                 ))}
               </div>
@@ -295,14 +325,14 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
                         {g === "PrEP" ? "Prevention (PrEP)" : "Treatment"} <span style={{ color: FAINT, fontWeight: 400 }}>{rows.length}</span>
                       </div>
                     </div>
-                    {rows.map((p) => <ProductRow key={p.id} p={p} active={openId === p.id} onOpen={() => setOpenId(p.id)} />)}
+                    {rows.map((p) => <ProductRow key={p.id} p={p} active={openId === p.id} onOpen={() => setOpenId(p.id)} cols={cols} pick={pick} />)}
                   </div>
                 );
               })}
             </div>
           </div>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginTop: 10, fontSize: 12, color: MUTED }}>
-            {["approved", "positive", "review", "notapproved", "planned"].map((k) => <StatusText key={k} def={STATUS[k]} size={12} />)}
+            {(view === "Reimbursement" ? ["favourable", "restricted", "noadded", "unfavourable"] : ["approved", "positive", "review", "notapproved", "planned"]).map((k) => <StatusText key={k} def={ALL_STATUS[k]} size={12} />)}
             <span style={{ color: FAINT }}>Select an asset for sources and full history.</span>
           </div>
         </>
@@ -334,7 +364,8 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         {liveResult.checked > 0
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA and EMA columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
-        Swissmedic, filings under review and planned filings are curated by hand from SwissPARs, CHMP agendas and company releases, last checked on {fmtDate(VERIFIED_ON)}.
+        Swissmedic, MHRA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
+        Reimbursement entries (NICE, G-BA, HAS, Spezialitätenliste) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)}; "Not verified" means the listing was not confirmed, not that the product is unlisted.
         "No public filing" means no announcement was found, not that none exists.
       </p>
 
