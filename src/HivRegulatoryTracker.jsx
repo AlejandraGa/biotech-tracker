@@ -4,7 +4,7 @@ import { ACCESS_BODIES, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivA
 import { applyLive } from "./liveStatus";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
-const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Company: "Company update" };
+const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Dachverband: "Dachverband (Austria)", Company: "Company update" };
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
 const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", hint: "Marketing authorisation" }];
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
@@ -26,6 +26,7 @@ const OUTCOME = {
   favourable: ACCESS_STATUS.favourable,
   restricted: { ...ACCESS_STATUS.restricted, label: "Favourable, restricted" },
   limited: ACCESS_STATUS.limited,
+  listed: ACCESS_STATUS.listed,
   noadded: ACCESS_STATUS.noadded,
   unfavourable: ACCESS_STATUS.unfavourable,
   info: { label: "", glyph: "", color: MUTED },
@@ -332,7 +333,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginTop: 10, fontSize: 12, color: MUTED }}>
-            {(view === "Reimbursement" ? ["favourable", "restricted", "noadded", "unfavourable"] : ["approved", "positive", "review", "notapproved", "planned"]).map((k) => <StatusText key={k} def={ALL_STATUS[k]} size={12} />)}
+            {(view === "Reimbursement" ? ["favourable", "listed", "restricted", "noadded", "unfavourable"] : ["approved", "positive", "review", "notapproved", "planned"]).map((k) => <StatusText key={k} def={ALL_STATUS[k]} size={12} />)}
             <span style={{ color: FAINT }}>Select an asset for sources and full history.</span>
           </div>
         </>
@@ -365,7 +366,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA and EMA columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
         Swissmedic, MHRA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
-        Reimbursement entries (NICE, G-BA, HAS, Spezialitätenliste) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)}; "Not verified" means the listing was not confirmed, not that the product is unlisted.
+        Reimbursement entries (NICE, G-BA, HAS, Spezialitätenliste, Erstattungskodex) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)}; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
         "No public filing" means no announcement was found, not that none exists.
       </p>
 
