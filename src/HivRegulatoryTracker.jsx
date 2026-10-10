@@ -363,7 +363,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
       <p style={{ marginTop: 18, fontSize: 12, color: FAINT, lineHeight: 1.6 }}>
         {liveResult.checked > 0
-          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA and EMA columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
+          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA, EMA and Swiss reimbursement columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
         Swissmedic, MHRA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
         Reimbursement entries (NICE, G-BA, HAS, Spezialitätenliste, Erstattungskodex) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)}; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
