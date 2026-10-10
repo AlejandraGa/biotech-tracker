@@ -17,7 +17,7 @@ const fmt = (isoDate) => { const [y, m, d] = isoDate.split('-').map(Number); ret
 export function buildDigest(data, appUrl = '') {
   const major = data.signals.filter((s) => s.level === 'major');
   const minor = data.signals.filter((s) => s.level !== 'major');
-  const order = ['FDA', 'EMA', 'Swissmedic', 'Press', 'ClinicalTrials.gov'];
+  const order = ['FDA', 'EMA', 'Swissmedic', 'Spezialitätenliste', 'Press', 'ClinicalTrials.gov'];
   const failed = data.sources.filter((s) => !s.ok);
   const subject = `HIV competitive intelligence: ${major.length} key update${major.length === 1 ? '' : 's'} this week`;
 
@@ -43,7 +43,7 @@ export function buildDigest(data, appUrl = '') {
     ${order.map(section).join('')}
     ${failed.length ? `<p style="font-size:12px;color:#92580a;margin:24px 0 0;line-height:1.5">Not checked this week (source did not respond): ${esc(failed.map((f) => f.name).join(', '))}.</p>` : ''}
     ${appUrl ? `<p style="margin:26px 0 0"><a href="${esc(appUrl)}" style="font-size:13px;color:#c8102e">Open the full activity log</a></p>` : ''}
-    <p style="font-size:11px;color:#9a948a;margin:22px 0 0;line-height:1.5">Compiled automatically from public sources (openFDA, EMA, Swissmedic, company and trade news, ClinicalTrials.gov). Check the linked source before relying on an item.</p>
+    <p style="font-size:11px;color:#9a948a;margin:22px 0 0;line-height:1.5">Compiled automatically from public sources (openFDA, EMA, Swissmedic, the Swiss Spezialitätenliste, company and trade news, ClinicalTrials.gov). Check the linked source before relying on an item.</p>
   </div></body></html>`;
 
   const text = [subject, '', ...major.map((s) => `${fmt(s.date)} · ${s.source} · ${s.title}\n${s.url}`)].join('\n');

@@ -86,7 +86,7 @@ export function useHivSignals() {
 }
 
 // ─── SMALL PIECES ────────────────────────────────────────────────────────────
-const SOURCE_TINT = { FDA: "#1e40af", EMA: "#0f766e", Swissmedic: "#b3122b", Press: "#6b6760", "ClinicalTrials.gov": "#6d28d9" };
+const SOURCE_TINT = { FDA: "#1e40af", EMA: "#0f766e", Swissmedic: "#b3122b", "Spezialitätenliste": "#b3122b", Press: "#6b6760", "ClinicalTrials.gov": "#6d28d9" };
 
 function SourceTag({ name }) {
   return <span style={{ fontSize: 11.5, fontWeight: 600, color: SOURCE_TINT[name] || MUTED, whiteSpace: "nowrap" }}>{name}</span>;
@@ -221,7 +221,7 @@ export function ActivityLog({ feed }) {
         {rows.map((s) => <SignalRow key={s.id} s={s} isNew={freshIds.has(s.id)} />)}
       </div>
       <p style={{ fontSize: 12, color: FAINT, marginTop: 10, lineHeight: 1.55 }}>
-        Covers the last 90 days. Items are collected automatically from openFDA, the EMA medicines dataset and news feed, Swissmedic's list of newly authorised medicines, company and trade news, and ClinicalTrials.gov. A red dot marks items you have not reviewed. Open the source before relying on an item.
+        Covers the last 90 days. Items are collected automatically from openFDA, the EMA medicines dataset and news feed, Swissmedic's list of newly authorised medicines, the Swiss Spezialitätenliste, company and trade news, and ClinicalTrials.gov. A red dot marks items you have not reviewed. Open the source before relying on an item.
       </p>
     </div>
   );

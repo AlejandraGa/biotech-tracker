@@ -316,13 +316,55 @@ export function parseCtgov(json, since) {
   return out;
 }
 
+// ─── SWITZERLAND · Spezialitätenliste (BAG public API) ──────────────────────
+// Reimbursement listing, public price and limitations for the tracked substances.
+const SL_API = 'https://epl.bag.admin.ch/api/sl/public/medicinal-products';
+const SL_SUBSTANCES = ['Lenacapavirum', 'Bictegravirum', 'Cabotegravirum', 'Rilpivirinum', 'Islatravirum', 'Doravirinum', 'Dolutegravirum'];
+export const slUrl = (term) => `${SL_API}?search=${encodeURIComponent(term)}&page=1&size=50`;
+export function parseSl(payloads) {
+  const byName = new Map();
+  for (const json of payloads) {
+    for (const item of json?.items || []) {
+      for (const mp of item.medicinalProducts || []) {
+        const packs = (mp.packagedMedicinalProducts || []).filter((p) => !p.delistingReason);
+        if (!packs.length) continue;
+        const key = mp.trademark || item.trademark;
+        const rec = byName.get(key) || { trademark: key, substances: (item.substances || []).join(', '), holder: item.marketingAuthorisationHolder?.name || '', packs: [], limitation: false, timeLimitedTo: '', firstListed: '', lastPriceChange: '' };
+        for (const p of packs) {
+          rec.packs.push({ form: mp.dosageFormAndStrength, size: p.packSize, retailPrice: p.retailPrice, exFactoryPrice: p.exFactoryPrice });
+          if (p.limitation || (mp.limitations || []).length) rec.limitation = true;
+          if (p.expiration && p.validTo && p.validTo > rec.timeLimitedTo) rec.timeLimitedTo = p.validTo;
+          if (p.firstListed && (!rec.firstListed || p.firstListed < rec.firstListed)) rec.firstListed = p.firstListed;
+          if (p.lastPriceChange && p.lastPriceChange > rec.lastPriceChange) rec.lastPriceChange = p.lastPriceChange;
+        }
+        byName.set(key, rec);
+      }
+    }
+  }
+  return [...byName.values()];
+}
+const chf = (n) => `CHF ${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+export function slSignals(records, since, today) {
+  const out = [];
+  const soon = isoDaysAgo(-60, new Date(`${today}T00:00:00Z`));
+  for (const r of records) {
+    const t = tagProduct(`${r.trademark} ${r.substances}`);
+    const base = { source: 'Spezialitätenliste', kind: 'decision', level: 'major', product: t.product || r.trademark, company: t.company || r.holder, url: `https://sl.bag.admin.ch/sl?search=${encodeURIComponent(r.trademark)}` };
+    const first = r.packs[0];
+    if (r.firstListed >= since) out.push({ ...base, id: `sl-${slug(r.trademark)}-listed-${r.firstListed}`, date: r.firstListed, title: `${r.trademark}: added to the Swiss Spezialitätenliste`, detail: `${chf(first.retailPrice)} public price, ${first.form}${r.limitation ? ' · with limitation' : ''}` });
+    if (r.lastPriceChange >= since && r.lastPriceChange !== r.firstListed) out.push({ ...base, id: `sl-${slug(r.trademark)}-price-${r.lastPriceChange}`, date: r.lastPriceChange, title: `${r.trademark}: Swiss list price changed`, detail: `Now ${chf(first.retailPrice)} public price, ${first.form}` });
+    if (r.timeLimitedTo && r.timeLimitedTo >= today && r.timeLimitedTo <= soon) out.push({ ...base, id: `sl-${slug(r.trademark)}-expiry-${r.timeLimitedTo}`, date: today, title: `${r.trademark}: time-limited Swiss listing ends ${r.timeLimitedTo}`, detail: 'A renewal decision by the BAG is due.' });
+  }
+  return out;
+}
+
 // ─── COLLECT ────────────────────────────────────────────────────────────────
 // Returns { generatedAt, since, sources:[{name, ok, count, error}], signals:[...] }
 export async function collectSignals({ days = 90, fetchImpl = fetch, now = new Date() } = {}) {
   const since = isoDaysAgo(days, now);
   const opt = { fetchImpl };
   // null means the dataset could not be read, so the table keeps its curated values.
-  const live = { fda: null, ema: null };
+  const live = { fda: null, ema: null, sl: null };
 
   const jobs = [
     ['FDA', async () => {
@@ -354,6 +396,14 @@ export async function collectSignals({ days = 90, fetchImpl = fetch, now = new D
       const all = results.flatMap((r) => (r.status === 'fulfilled' ? r.value : [])).sort((a, b) => b.date.localeCompare(a.date));
       const stories = new Set();
       return all.filter((x) => { const k = storyKey(x.title); if (stories.has(k)) return false; stories.add(k); return true; });
+    }],
+    ['Spezialitätenliste', async () => {
+      const results = await Promise.allSettled(SL_SUBSTANCES.map((term) => get(slUrl(term), { ...opt, as: 'json', timeout: 10000 })));
+      if (results.every((r) => r.status === 'rejected')) throw results[0].reason;
+      // Only publish the snapshot when every query answered, so a gap is never read as "not listed".
+      const records = parseSl(results.filter((r) => r.status === 'fulfilled').map((r) => r.value));
+      if (results.every((r) => r.status === 'fulfilled')) live.sl = records;
+      return slSignals(records, since, iso(now));
     }],
     ['ClinicalTrials.gov', async () => parseCtgov(await get(ctgovUrl(since), { ...opt, as: 'json' }), since)],
   ];
