@@ -255,14 +255,14 @@ export const PRODUCTS = [
     position: 'First non-INSTI, tenofovir-free two-drug regimen. Switch indication for virologically suppressed adults.',
     trials: 'Trial 051 (NCT05631093), Trial 052 (NCT05630755, vs Biktarvy)',
     reg: {
-      fda:  { s: 'approved', date: '2026-04-21', src: S.idvynsoApproval },
+      fda:  { s: 'approved', date: '2026-04-20', note: 'Announced 21 Apr', src: S.idvynsoApproval },
       chmp: { s: 'review', note: 'Day 120 questions, Sept 2026', src: S.chmpSep26 },
       ec:   { s: 'pending' },
       ch:   NO_INFO,
     },
     events: [
       { date: '2025-07-10', agency: 'FDA', outcome: 'review', text: 'NDA accepted; PDUFA date set for 28 Apr 2026.', src: S.dorIslAccept },
-      { date: '2026-04-21', agency: 'FDA', outcome: 'approved', text: 'Approved for virologically suppressed adults with no history of treatment failure and no known doravirine resistance.', src: S.idvynsoApproval },
+      { date: '2026-04-20', agency: 'FDA', outcome: 'approved', text: 'Approved for virologically suppressed adults with no history of treatment failure and no known doravirine resistance. Announced the next day.', src: S.idvynsoApproval },
       { date: '2026-09-14', agency: 'CHMP', outcome: 'review', text: 'Initial application EMEA/H/C/006642 on the CHMP agenda for adoption of the Day 120 list of questions.', src: S.chmpSep26 },
     ],
     watch: 'CHMP opinion. The procedure reached the Day 120 list of questions in Sept 2026.',

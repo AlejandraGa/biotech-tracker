@@ -33,6 +33,12 @@ function findFda(rows, brands) {
   return hits.sort((a, b) => a.approvalDate.localeCompare(b.approvalDate))[0] || null;
 }
 
+function opinionSense(ema) {
+  if (/negative/i.test(ema.opinionStatus) || ema.refusalDate) return "negative";
+  if (/positive/i.test(ema.opinionStatus) || ema.maDate) return "positive";
+  return null;
+}
+
 // Returns the cell to display, given the curated cell and what the dataset says.
 function reconcile(curated, official, datasetLabel) {
   if (!official) return curated;
@@ -58,8 +64,10 @@ export function applyLive(products, live) {
     const ema = findEma(live.ema, m.ema);
     const official = {
       fda: fda ? { s: "approved", date: fda.approvalDate, src: fda.url } : null,
-      chmp: ema && ema.opinionDate && /positive|negative/i.test(ema.opinionStatus)
-        ? { s: /negative/i.test(ema.opinionStatus) ? "negative" : "positive", date: ema.opinionDate, src: ema.url } : null,
+      // The dataset leaves the opinion's direction blank once a medicine is authorised,
+      // so an authorisation counts as a positive opinion and a refusal as a negative one.
+      chmp: ema && ema.opinionDate && opinionSense(ema)
+        ? { s: opinionSense(ema), date: ema.opinionDate, src: ema.url } : null,
       ec: ema && ema.maDate ? { s: "approved", date: ema.maDate, src: ema.url }
         : ema && ema.refusalDate ? { s: "negative", date: ema.refusalDate, note: "Marketing authorisation refused", src: ema.url } : null,
     };
