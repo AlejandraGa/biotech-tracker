@@ -40,7 +40,7 @@ const SWISSMEDIC_TERMS = ['lenacapavir', 'bictegravir', 'islatravir', 'doravirin
 
 const HIV_RE = /\bHIV\b|pre-exposure prophylaxis|\bPrEP\b|antiretroviral/i;
 const COMPANY_RE = /gilead|viiv|\bgsk\b|merck|\bmsd\b|janssen|johnson & johnson/i;
-const REG_RE = /\bFDA\b|\bEMA\b|\bCHMP\b|swissmedic|european commission|approv|authoris|authoriz|opinion|pdufa|\bNDA\b|\bsNDA\b|\bMAA\b|complete response|priority review|submission|filing|phase 3|phase III|topline/i;
+const REG_RE = /\bFDA\b|\bEMA\b|\bCHMP\b|swissmedic|european commission|approv|authoris|authoriz|opinion|pdufa|\bNDA\b|\bsNDA\b|\bMAA\b|complete response|priority review|submission|filing|phase 3|phase III|topline|\bNICE\b|G-BA|\bHTA\b|reimburs|draft guidance/i;
 
 // Investor and stock-market coverage: not competitive intelligence.
 const FINANCE_PUBLISHER_RE = /simply wall|zacks|motley fool|seeking alpha|marketbeat|yahoo finance|investing\.com|tipranks|benzinga|insider monkey|barchart|stocktwits|investorplace|24\/7 wall|tradingview|nasdaq\.com|morningstar|barron|stock titan|defense world|ticker report|marketscreener|finviz|gurufocus|investor's business/i;
