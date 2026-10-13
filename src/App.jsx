@@ -104,17 +104,6 @@ function matchesTopic(pub, topicKey) {
   return topic.keywords.some(kw => haystack.includes(kw));
 }
 
-function tagColor(tag) {
-  if (!tag) return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
-  const t = tag.toLowerCase();
-  if (t.includes('trial') || t.includes('clinical')) return { bg: 'rgba(22,163,74,0.08)', color: '#15803d', border: 'rgba(22,163,74,0.25)' };
-  if (t.includes('regulat') || t.includes('fda') || t.includes('ema') || t.includes('hta')) return { bg: 'rgba(29,78,216,0.07)', color: '#1d4ed8', border: 'rgba(29,78,216,0.2)' };
-  if (t.includes('partner') || t.includes('deal')) return { bg: 'rgba(161,98,7,0.07)', color: '#a16207', border: 'rgba(161,98,7,0.2)' };
-  if (t.includes('conference')) return { bg: 'rgba(190,18,60,0.07)', color: '#be123c', border: 'rgba(190,18,60,0.2)' };
-  if (t.includes('access') || t.includes('reimburse') || t.includes('pricing') || t.includes('nice') || t.includes('g-ba')) return { bg: 'rgba(5,150,105,0.07)', color: '#065f46', border: 'rgba(5,150,105,0.2)' };
-  return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
-}
-
 // ─── STATIC COMPETITIVE LANDSCAPE DATA ──────────────────────────────────────
 const COMPETITIVE_LANDSCAPE_DATA = [
   {
@@ -203,27 +192,14 @@ const np = {
   featuredHeadline: { fontSize: 28, fontWeight: 700, lineHeight: 1.15, color: '#111', marginBottom: 10, letterSpacing: '-0.3px', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
   featuredByline: { fontSize: 12.5, color: '#777', marginBottom: 10, letterSpacing: '0.3px', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
   featuredSummary: { fontSize: 15, lineHeight: 1.75, color: '#333', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
-  tagPill: (tag) => {
-    const c = tagColor(tag);
-    return { display: 'inline-block', fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 3, background: c.bg, color: c.color, border: `1px solid ${c.border}`, marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" };
-  },
+  // News category: plain small caps in grey, no colour.
+  tagPill: () => ({ display: 'inline-block', fontSize: 11.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b6760', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }),
   filterBar: { display: 'flex', gap: 8, marginBottom: '1.25rem', alignItems: 'center' },
   filterInput: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 6, padding: '7px 12px', color: '#1a1a1a', fontSize: 13, outline: 'none', flex: 1, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
   npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
 
-const IMPACT_STYLE = {
-  High: { color: '#b91c1c', bg: 'rgba(185,28,28,0.07)' },
-  Medium: { color: '#92580a', bg: 'rgba(146,88,10,0.08)' },
-  Low: { color: '#6b6760', bg: '#f3f0ea' },
-};
 const NEWS_FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
-
-function ImpactPill({ impact }) {
-  if (!impact) return null;
-  const c = IMPACT_STYLE[impact] || IMPACT_STYLE.Low;
-  return <span title="Estimated from the type of news: approvals, results, prices and guidelines on a competitor are high" style={{ fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 3, color: c.color, background: c.bg, fontFamily: NEWS_FONT, whiteSpace: 'nowrap' }}>{impact} impact</span>;
-}
 
 // Competitors and products named in the story, then the other outlets that ran it.
 function StoryMeta({ story }) {
@@ -241,9 +217,6 @@ function StoryMeta({ story }) {
   );
 }
 
-const briefKey = () => `catalyst-weekly-brief-${new Date().toISOString().slice(0, 10)}`;
-function readBrief() { try { return localStorage.getItem(briefKey()) || ''; } catch { return ''; } }
-function saveBrief(text) { try { localStorage.setItem(briefKey(), text); } catch {} }
 
 function Spinner() {
   return <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />;
@@ -635,9 +608,9 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [companySel, setCompanySel] = useState(null);
   const [productSel, setProductSel] = useState(null);
-  const [impactSel, setImpactSel] = useState(null);
-  const [brief, setBrief] = useState(readBrief);
-  const [briefLoading, setBriefLoading] = useState(false);
+  // Weekly brief: written once a day on the server (/api/brief) and shared by every visitor.
+  const [brief, setBrief] = useState('');
+  const [briefState, setBriefState] = useState('loading');
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -646,6 +619,12 @@ export default function App() {
       setLoadingNews(false);
     };
     fetchNews();
+  }, []);
+
+  React.useEffect(() => {
+    fetch('/api/brief').then(r => r.json())
+      .then(d => { setBrief(d.brief || ''); setBriefState(d.brief ? 'ok' : d.error ? 'error' : 'none'); })
+      .catch(() => setBriefState('error'));
   }, []);
 
   React.useEffect(() => {
@@ -667,7 +646,6 @@ export default function App() {
   const newsSource = realNews;
   const companyOptions = ['Gilead', 'ViiV/GSK', 'MSD', 'J&J'];
   const productOptions = [...new Set(newsSource.flatMap(n => n.products || []))].sort();
-  const impactOptions = ['High', 'Medium', 'Low'];
   const CATEGORY_KEYWORDS = {
     'Treatment': ['treatment', 'antiretroviral', 'regimen', 'switch', 'suppress', 'biktarvy', 'dovato', 'cabenuva', 'sunlenca', 'bixlenvo', 'idvynso'],
     'Prevention / PrEP': ['prep', 'prevention', 'prophylaxis', 'yeztugo', 'yeytuo', 'apretude', 'descovy', 'truvada', 'mk-8527'],
@@ -687,27 +665,11 @@ export default function App() {
     }
     if (companySel?.length && !(n.competitors || []).some(c => companySel.includes(c))) return false;
     if (productSel?.length && !(n.products || []).some(p => productSel.includes(p))) return false;
-    if (impactSel?.length && !impactSel.includes(n.impact)) return false;
     if (newsFilter) { if (!(n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '') + ' ' + (n.companies || []).map(c => c.companyName).join(' ')).toLowerCase().includes(newsFilter.toLowerCase())) return false; }
     return true;
   });
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  // Weekly brief: generated only on request, from the last 7 days' headlines, and kept for the day.
-  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-  const weekStories = newsSource.filter(n => n.published && n.published >= weekAgo && !isPaywalled(n))
-    .sort((a, b) => impactOptions.indexOf(a.impact) - impactOptions.indexOf(b.impact))
-    .slice(0, 25);
-  const generateBrief = async () => {
-    setBriefLoading(true);
-    const list = weekStories.map(n => `- [${n.published}] ${n.headline} (${n.source})`).join('\n');
-    try {
-      const text = await callClaude(`You are a competitive intelligence analyst for an HIV launch readiness team. From these HIV news headlines of the last 7 days, write exactly 3 bullet points on what matters most this week for the HIV market and its competitors (Gilead, ViiV/GSK, MSD, J&J) and for access. One sentence each, each starting with "• ". Use only facts from the headlines; do not invent numbers or dates.\n\n${list}`);
-      setBrief(text); saveBrief(text);
-    } catch { setBrief('The brief could not be generated right now.'); }
-    setBriefLoading(false);
-  };
-
   const featured = filteredNews[0];
   const secondary = filteredNews.slice(1);
 
@@ -736,7 +698,7 @@ export default function App() {
           .app-tabs::-webkit-scrollbar { display: none; }
           .app-tabs button { padding: 10px 12px !important; font-size: 13px !important; white-space: nowrap !important; flex-shrink: 0 !important; }
           .news-layout { grid-template-columns: 1fr !important; }
-          .news-sidebar { position: static !important; margin-top: 2rem; }
+          .news-sidebar { position: static !important; max-height: none !important; overflow: visible !important; margin-top: 2rem; }
           .featured-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
           .featured-headline { font-size: 22px !important; }
           .story-row { flex-direction: column !important; gap: 10px !important; }
@@ -800,17 +762,15 @@ export default function App() {
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: '1.25rem' }}>
               <MultiSelect label="Competitor" allLabel="All competitors" selected={companySel} onChange={setCompanySel} options={companyOptions} />
               {productOptions.length > 0 && <MultiSelect label="Product" allLabel="All products" selected={productSel} onChange={setProductSel} options={productOptions} />}
-              <MultiSelect label="Impact" allLabel="All" selected={impactSel} onChange={setImpactSel} options={impactOptions} />
             </div>
-            {!loadingNews && weekStories.length > 0 && (
+            {(briefState === 'loading' || briefState === 'ok') && (
               <div style={{ border: '1px solid #e5e0d8', borderRadius: 6, padding: '12px 16px', marginBottom: '1.5rem', background: '#fff' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: NEWS_FONT }}>What matters this week</div>
-                  {!brief && <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={generateBrief} disabled={briefLoading}>{briefLoading ? <><Spinner />Writing…</> : 'Generate brief →'}</button>}
                 </div>
                 {brief
                   ? <div style={{ fontSize: 14, lineHeight: 1.7, color: '#333', marginTop: 8, whiteSpace: 'pre-line', fontFamily: NEWS_FONT }}>{brief}</div>
-                  : <div style={{ fontSize: 13, color: '#888', marginTop: 6, fontFamily: NEWS_FONT }}>Three lines on the {weekStories.length} most relevant stories of the last 7 days.</div>}
+                  : <div style={{ fontSize: 13, color: '#888', marginTop: 6, fontFamily: NEWS_FONT }}>{briefState === 'loading' ? <><Spinner />Summarising the last 7 days…</> : 'The summary could not be written right now.'}</div>}
                 {brief && <div style={{ fontSize: 12, color: '#999', marginTop: 8, fontFamily: NEWS_FONT }}>AI-generated from this week's headlines. Check the sources before sharing.</div>}
               </div>
             )}
@@ -821,7 +781,7 @@ export default function App() {
                 <div style={np.sectionLabel}>Top Story</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' }} className="featured-grid">
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}><div style={np.tagPill(featured.tag)}>{featured.tag}</div><ImpactPill impact={featured.impact} /></div>
+                    <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                     <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
                     <div style={np.featuredByline}>{featured.source} · {featured.date}{featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 12.5, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}</div>
                     <StoryMeta story={featured} />
@@ -849,7 +809,6 @@ export default function App() {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
                             <span style={np.tagPill(n.tag)}>{n.tag}</span>
-                            <span style={{ marginBottom: 8 }}><ImpactPill impact={n.impact} /></span>
                             <span style={{ fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.source} · {n.date}</span>
                             {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
                           </div>
@@ -868,7 +827,7 @@ export default function App() {
               </div>
             )}
           </div>
-          <div style={{ position: 'sticky', top: '1rem' }} className="news-sidebar">
+          <div style={{ position: 'sticky', top: '1rem', maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto', paddingRight: 4 }} className="news-sidebar">
             <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>HIV Company Announcements</div>
             </div>

@@ -183,12 +183,9 @@ function deduplicate(articles) {
   });
 }
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-
-  try {
+// Fetches, filters and ranks the HIV news. Returns null when every feed failed.
+// Also used by /api/brief.
+export async function loadHivNews() {
     const results = await Promise.allSettled(
       RSS_FEEDS.map(async ({ url, source }) => {
         const response = await fetch(url, {
@@ -214,7 +211,7 @@ export default async function handler(req, res) {
     });
 
     if (results.every(r => r.status === 'rejected')) {
-      return res.status(502).json({ error: 'All feeds failed' });
+      return null;
     }
 
     // Deduplicate
@@ -291,8 +288,18 @@ export default async function handler(req, res) {
     // Send the publication date as YYYY-MM-DD for the weekly brief
     const clean = allArticles.map(({ dateObj, ...rest }) => ({ ...rest, published: dateObj ? dateObj.slice(0, 10) : '' }));
 
-    return res.status(200).json(clean.slice(0, 80));
+    return clean.slice(0, 80);
+}
 
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  try {
+    const news = await loadHivNews();
+    if (!news) return res.status(502).json({ error: 'All feeds failed' });
+    return res.status(200).json(news);
   } catch (err) {
     console.error('RSS handler error:', err);
     return res.status(500).json({ error: err.message });
