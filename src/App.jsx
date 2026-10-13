@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import CompetitiveLandscape from './CompetitiveLandscape';
+import HivLaunchMap from './HivLaunchMap';
 import MultiSelect from './MultiSelect';
 
 // HIV searches for the Publications tab: one per competitor asset, plus prevention.
@@ -640,6 +641,7 @@ export default function App() {
     { key: 'news', label: 'News' },
     { key: 'publications', label: 'Publications' },
     { key: 'landscape', label: 'HIV Competitive Intelligence', short: 'HIV CI' },
+    { key: 'launch', label: 'HIV Launch Map', short: 'Launch map' },
   ];
 
   return (
@@ -813,6 +815,9 @@ export default function App() {
 
       {/* ══ COMPETITIVE LANDSCAPE ══ */}
       {tab === 'landscape' && <CompetitiveLandscape />}
+
+      {/* ══ HIV LAUNCH MAP ══ */}
+      {tab === 'launch' && <HivLaunchMap />}
     </div>
   );
 }

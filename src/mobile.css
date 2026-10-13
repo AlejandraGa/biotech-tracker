@@ -66,7 +66,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .hiv-asset-head { grid-template-columns: 1fr !important; gap: 4px !important; }
   .hiv-asset-head > :last-child { justify-self: start; }
 
-  /* Map view launch sequence: fit the screen instead of scrolling sideways;
+  /* Launch map tab, launch sequence: fit the screen instead of scrolling sideways;
      the time-to-reimbursement note moves under each bar. */
   .hiv-ls-inner { min-width: 0 !important; }
   .hiv-ls { grid-template-columns: 104px minmax(0, 1fr) !important; column-gap: 10px !important; padding: 4px 0; }
@@ -74,6 +74,16 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .hiv-ls-axis > span:last-child { transform: translateX(-100%) !important; }
   .hiv-ls > :nth-child(3) { grid-column: 2; }
   .hiv-ls:first-child > :nth-child(3) { display: none; }
+
+  /* Launch map tab: pickers full width like the dropdown filters, view switch
+     in one row, overview grid with a narrow product column, details as a bottom sheet. */
+  .lm-pick { display: flex !important; width: 100%; }
+  .lm-pick select { flex: 1; max-width: none !important; }
+  .lm-seg { display: flex !important; width: 100%; flex-wrap: nowrap !important; }
+  .lm-seg button { flex: 1; padding: 7px 6px !important; }
+  .lm-matrix { --lm-prod: 128px; --lm-cell: 46px; max-height: 70vh !important; }
+  .lm-overlay { align-items: flex-end; }
+  .lm-sheet { width: 100% !important; height: auto !important; max-height: 85vh; border-radius: 12px 12px 0 0; padding: 16px 16px 28px !important; }
 
   /* Clinical pipeline search form */
   .cl-inputs { grid-template-columns: 1fr !important; }

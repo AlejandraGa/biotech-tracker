@@ -5,7 +5,6 @@ import { MORE_VERIFIED_ON } from "./hivAccessMore";
 import { BASE as CURATED, applyDetections } from "./hivData";
 import AUTO from "./hivAutoDetections.json";
 import { applyLive } from "./liveStatus";
-import HivProgressMap from "./HivProgressMap";
 import ClinicalCompare from "./ClinicalCompare";
 import { openOnePager } from "./onePager";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
@@ -25,7 +24,7 @@ const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.l
 // Column widths come from CSS variables so phones can use narrower columns (see mobile.css).
 const gridFor = (n) => `minmax(var(--asset-col, 250px),1.3fr) repeat(${n}, minmax(var(--status-col, 168px),1fr))`;
 
-// Curated data, with any decisions found by the daily page check laid over it.
+// Curated data, with any decisions found by the page check laid over it.
 const BASE = applyDetections(CURATED, AUTO);
 const OUTCOME = {
   approved: STATUS.approved,
@@ -376,7 +375,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
       {/* Controls */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Clinical", "Timeline", "Map"]} />
+        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Clinical", "Timeline"]} />
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
@@ -428,7 +427,6 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
       )}
 
       {view === "Timeline" && products.length > 0 && <Timeline products={products} />}
-      {view === "Map" && products.length > 0 && <HivProgressMap products={products} onOpen={setOpenId} />}
       {view === "Clinical" && products.length > 0 && <ClinicalCompare products={products} onOpen={setOpenId} />}
 
       {/* Earlier pipeline */}
@@ -456,7 +454,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA, EMA and Swiss reimbursement columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
         {AUTO.lastRun
-          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>The other regulators' and reimbursement bodies' websites are checked automatically every day</strong> (last check {fmtDate(AUTO.lastRun)}{Object.values(AUTO.sources).some((x) => !x.ok) ? `; ${new Set(Object.values(AUTO.sources).filter((x) => !x.ok).map((x) => x.body)).size} did not respond` : ""}). {AUTO.detections.length ? `${AUTO.detections.length} decision${AUTO.detections.length === 1 ? " was" : "s were"} picked up this way and ${AUTO.detections.length === 1 ? "is" : "are"} marked "Updated automatically".` : "No new decisions have been picked up this way yet."} </>
+          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>The other regulators' and reimbursement bodies' websites are checked automatically every 3 hours</strong> (last check {fmtDate(AUTO.lastRun)}{Object.values(AUTO.sources).some((x) => !x.ok) ? `; ${new Set(Object.values(AUTO.sources).filter((x) => !x.ok).map((x) => x.body)).size} did not respond` : ""}). {AUTO.detections.length ? `${AUTO.detections.length} decision${AUTO.detections.length === 1 ? " was" : "s were"} picked up this way and ${AUTO.detections.length === 1 ? "is" : "are"} marked "Updated automatically".` : "No new decisions have been picked up this way yet."} </>
           : null}
         Swissmedic, MHRA, Health Canada, TGA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
         Reimbursement entries ({ACCESS_BODIES.map((b) => b.label).join(", ")}) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)} for NICE, G-BA, HAS, BAG and the Dachverband and on {fmtDate(MORE_VERIFIED_ON)} for the rest; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
