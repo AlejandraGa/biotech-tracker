@@ -4,7 +4,7 @@ import { isHivNews, stripPublisher, gnews } from './_lib/hivNews.js';
 
 const PRESS_FEEDS = [
   { url: gnews('HIV (site:businesswire.com OR site:prnewswire.com OR site:globenewswire.com)'), source: 'Press wire' },
-  { url: gnews('HIV (site:gilead.com OR site:viivhealthcare.com OR site:merck.com OR site:gsk.com)'), source: 'Company newsroom' },
+  { url: gnews('HIV (Gilead OR ViiV OR GSK OR Merck OR MSD OR "Johnson & Johnson") announces'), source: 'Company news' },
   { url: 'https://www.biopharmadive.com/press-release/feed/', source: 'BioPharma Dive' },
   { url: 'https://www.fiercebiotech.com/rss/press-releases', source: 'Fierce Biotech' },
   { url: 'https://www.fiercepharma.com/rss/press-releases', source: 'Fierce Pharma' },
