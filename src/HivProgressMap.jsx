@@ -3,7 +3,7 @@ import { geoMercator, geoConicConformal, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import { AGENCIES, STATUS } from "./hivRegulatoryData";
 import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS_STATUS } from "./hivAccessData";
-import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate } from "./ui";
+import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
 const ATLAS_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json";
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
@@ -188,6 +188,136 @@ function MarketCard({ m, pr, onClose }) {
   );
 }
 
+// ─── LAUNCH TIMELINE ─────────────────────────────────────────────────────────
+// One bar per market on a shared time axis: the authorisation date, the first
+// reimbursement decision, and the wait between them.
+const FLAG = (m) => `https://flagcdn.com/w40/${m.short === "UK" ? "gb" : m.short.toLowerCase()}.png`;
+const MONTH_MS = 30.44 * 86400000;
+const monthsBetween = (a, b) => Math.max(0, Math.round((new Date(b) - new Date(a)) / MONTH_MS));
+const shortDate = (iso) => { const [y, m] = iso.split("-").map(Number); return `${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1]} ${y}`; };
+
+function timelineRow(p, m, pr, today) {
+  const lead = pr.lead;
+  const approved = pr.level === "approved" || pr.level === "reimbursed";
+  const a = approved ? lead.cell?.date : null;
+  const paid = pr.access.filter((x) => covers(x.key, x.cell));
+  const dated = paid.filter((x) => x.cell.date).sort((x, y) => x.cell.date.localeCompare(y.cell.date));
+  const first = dated[0];
+  // A decision dated before the authorisation (a pre-launch listing) counts from the authorisation.
+  const r = first ? (a && first.cell.date < a ? a : first.cell.date) : null;
+  // Why there is no reimbursement yet: no body tracked, status not verified, a negative decision, or still waiting.
+  const negative = pr.access.find((x) => ["unfavourable", "noadded"].includes(x.cell?.s) && !covers(x.key, x.cell));
+  const unverified = pr.access.length > 0 && pr.access.every((x) => x.cell?.s === "none" && /not verified/i.test(x.cell?.note || ""));
+  const gap = approved && !paid.length ? (!pr.access.length ? "untracked" : negative ? "negative" : unverified ? "unverified" : "waiting") : null;
+  return { m, pr, a, r, rKey: first?.key, approved, paidNoDate: !first && paid.length > 0, gap, negative, waiting: gap === "waiting" && a ? monthsBetween(a, today) : null };
+}
+
+function LaunchTimeline({ p, progress, today }) {
+  const [tip, setTip] = useState(null);
+  const box = useRef(null);
+  const rows = MARKETS.map((m) => timelineRow(p, m, progress[m.id], today));
+  const rank = { reimbursed: 0, approved: 0, review: 1, none: 2, unknown: 3 };
+  rows.sort((x, y) => rank[x.pr.level] - rank[y.pr.level] || (x.a || "9").localeCompare(y.a || "9") || x.m.name.localeCompare(y.m.name));
+  const dates = rows.flatMap((x) => [x.a, x.r]).filter(Boolean);
+  if (!dates.length) {
+    return <div style={{ fontSize: 13, color: MUTED, padding: "14px 2px" }}>{p.name} is not authorised in any tracked market yet, so there is no launch sequence to show.</div>;
+  }
+  const y0 = Number(dates.reduce((a, b) => (a < b ? a : b)).slice(0, 4));
+  const start = `${y0}-01-01`, end = `${Number(today.slice(0, 4)) + 1}-01-01`;
+  const t0 = new Date(start).getTime(), span = new Date(end).getTime() - t0;
+  const x = (iso) => `${((new Date(iso).getTime() - t0) / span) * 100}%`;
+  const years = []; for (let y = y0; y <= Number(today.slice(0, 4)); y++) years.push(y);
+  const step = years.length > 8 ? 2 : 1;
+  const show = (e, text) => {
+    const r = box.current.getBoundingClientRect();
+    setTip({ text, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
+  };
+  const marker = (iso, kind, label) => (
+    <span role="img" aria-label={label} tabIndex={0}
+      onPointerEnter={(e) => show(e, label)} onPointerMove={(e) => show(e, label)} onPointerLeave={() => setTip(null)} onFocus={(e) => { const b = e.target.getBoundingClientRect(); show({ clientX: b.right, clientY: b.bottom }, label); }} onBlur={() => setTip(null)}
+      style={{ position: "absolute", left: x(iso), top: "50%", width: 18, height: 18, transform: "translate(-50%,-50%)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "default", outline: "none", zIndex: 2 }}>
+      <span style={kind === "a"
+        ? { width: 10, height: 10, transform: "rotate(45deg)", background: "#fff", border: `2px solid ${LEVELS.reimbursed.fill}`, boxShadow: "0 0 0 2px #fff" }
+        : { width: 11, height: 11, borderRadius: 6, background: LEVELS.reimbursed.fill, boxShadow: "0 0 0 2px #fff" }} />
+    </span>
+  );
+
+  return (
+    <div ref={box} style={{ position: "relative" }}>
+      <style>{`
+        .hiv-ls { display: grid; grid-template-columns: 150px minmax(420px,1fr) 210px; column-gap: 14px; align-items: center; }
+        .hiv-ls-scroll { overflow-x: auto; }
+        @media (max-width: 760px) { .hiv-ls { grid-template-columns: 112px minmax(380px,1fr) 150px; column-gap: 10px; } }
+      `}</style>
+      <div className="hiv-ls-scroll">
+        <div style={{ minWidth: 640 }}>
+          {/* Year axis */}
+          <div className="hiv-ls" style={{ height: 22 }}>
+            <span />
+            <div style={{ position: "relative", height: "100%" }}>
+              {years.filter((y, i) => i % step === 0).map((y) => <span key={y} style={{ position: "absolute", left: x(`${y}-01-01`), bottom: 4, fontSize: 11.5, color: MUTED, transform: "translateX(-50%)", fontVariantNumeric: "tabular-nums" }}>{y}</span>)}
+              <span style={{ position: "absolute", left: x(today), bottom: 4, fontSize: 11.5, color: INK, fontWeight: 600, transform: "translateX(-50%)", background: "#fff", padding: "0 3px" }}>Today</span>
+            </div>
+            <span style={{ fontSize: 11.5, color: MUTED }}>Time to reimbursement</span>
+          </div>
+          {rows.map((row) => {
+            const { m, pr, a, r } = row;
+            const regName = BODY[pr.lead.key];
+            const firstBody = row.rKey && BODY[row.rKey].split(" · ")[0];
+            const neg = row.negative && statusOf(row.negative.cell);
+            let side;
+            if (r) side = <><strong style={{ color: INK, fontWeight: 600 }}>{monthsBetween(a, r)} months</strong> <span style={{ color: MUTED }}>to {firstBody}</span></>;
+            else if (row.paidNoDate) side = <span style={{ color: MUTED }}>{a ? "Reimbursed, date not recorded" : "Authorised and reimbursed, dates not recorded"}</span>;
+            else if (row.gap === "untracked") side = <span style={{ color: MUTED }}>No reimbursement body tracked</span>;
+            else if (row.gap === "unverified") side = <span style={{ color: MUTED }}>Reimbursement not verified</span>;
+            else if (row.gap === "negative") side = <><strong style={{ color: neg.color, fontWeight: 600 }}>{neg.label}</strong> <span style={{ color: MUTED }}>({BODY[row.negative.key].split(" · ")[0]})</span></>;
+            else if (row.waiting !== null) side = <><strong style={{ color: "#92580a", fontWeight: 600 }}>Waiting {row.waiting} months</strong></>;
+            else if (row.approved) side = <span style={{ color: MUTED }}>Authorised, date not recorded</span>;
+            else side = <span style={{ color: pr.level === "review" ? "#92580a" : FAINT }}>{LEVELS[pr.level].label}</span>;
+            return (
+              <div key={m.id} className="hiv-ls" style={{ minHeight: 34, borderTop: `1px solid ${HAIR}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                  <img src={FLAG(m)} alt="" width={20} height={15} loading="lazy" style={{ borderRadius: 2, boxShadow: "0 0 0 1px rgba(0,0,0,0.08)", objectFit: "cover", flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: INK, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{m.name}</span>
+                </div>
+                <div style={{ position: "relative", height: 34 }}>
+                  {years.map((y) => <span key={y} aria-hidden="true" style={{ position: "absolute", left: x(`${y}-01-01`), top: 0, bottom: 0, borderLeft: `1px solid ${HAIR}` }} />)}
+                  <span aria-hidden="true" style={{ position: "absolute", left: x(today), top: 0, bottom: 0, borderLeft: `1px dashed #bdb7ad` }} />
+                  {/* Wait between authorisation and reimbursement, then time on the market */}
+                  {a && r && <span style={{ position: "absolute", left: x(a), width: `calc(${x(r)} - ${x(a)})`, top: "50%", height: 8, transform: "translateY(-50%)", background: LEVELS.approved.fill, borderRadius: 4 }} />}
+                  {a && (r || row.paidNoDate) && <span style={{ position: "absolute", left: x(r || a), right: `calc(100% - ${x(today)})`, top: "50%", height: 8, transform: "translateY(-50%)", background: LEVELS.reimbursed.fill, borderRadius: 4, opacity: row.paidNoDate ? 0.55 : 1 }} />}
+                  {a && (row.gap === "untracked" || row.gap === "unverified" || row.gap === "negative") && <span style={{ position: "absolute", left: x(a), right: `calc(100% - ${x(today)})`, top: "50%", height: 3, transform: "translateY(-50%)", background: "#cfc8bc", borderRadius: 2 }} />}
+                  {row.gap === "negative" && row.negative.cell.date && <span role="img" aria-label={`${neg.label}, ${BODY[row.negative.key]}, ${fmtDate(row.negative.cell.date)}`} title={`${neg.label}, ${BODY[row.negative.key]}, ${fmtDate(row.negative.cell.date)}`} style={{ position: "absolute", left: x(row.negative.cell.date), top: "50%", transform: "translate(-50%,-50%)", fontSize: 13, fontWeight: 700, color: neg.color, lineHeight: 1, background: "#fff", padding: "0 1px" }}>{neg.glyph}</span>}
+                  {a && row.waiting !== null && <span style={{ position: "absolute", left: x(a), right: `calc(100% - ${x(today)})`, top: "50%", height: 8, transform: "translateY(-50%)", backgroundImage: `repeating-linear-gradient(135deg, ${LEVELS.approved.fill} 0 4px, #fff 4px 7px)`, borderRadius: 4, border: `1px solid ${LEVELS.approved.fill}` }} />}
+                  {a && marker(a, "a", `${m.name}: approved by ${regName}, ${fmtDate(a)}`)}
+                  {r && marker(r, "r", `${m.name}: reimbursed after ${firstBody}, ${fmtDate(r)}`)}
+                  {pr.level === "review" && <span style={{ position: "absolute", left: x(today), top: "50%", transform: "translate(-50%,-50%)", width: 10, height: 10, borderRadius: 6, background: LEVELS.review.fill, boxShadow: "0 0 0 2px #fff" }} title={`Under review at ${regName}`} />}
+                </div>
+                <div style={{ fontSize: 12.5, lineHeight: 1.35 }}>
+                  {side}
+                  {a && <div style={{ fontSize: 11.5, color: MUTED, fontVariantNumeric: "tabular-nums" }}>{shortDate(a)}{r ? ` → ${shortDate(r)}` : ""}</div>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {/* Legend */}
+      <div style={{ display: "flex", gap: "8px 18px", flexWrap: "wrap", marginTop: 10, fontSize: 12, color: TEXT, alignItems: "center" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span aria-hidden="true" style={{ width: 9, height: 9, transform: "rotate(45deg)", border: `2px solid ${LEVELS.reimbursed.fill}`, background: "#fff" }} />Authorised</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span aria-hidden="true" style={{ width: 22, height: 7, borderRadius: 4, background: LEVELS.approved.fill }} />Waiting for reimbursement</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span aria-hidden="true" style={{ width: 10, height: 10, borderRadius: 6, background: LEVELS.reimbursed.fill }} />First reimbursement decision</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span aria-hidden="true" style={{ width: 22, height: 7, borderRadius: 4, background: LEVELS.reimbursed.fill }} />Reimbursed</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span aria-hidden="true" style={{ width: 22, height: 7, borderRadius: 4, backgroundImage: `repeating-linear-gradient(135deg, ${LEVELS.approved.fill} 0 4px, #fff 4px 7px)`, border: `1px solid ${LEVELS.approved.fill}` }} />Still waiting</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span aria-hidden="true" style={{ width: 22, height: 3, borderRadius: 2, background: "#cfc8bc" }} />Negative decision, not verified or not tracked</span>
+      </div>
+      {tip && (
+        <div role="tooltip" style={{ position: "absolute", left: Math.max(0, Math.min(tip.x + 12, tip.w - 290)), top: tip.y + 12, maxWidth: 280, zIndex: 5, pointerEvents: "none", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: "7px 10px", fontSize: 12.5, color: TEXT }}>{tip.text}</div>
+      )}
+    </div>
+  );
+}
+
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function HivProgressMap({ products, onOpen }) {
   const [pickedId, setPickedId] = useState(null);
@@ -257,6 +387,13 @@ export default function HivProgressMap({ products, onOpen }) {
           {p.company}<span style={{ color: "#cfcac2", margin: "0 6px" }}>·</span>{p.stage}
         </span>
         <button onClick={() => onOpen(p.id)} style={{ fontFamily: FONT, fontSize: 12.5, color: TEXT, background: "none", border: "none", padding: 0, textDecoration: "underline", textUnderlineOffset: 2, cursor: "pointer" }}>Full history and sources</button>
+      </div>
+
+      <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: "12px 14px", marginBottom: 14 }}>
+        <div style={{ fontSize: 13, color: TEXT, marginBottom: 8, lineHeight: 1.5 }}>
+          <strong style={{ color: INK, fontWeight: 600 }}>Launch sequence</strong>: when {p.name} was authorised in each market and how long reimbursement took.
+        </div>
+        <LaunchTimeline p={p} progress={progress} today={todayIso()} />
       </div>
 
       <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: 12 }}>
