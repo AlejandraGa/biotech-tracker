@@ -299,6 +299,8 @@ export default async function handler(req, res) {
   try {
     const news = await loadHivNews();
     if (!news) return res.status(502).json({ error: 'All feeds failed' });
+    // Shared by every visitor for 30 minutes; an older copy is served while the next one loads.
+    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
     return res.status(200).json(news);
   } catch (err) {
     console.error('RSS handler error:', err);

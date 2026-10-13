@@ -6,6 +6,7 @@ import { BASE as CURATED, applyDetections } from "./hivData";
 import AUTO from "./hivAutoDetections.json";
 import { applyLive } from "./liveStatus";
 import HivProgressMap from "./HivProgressMap";
+import { openOnePager } from "./onePager";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
 const AGENCY_TAG = {
@@ -226,6 +227,7 @@ function Drawer({ p, onClose }) {
             <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "none", fontSize: 24, lineHeight: 1, color: MUTED, cursor: "pointer", padding: 2 }}>×</button>
           </div>
           <div style={{ fontSize: 13, color: TEXT, marginTop: 10, display: "flex", alignItems: "center" }}><Dot company={p.company} />{p.company}<span style={{ color: "#cfcac2", margin: "0 7px" }}>·</span>{p.stage}</div>
+          <button type="button" onClick={() => openOnePager(p)} style={{ marginTop: 12, fontFamily: FONT, fontSize: 12.5, color: INK, background: "#fff", border: "1px solid #d3cec6", borderRadius: 6, padding: "6px 12px", cursor: "pointer" }}>Download one-pager (PDF)</button>
         </div>
 
         <div style={{ padding: "18px 24px 28px" }}>

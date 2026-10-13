@@ -54,6 +54,8 @@ export default async function handler(req, res) {
       pubType: p.pubType || '',
     }));
 
+    // Publications change slowly: share each search for 6 hours.
+    res.setHeader('Cache-Control', 's-maxage=21600, stale-while-revalidate=86400');
     return res.status(200).json(results);
 
   } catch (err) {
