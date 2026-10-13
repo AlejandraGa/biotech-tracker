@@ -1,21 +1,36 @@
 import { useEffect, useMemo, useState } from "react";
 import { AGENCIES, STATUS, PRODUCTS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRegulatoryData";
-import { ACCESS_BODIES, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
+import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
+import { MORE_ACCESS, MORE_EVENTS, MORE_VERIFIED_ON } from "./hivAccessMore";
 import { applyLive } from "./liveStatus";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
-const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Dachverband: "Dachverband (Austria)", Company: "Company update" };
+const AGENCY_TAG = {
+  FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Dachverband: "Dachverband (Austria)", Company: "Company update",
+  SMC: "SMC (Scotland)", NCPE: "NCPE / HSE (Ireland)", AIFA: "AIFA (Italy)", Spain: "Ministry of Health (Spain)", INFARMED: "INFARMED (Portugal)", Zorginstituut: "Zorginstituut (Netherlands)", RIZIV: "RIZIV / INAMI (Belgium)",
+  TLV: "TLV / NT-rådet (Sweden)", Medicinradet: "Medicinrådet (Denmark)", "Nye Metoder": "Nye Metoder (Norway)", "Health Canada": "Health Canada", "CDA-AMC": "CDA-AMC (Canada)", TGA: "TGA (Australia)", PBAC: "PBAC (Australia)",
+};
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
-const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", hint: "Marketing authorisation" }];
+const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", area: "UK & Ireland", hint: "Marketing authorisation" }, ...EXTRA_REGULATORS];
+const areasOf = (cols) => ["All countries", ...new Set(cols.map((c) => c.area))];
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
 const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
+
+const UNVERIFIED = { s: "none", note: "Not verified" };
 
 // Curated regulatory data joined with the market-access data for each asset.
 const BASE = PRODUCTS.map((p) => {
   const a = ACCESS[p.id];
   if (!a) return { ...p, access: {} };
-  const { mhra, events, watch, ...access } = a;
-  return { ...p, reg: { ...p.reg, mhra }, access, events: [...p.events, ...events], watch: watch || p.watch };
+  const { hc, tga, ...more } = MORE_ACCESS[p.id] || {};
+  const { mhra, events, watch, ...own } = a;
+  const curated = { ...own, ...more };
+  // Bodies added later default to "not verified", or "not authorised" for assets with no EU authorisation.
+  const unauthorised = curated.gba?.note === "Not authorised here";
+  const fallback = unauthorised ? curated.gba : UNVERIFIED;
+  const regFallback = unauthorised ? { s: "none", note: "No public announcement found" } : UNVERIFIED;
+  const access = Object.fromEntries(ACCESS_BODIES.map((b) => [b.key, curated[b.key] || fallback]));
+  return { ...p, reg: { ...p.reg, mhra, hc: hc || regFallback, tga: tga || regFallback }, access, events: [...p.events, ...events, ...(MORE_EVENTS[p.id] || [])], watch: watch || p.watch };
 });
 const OUTCOME = {
   approved: STATUS.approved,
@@ -51,7 +66,7 @@ function SourceLink({ href, children = "Source" }) {
 
 function Segmented({ value, onChange, options, label }) {
   return (
-    <div role="group" aria-label={label} style={{ display: "inline-flex", border: `1px solid #d3cec6`, borderRadius: 6, overflow: "hidden", background: "#fff" }}>
+    <div role="group" aria-label={label} style={{ display: "inline-flex", flexWrap: "wrap", maxWidth: "100%", border: `1px solid #d3cec6`, borderRadius: 6, overflow: "hidden", background: "#fff" }}>
       {options.map((o, i) => (
         <button key={o} onClick={() => onChange(o)} aria-pressed={value === o}
           style={{ padding: "6px 13px", fontSize: 12.5, fontFamily: FONT, cursor: "pointer", border: "none", borderLeft: i ? `1px solid #d3cec6` : "none", background: value === o ? INK : "#fff", color: value === o ? "#fff" : TEXT, fontWeight: value === o ? 500 : 400 }}>
@@ -238,6 +253,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
+  const [area, setArea] = useState("All countries");
   const [openId, setOpenId] = useState(null);
 
   const products = useMemo(() => ALL.filter((p) =>
@@ -261,7 +277,10 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
     { label: "Next dated decision", value: nextDated ? fmtDate(nextDated.date) : "None", sub: nextDated ? `${nextDated.product}, ${AGENCY_TAG[nextDated.agency]}` : "No published dates" },
   ];
 
-  const cols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
+  const allCols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
+  const areas = areasOf(allCols);
+  const activeArea = areas.includes(area) ? area : "All countries";
+  const cols = activeArea === "All countries" ? allCols : allCols.filter((c) => c.area === activeArea);
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
@@ -299,6 +318,13 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
+      {view !== "Timeline" && (
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <span style={{ fontSize: 12.5, color: MUTED }}>Countries</span>
+          <Segmented label="Countries" value={activeArea} onChange={setArea} options={areas} />
+          <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>
+        </div>
+      )}
 
       {products.length === 0 && <div style={{ padding: "2rem", textAlign: "center", fontSize: 13.5, color: MUTED, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6 }}>No assets match these filters.</div>}
 
@@ -365,8 +391,8 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         {liveResult.checked > 0
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA, EMA and Swiss reimbursement columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
-        Swissmedic, MHRA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
-        Reimbursement entries (NICE, G-BA, HAS, Spezialitätenliste, Erstattungskodex) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)}; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
+        Swissmedic, MHRA, Health Canada, TGA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
+        Reimbursement entries ({ACCESS_BODIES.map((b) => b.label).join(", ")}) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)} for NICE, G-BA, HAS, BAG and the Dachverband and on {fmtDate(MORE_VERIFIED_ON)} for the rest; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
         "No public filing" means no announcement was found, not that none exists.
       </p>
 
