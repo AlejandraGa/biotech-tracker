@@ -132,7 +132,7 @@ function FilterPill({ active, onClick, children, activeColor="#1a1a1a" }) {
 
 async function callClaude(prompt) {
   try {
-    const res = await fetch("/api/claude", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ model:"claude-sonnet-4-5", max_tokens:700, messages:[{role:"user",content:prompt}] }) });
+    const res = await fetch("/api/claude", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ prompt }) });
     const d = await res.json();
     return d.content?.[0]?.text || "No response.";
   } catch { return "Could not reach AI."; }
