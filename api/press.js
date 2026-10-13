@@ -135,6 +135,8 @@ export default async function handler(req, res) {
     });
 
     const clean = all.map(({ dateObj, ...rest }) => rest);
+    // Shared by every visitor for 30 minutes; an older copy is served while the next one loads.
+    res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
     return res.status(200).json(clean.slice(0, 30));
   } catch (err) {
     return res.status(500).json({ error: err.message });

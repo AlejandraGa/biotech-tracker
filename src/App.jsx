@@ -2,54 +2,38 @@ import React, { useState, useCallback } from 'react';
 import CompetitiveLandscape from './CompetitiveLandscape';
 import MultiSelect from './MultiSelect';
 
-const DEFAULT_WATCHLIST = [
-  { ticker: 'MRNA', name: 'Moderna', price: 0, change: 0, mktcap: '—', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
-  { ticker: 'EDIT', name: 'Editas Medicine', price: 0, change: 0, mktcap: '—', stage: 'Phase 1/2', note: 'CRISPR gene editing for sickle cell' },
-  { ticker: 'RXRX', name: 'Recursion Pharma', price: 0, change: 0, mktcap: '—', stage: 'Platform', note: 'AI-driven drug discovery platform' },
-  { ticker: 'BEAM', name: 'Beam Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Phase 1', note: 'Base editing in hemoglobinopathies' },
-  { ticker: 'KYMR', name: 'Kymera Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'Targeted protein degradation, STAT6 program' },
-  { ticker: 'GBIO', name: 'Generation Bio', price: 0, change: 0, mktcap: '—', stage: 'Phase 1/2', note: 'Non-viral gene therapy platform' },
-  { ticker: 'KALA', name: 'Kailera Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'GLP-1 based obesity programs' },
-  { ticker: 'ODSY', name: 'Odyssey Therapeutics', price: 0, change: 0, mktcap: '—', stage: 'Preclinical', note: 'Precision immunology' },
-  { ticker: 'EVMN', name: 'Evommune Inc', price: 0, change: 0, mktcap: '—', stage: 'Phase 2', note: 'Inflammatory disease programs' },
+// HIV searches for the Publications tab: one per competitor asset, plus prevention.
+const HIV_PUB_QUERIES = [
+  { name: 'Lenacapavir', query: 'lenacapavir', company: 'Gilead' },
+  { name: 'Bictegravir', query: 'bictegravir', company: 'Gilead' },
+  { name: 'Cabotegravir', query: 'cabotegravir', company: 'ViiV/GSK' },
+  { name: 'Dolutegravir', query: 'dolutegravir', company: 'ViiV/GSK' },
+  { name: 'bNAbs', query: 'broadly neutralizing antibodies HIV', company: 'ViiV/GSK' },
+  { name: 'Islatravir', query: 'islatravir', company: 'MSD' },
+  { name: 'Doravirine', query: 'doravirine', company: 'MSD' },
+  { name: 'Rilpivirine', query: 'rilpivirine', company: 'J&J' },
+  { name: 'PrEP', query: 'HIV pre-exposure prophylaxis', company: '' },
 ];
 
-const LS_KEY = 'catalyst_watchlist_tickers';
-
-function getSavedTickers() {
-  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; }
-  catch { return null; }
-}
-
-function getInitialWatchlist() {
-  const saved = getSavedTickers();
-  if (!saved) return DEFAULT_WATCHLIST;
-  return saved.map(s => ({ price: 0, change: 0, mktcap: '—', ...DEFAULT_WATCHLIST.find(d => d.ticker === s.ticker), ...s }));
-}
-
-const OTHER_COMPANIES = [
-  { name: 'Pfizer', query: 'Pfizer' }, { name: 'Novartis', query: 'Novartis' },
-  { name: 'Roche', query: 'Roche' }, { name: 'AstraZeneca', query: 'AstraZeneca' },
-  { name: 'BioNTech', query: 'BioNTech' }, { name: 'Regeneron', query: 'Regeneron' },
-  { name: 'Gilead', query: 'Gilead' }, { name: 'Vertex', query: 'Vertex Pharmaceuticals' },
-];
-
+// HIV congresses and journals, all shown in the same neutral badge.
 const CONGRESS_SOURCES = {
-  'ASCO': { label: 'ASCO', color: '#1d4ed8', bg: 'rgba(29,78,216,0.08)', border: 'rgba(29,78,216,0.25)' },
-  'ESMO': { label: 'ESMO', color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.25)' },
-  'ASH': { label: 'ASH', color: '#b91c1c', bg: 'rgba(185,28,28,0.08)', border: 'rgba(185,28,28,0.25)' },
-  'EHA': { label: 'EHA', color: '#0369a1', bg: 'rgba(3,105,161,0.08)', border: 'rgba(3,105,161,0.25)' },
-  'AACR': { label: 'AACR', color: '#047857', bg: 'rgba(4,120,87,0.08)', border: 'rgba(4,120,87,0.25)' },
-  'EORTC': { label: 'EORTC', color: '#9a3412', bg: 'rgba(154,52,18,0.08)', border: 'rgba(154,52,18,0.25)' },
-  'SITC': { label: 'SITC', color: '#4338ca', bg: 'rgba(67,56,202,0.08)', border: 'rgba(67,56,202,0.25)' },
-  'NEJM': { label: 'NEJM', color: '#dc2626', bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.2)' },
-  'Lancet': { label: 'Lancet', color: '#b45309', bg: 'rgba(180,83,9,0.08)', border: 'rgba(180,83,9,0.2)' },
-  'Nature': { label: 'Nature', color: '#15803d', bg: 'rgba(21,128,61,0.08)', border: 'rgba(21,128,61,0.2)' },
+  'CROI': { label: 'CROI', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'IAS': { label: 'IAS', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'AIDS 20': { label: 'AIDS conference', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'EACS': { label: 'EACS', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'IDWeek': { label: 'IDWeek', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'HIV Glasgow': { label: 'HIV Glasgow', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'NEJM': { label: 'NEJM', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'Lancet HIV': { label: 'Lancet HIV', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'Lancet': { label: 'Lancet', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'JAIDS': { label: 'JAIDS', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
+  'Clin Infect Dis': { label: 'CID', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' },
 };
+const CONGRESSES = ['CROI', 'IAS', 'AIDS 20', 'EACS', 'IDWeek', 'HIV Glasgow'];
 
 function detectCongress(pub) {
   const haystack = ((pub.journalTitle || '') + ' ' + (pub.source || '') + ' ' + (pub.title || '')).toUpperCase();
-  for (const key of Object.keys(CONGRESS_SOURCES)) { if (haystack.includes(key)) return key; }
+  for (const key of CONGRESSES) { if (new RegExp(`\\b${key.toUpperCase()}\\b`).test(haystack)) return key; }
   return null;
 }
 
@@ -58,19 +42,21 @@ function getSourceBadge(pub) {
   if (congress) return CONGRESS_SOURCES[congress];
   const journal = (pub.journalTitle || '').toLowerCase();
   if (journal.includes('new england') || journal.includes('nejm')) return CONGRESS_SOURCES['NEJM'];
+  if (journal.includes('lancet hiv')) return CONGRESS_SOURCES['Lancet HIV'];
   if (journal.includes('lancet')) return CONGRESS_SOURCES['Lancet'];
-  if (journal.includes('nature')) return CONGRESS_SOURCES['Nature'];
-  return { label: pub.journalTitle ? pub.journalTitle.slice(0, 20) : 'Journal', color: '#555', bg: 'rgba(100,100,100,0.07)', border: 'rgba(100,100,100,0.2)' };
+  if (journal.includes('acquir') && journal.includes('immune')) return CONGRESS_SOURCES['JAIDS'];
+  if (journal.includes('clinical infectious diseases')) return CONGRESS_SOURCES['Clin Infect Dis'];
+  return { label: pub.journalTitle ? pub.journalTitle.slice(0, 24) : 'Journal', color: '#6b6760', bg: 'transparent', border: '#d8d2c8' };
 }
 
 const TOPIC_FILTERS = [
   { key: '', label: 'All' },
-  { key: 'oncology', label: 'Oncology', keywords: ['cancer', 'oncol', 'tumor', 'carcinoma', 'leukemia', 'lymphoma', 'melanoma', 'immunotherapy'] },
-  { key: 'gene-therapy', label: 'Gene Therapy', keywords: ['gene therapy', 'gene edit', 'crispr', 'base edit', 'prime edit', 'aav', 'lentiviral'] },
-  { key: 'ai', label: 'AI / ML', keywords: ['artificial intelligence', 'machine learning', 'deep learning', 'neural', 'algorithm', 'ai-driven', 'computational'] },
-  { key: 'immunology', label: 'Immunology', keywords: ['immunol', 'autoimmune', 'inflammation', 'cytokine', 'checkpoint', 'car-t', 'bispecific'] },
-  { key: 'rare-disease', label: 'Rare Disease', keywords: ['rare disease', 'orphan', 'sickle cell', 'thalassemia', 'hemophilia', 'duchenne', 'spinal muscular'] },
-  { key: 'rna', label: 'RNA / mRNA', keywords: ['mrna', 'rna', 'antisense', 'sirna', 'oligonucleotide'] },
+  { key: 'treatment', label: 'Treatment', keywords: ['treatment', 'antiretroviral therapy', 'switch', 'suppress', 'regimen', 'virolog'] },
+  { key: 'prep', label: 'Prevention / PrEP', keywords: ['prep', 'pre-exposure', 'prevention', 'prophylaxis', 'incidence'] },
+  { key: 'long-acting', label: 'Long-acting', keywords: ['long-acting', 'injectable', 'twice-yearly', 'every 2 months', 'every six months', 'weekly', 'monthly'] },
+  { key: 'resistance', label: 'Resistance', keywords: ['resistan', 'mutation', 'virologic failure'] },
+  { key: 'real-world', label: 'Real-world', keywords: ['real-world', 'cohort', 'observational', 'implementation', 'retrospective'] },
+  { key: 'safety', label: 'Safety', keywords: ['safety', 'weight gain', 'adverse', 'tolerab', 'injection site'] },
 ];
 
 const PAYWALLED_DOMAINS = [
@@ -453,9 +439,9 @@ function PubCard({ pub, companyName, showCompany }) {
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 3, background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{badge.label}</span>
-        {isConference && <span style={{ fontSize: 13, padding: '2px 7px', borderRadius: 3, background: 'rgba(190,18,60,0.07)', color: '#be123c', border: '1px solid rgba(190,18,60,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>CONGRESS</span>}
-        {showCompany && companyName && <span style={{ fontSize: 13, padding: '2px 7px', borderRadius: 3, background: 'rgba(200,16,46,0.07)', color: '#c8102e', border: '0.5px solid rgba(200,16,46,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>{companyName}</span>}
+        <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: badge.color, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{badge.label}</span>
+        {isConference && <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b6760', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Congress</span>}
+        {showCompany && companyName && <span style={{ ...({ fontSize: 11.5, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#6b6760', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }), color: '#1a1a1a' }}>{companyName}</span>}
         {pub.isOpenAccess && <span style={{ fontSize: 13, padding: '2px 7px', borderRadius: 3, background: 'rgba(21,128,61,0.07)', color: '#15803d', border: '0.5px solid rgba(21,128,61,0.2)', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 600 }}>OA</span>}
         <span style={{ marginLeft: 'auto', fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{pub.pubDate || pub.pubYear || ''}</span>
       </div>
@@ -480,44 +466,34 @@ function PubCard({ pub, companyName, showCompany }) {
   );
 }
 
-function PublicationsTab({ watchlist }) {
+function PublicationsTab() {
   const [topicFilter, setTopicFilter] = useState('');
   const [searchText, setSearchText] = useState('');
   const [pubTypeFilter, setPubTypeFilter] = useState('all');
-  const [watchlistPubs, setWatchlistPubs] = useState([]);
-  const [otherPubs, setOtherPubs] = useState([]);
-  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
-  const [loadingOther, setLoadingOther] = useState(false);
-  const [fetchedOnce, setFetchedOnce] = useState(false);
-  const [activeSection, setActiveSection] = useState('watchlist');
+  const [assetSel, setAssetSel] = useState(null);
+  const [pubs, setPubs] = useState([]);
+  const [loadingPubs, setLoadingPubs] = useState(true);
 
-  const fetchPublications = useCallback(async () => {
-    if (fetchedOnce) return;
-    setFetchedOnce(true);
-    setLoadingWatchlist(true);
-    setLoadingOther(true);
-    const wResults = [];
-    for (const stock of watchlist) {
-      const shortName = stock.name.replace(/\s+(Inc\.?|Therapeutics|Pharmaceuticals?|Pharma|Medicine|Sciences?|Biosciences?|Biotech|Bio)$/i, '').trim();
-      const pubs = await fetchEuropePMC(shortName, 8);
-      pubs.forEach(p => wResults.push({ ...p, _company: stock.name }));
-    }
-    wResults.sort((a, b) => (b.pubDate || '').localeCompare(a.pubDate || ''));
-    setWatchlistPubs(wResults);
-    setLoadingWatchlist(false);
-    const oResults = [];
-    for (const co of OTHER_COMPANIES) {
-      const pubs = await fetchEuropePMC(co.query, 5);
-      pubs.forEach(p => oResults.push({ ...p, _company: co.name }));
-    }
-    oResults.sort((a, b) => (b.pubDate || '').localeCompare(a.pubDate || ''));
-    setOtherPubs(oResults);
-    setLoadingOther(false);
-  }, [watchlist, fetchedOnce]);
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const lists = await Promise.all(HIV_PUB_QUERIES.map(async q => (await fetchEuropePMC(q.query, 8)).map(p => ({ ...p, _company: q.name, _assets: [q.name] }))));
+      // The same paper can come back for two searches (e.g. islatravir + lenacapavir): keep one, listing both.
+      const byId = new Map();
+      for (const p of lists.flat()) {
+        const key = p.id || p.title;
+        if (byId.has(key)) { const prev = byId.get(key); if (!prev._assets.includes(p._company)) prev._assets.push(p._company); }
+        else byId.set(key, p);
+      }
+      const all = [...byId.values()].map(p => ({ ...p, _company: p._assets.join(' · ') }))
+        .sort((x, y) => (y.pubDate || '').localeCompare(x.pubDate || ''));
+      if (!cancelled) { setPubs(all); setLoadingPubs(false); }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
-  React.useEffect(() => { fetchPublications(); }, [fetchPublications]);
-
-  const applyFilters = (pubs) => pubs.filter(pub => {
+  const applyFilters = (list) => list.filter(pub => {
+    if (assetSel?.length && !pub._assets.some(a => assetSel.includes(a))) return false;
     if (!matchesTopic(pub, topicFilter)) return false;
     if (pubTypeFilter === 'congress') { const isCong = detectCongress(pub) !== null || (pub.pubType || '').toLowerCase().includes('conference') || (pub.pubType || '').toLowerCase().includes('abstract'); if (!isCong) return false; }
     if (pubTypeFilter === 'journal') { if (detectCongress(pub) !== null) return false; }
@@ -525,66 +501,56 @@ function PublicationsTab({ watchlist }) {
     return true;
   });
 
-  const filteredWatchlist = applyFilters(watchlistPubs);
-  const filteredOther = applyFilters(otherPubs);
-  const activePubs = activeSection === 'watchlist' ? filteredWatchlist : filteredOther;
-  const activeLoading = activeSection === 'watchlist' ? loadingWatchlist : loadingOther;
-  const congressCount = (activeSection === 'watchlist' ? watchlistPubs : otherPubs).filter(p => detectCongress(p) !== null).length;
+  const activePubs = applyFilters(pubs);
+  const congressCount = pubs.filter(p => detectCongress(p) !== null).length;
+  const FONT_STACK = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  const chip = (on) => ({ padding: '5px 12px', borderRadius: 4, border: on ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: on ? '#1a1a1a' : 'transparent', color: on ? '#fff' : '#555', fontSize: 12.5, fontWeight: on ? 600 : 400, cursor: 'pointer', fontFamily: FONT_STACK });
 
   return (
     <div>
       <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Scientific Publications & Congress Abstracts</span>
-        <span style={{ fontSize: 13, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>via Europe PMC · PubMed · Preprints</span>
+        <span style={{ fontSize: 13, color: '#555', fontFamily: FONT_STACK }}>HIV publications and congress abstracts</span>
+        <span style={{ fontSize: 13, color: '#c8102e', fontFamily: FONT_STACK, fontWeight: 700 }}>via Europe PMC · PubMed · Preprints</span>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }} className="metric-grid">
         {[
-          { label: 'Watchlist pubs', val: loadingWatchlist ? '…' : watchlistPubs.length, color: '#1a1a1a' },
-          { label: 'Other sector', val: loadingOther ? '…' : otherPubs.length, color: '#1a1a1a' },
-          { label: 'Congress abstracts', val: activeLoading ? '…' : congressCount, color: '#c8102e' },
-          { label: 'Showing', val: activeLoading ? '…' : activePubs.length, color: '#1d4ed8' },
+          { label: 'Publications', val: loadingPubs ? '…' : pubs.length },
+          { label: 'Congress abstracts', val: loadingPubs ? '…' : congressCount },
+          { label: 'Showing', val: loadingPubs ? '…' : activePubs.length },
         ].map(m => (
           <div key={m.label} style={s.metric}>
             <div style={s.metricLabel}>{m.label}</div>
-            <div style={{ ...s.metricVal, color: m.color, fontSize: 26 }}>{m.val}</div>
+            <div style={{ ...s.metricVal, color: '#1a1a1a', fontSize: 26 }}>{m.val}</div>
           </div>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 0, marginBottom: '1.25rem', background: '#f5f2ed', borderRadius: 8, padding: 4 }}>
-        {[{ key: 'watchlist', label: 'My Watchlist', count: filteredWatchlist.length }, { key: 'other', label: 'Sector (Other)', count: filteredOther.length }].map(sec => (
-          <button key={sec.key} onClick={() => setActiveSection(sec.key)} style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: activeSection === sec.key ? '#fff' : 'transparent', color: activeSection === sec.key ? '#1a1a1a' : '#888', fontWeight: activeSection === sec.key ? 700 : 400, fontSize: 13, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", boxShadow: activeSection === sec.key ? '0 1px 4px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
-            {sec.label}<span style={{ marginLeft: 6, fontSize: 13, color: activeSection === sec.key ? '#c8102e' : '#bbb' }}>({sec.count})</span>
-          </button>
         ))}
       </div>
       <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
+        <div style={{ marginBottom: 12 }}>
+          <MultiSelect label="Asset" allLabel="All assets" selected={assetSel} onChange={setAssetSel} options={HIV_PUB_QUERIES.map(q => ({ value: q.name, label: q.company ? `${q.name} (${q.company})` : q.name }))} />
+        </div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Topic area</div>
+          <div style={{ fontSize: 13, color: '#888', fontFamily: FONT_STACK, marginBottom: 6 }}>Topic</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {TOPIC_FILTERS.map(t => (
-              <button key={t.key} onClick={() => setTopicFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: topicFilter === t.key ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: topicFilter === t.key ? '#1a1a1a' : 'transparent', color: topicFilter === t.key ? '#fff' : '#555', fontSize: 12.5, fontWeight: topicFilter === t.key ? 600 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s' }}>{t.label}</button>
-            ))}
+            {TOPIC_FILTERS.map(t => <button key={t.key} onClick={() => setTopicFilter(t.key)} style={chip(topicFilter === t.key)}>{t.label}</button>)}
           </div>
         </div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Publication type</div>
+          <div style={{ fontSize: 13, color: '#888', fontFamily: FONT_STACK, marginBottom: 6 }}>Publication type</div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {[{ key: 'all', label: 'All' }, { key: 'congress', label: 'Congresses only' }, { key: 'journal', label: 'Journals only' }].map(t => (
-              <button key={t.key} onClick={() => setPubTypeFilter(t.key)} style={{ padding: '5px 12px', borderRadius: 4, border: pubTypeFilter === t.key ? '1.5px solid #c8102e' : '1px solid #d1ccc4', background: pubTypeFilter === t.key ? 'rgba(200,16,46,0.07)' : 'transparent', color: pubTypeFilter === t.key ? '#c8102e' : '#555', fontSize: 12.5, fontWeight: pubTypeFilter === t.key ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s' }}>{t.label}</button>
-            ))}
+            {[{ key: 'all', label: 'All' }, { key: 'congress', label: 'Congresses only' }, { key: 'journal', label: 'Journals only' }].map(t => <button key={t.key} onClick={() => setPubTypeFilter(t.key)} style={chip(pubTypeFilter === t.key)}>{t.label}</button>)}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <input style={{ ...np.filterInput, fontSize: 13 }} value={searchText} onChange={e => setSearchText(e.target.value)} placeholder="Search by title, author, company…" />
+          <input style={{ ...np.filterInput, fontSize: 13 }} value={searchText} onChange={e => setSearchText(e.target.value)} placeholder="Search by title, author, asset…" />
           {searchText && <button style={s.btnSm} onClick={() => setSearchText('')}>Clear</button>}
         </div>
       </div>
-      {activeLoading && <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}><Spinner /><span style={{ fontSize: 13, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Fetching publications from Europe PMC…</span></div>}
-      {!activeLoading && activePubs.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>No publications found for current filters.</div>}
-      {!activeLoading && activePubs.length > 0 && (
+      {loadingPubs && <div style={{ textAlign: 'center', padding: '3rem', color: '#888' }}><Spinner /><span style={{ fontSize: 13, fontFamily: FONT_STACK }}>Fetching HIV publications from Europe PMC…</span></div>}
+      {!loadingPubs && activePubs.length === 0 && <div style={{ textAlign: 'center', padding: '3rem', color: '#888', fontSize: 13, fontFamily: FONT_STACK }}>{pubs.length ? 'No publications match your filters.' : 'Publications could not be loaded right now.'}</div>}
+      {!loadingPubs && activePubs.length > 0 && (
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
-            {activeSection === 'watchlist' ? 'Publications from your watchlist companies' : 'Publications from sector leaders'} · {activePubs.length} results
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: FONT_STACK, borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
+            Latest on competitor assets · {activePubs.length} results
           </div>
           {activePubs.map((pub, i) => <PubCard key={pub.id || i} pub={pub} companyName={pub._company} showCompany={true} />)}
         </div>
@@ -594,8 +560,6 @@ function PublicationsTab({ watchlist }) {
 }
 
 export default function App() {
-  const [watchlist] = useState(getInitialWatchlist);
-
   const [tab, setTab] = useState('news');
   const [newsFilter, setNewsFilter] = useState('');
   const [summaries, setSummaries] = useState({});
@@ -719,7 +683,7 @@ export default function App() {
             </div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.3px', color: '#1a1a1a', lineHeight: 1.1 }}>Catalyst</div>
-              <div style={{ fontSize: 12.5, color: '#6b6760', marginTop: 2 }}>Biotech and pharma intelligence</div>
+              <div style={{ fontSize: 12.5, color: '#6b6760', marginTop: 2 }}>HIV competitive intelligence</div>
             </div>
           </div>
           <span className="app-header-right" style={{ fontSize: 12.5, color: '#6b6760' }}>
@@ -845,7 +809,7 @@ export default function App() {
       )}
 
       {/* ══ PUBLICATIONS ══ */}
-      {tab === 'publications' && <PublicationsTab watchlist={watchlist} />}
+      {tab === 'publications' && <PublicationsTab />}
 
       {/* ══ COMPETITIVE LANDSCAPE ══ */}
       {tab === 'landscape' && <CompetitiveLandscape />}
