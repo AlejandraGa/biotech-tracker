@@ -633,9 +633,9 @@ export default function App() {
   const [pressReleases, setPressReleases] = useState([]);
   const [loadingPress, setLoadingPress] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [companySel, setCompanySel] = useState([]);
-  const [productSel, setProductSel] = useState([]);
-  const [impactSel, setImpactSel] = useState([]);
+  const [companySel, setCompanySel] = useState(null);
+  const [productSel, setProductSel] = useState(null);
+  const [impactSel, setImpactSel] = useState(null);
   const [brief, setBrief] = useState(readBrief);
   const [briefLoading, setBriefLoading] = useState(false);
 
@@ -685,9 +685,9 @@ export default function App() {
       const hay = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
       if (!kws.some(kw => hay.includes(kw)) && !(n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()))) return false;
     }
-    if (companySel.length && !(n.competitors || []).some(c => companySel.includes(c))) return false;
-    if (productSel.length && !(n.products || []).some(p => productSel.includes(p))) return false;
-    if (impactSel.length && !impactSel.includes(n.impact)) return false;
+    if (companySel?.length && !(n.competitors || []).some(c => companySel.includes(c))) return false;
+    if (productSel?.length && !(n.products || []).some(p => productSel.includes(p))) return false;
+    if (impactSel?.length && !impactSel.includes(n.impact)) return false;
     if (newsFilter) { if (!(n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '') + ' ' + (n.companies || []).map(c => c.companyName).join(' ')).toLowerCase().includes(newsFilter.toLowerCase())) return false; }
     return true;
   });

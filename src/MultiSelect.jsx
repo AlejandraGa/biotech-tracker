@@ -15,15 +15,17 @@ export default function MultiSelect({ label, allLabel, selected, onChange, optio
     document.addEventListener("keydown", esc);
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
   }, [open]);
+  // `selected` is null when everything is ticked, and [] when "All" was unticked to start a fresh pick;
+  // nothing ticked filters nothing out.
   const opts = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
-  const isAll = selected.length === 0 || selected.length === opts.length;
+  const isAll = selected === null || selected.length === opts.length;
   const isOn = (v) => isAll || selected.includes(v);
-  const picked = opts.filter((o) => selected.includes(o.value));
-  const summary = isAll ? allLabel : picked.length <= 2 ? picked.map((o) => o.label).join(", ") : `${picked.length} of ${opts.length} selected`;
+  const picked = isAll ? [] : opts.filter((o) => selected.includes(o.value));
+  const summary = isAll ? allLabel : !picked.length ? "None ticked (showing all)" : picked.length <= 2 ? picked.map((o) => o.label).join(", ") : `${picked.length} of ${opts.length} selected`;
   const toggle = (v) => {
     const base = isAll ? opts.map((o) => o.value) : selected;
     const next = base.includes(v) ? base.filter((x) => x !== v) : [...base, v];
-    onChange(next.length === opts.length ? [] : next);
+    onChange(next.length === opts.length ? null : next);
   };
   return (
     <div ref={ref} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
@@ -37,7 +39,7 @@ export default function MultiSelect({ label, allLabel, selected, onChange, optio
       {open && (
         <div role="listbox" aria-multiselectable="true" style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: 6, minWidth: 220, maxHeight: 320, overflowY: "auto" }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", fontSize: 13, fontWeight: 600, color: INK, cursor: "pointer", borderBottom: `1px solid ${HAIR}`, marginBottom: 2 }}>
-            <input type="checkbox" checked={isAll} onChange={() => onChange([])} />
+            <input type="checkbox" checked={isAll} onChange={() => onChange(isAll ? [] : null)} />
             {allLabel}
           </label>
           {opts.map((o) => (
