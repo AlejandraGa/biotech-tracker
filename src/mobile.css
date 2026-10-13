@@ -82,7 +82,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .lm-seg { display: flex !important; width: 100%; flex-wrap: nowrap !important; }
   .lm-seg button { flex: 1; padding: 7px 6px !important; }
   .lm-matrix { --lm-prod: 128px; --lm-cell: 46px; max-height: 70vh !important; }
-  .lm-matrix .lm-sub { display: none !important; }
   .lm-overlay { align-items: flex-end; }
   .lm-sheet { width: 100% !important; height: auto !important; max-height: 85vh; border-radius: 12px 12px 0 0; padding: 16px 16px 28px !important; }
 

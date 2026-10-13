@@ -2,7 +2,7 @@
 // reimbursed, market by market, with dates. Three views share one set of filters:
 // one product across markets, all products in one market, and a product × market grid.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { geoMercator, geoConicConformal, geoPath } from "d3-geo";
+import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import { AGENCIES, STATUS } from "./hivRegulatoryData";
 import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS_STATUS } from "./hivAccessData";
@@ -137,14 +137,17 @@ const loadAtlas = () => {
   return atlasPromise;
 };
 
-// Each panel is fitted to a fixed box, not to the countries, so far-flung territories
-// (Svalbard, French Guiana, Alaska) do not shrink the part we care about.
-const box = (w, s, e, n) => ({ type: "MultiPoint", coordinates: [[w, s], [e, s], [w, n], [e, n], [(w + e) / 2, n], [(w + e) / 2, s]] });
-const PANELS = {
-  eu: { title: "Europe", w: 600, h: 560, proj: () => geoConicConformal().rotate([-8, 0]).parallels([40, 62]), fit: box(-11, 35.5, 26, 70.5) },
-  na: { title: "North America", w: 400, h: 270, proj: () => geoConicConformal().rotate([98, 0]).parallels([33, 60]), fit: box(-128, 24, -64, 64) },
-  au: { title: "Australia", w: 400, h: 270, proj: () => geoMercator(), fit: box(112, -44, 155, -10) },
-};
+// The world map: one Natural Earth projection in a fixed box, and the places the
+// shortcut buttons jump to (a lon/lat box each; `panel` picks the starting place).
+const W = 960, H = 520, K_MAX = 24;
+const PROJ = geoNaturalEarth1().fitExtent([[0, 0], [W, H]], { type: "Sphere" });
+const SPHERE = geoPath(PROJ).bounds({ type: "Sphere" });
+const PLACES = [
+  { name: "Europe", panel: "eu", box: [[-11, 71], [32, 35]] },
+  { name: "North America", panel: "na", box: [[-128, 62], [-60, 22]] },
+  { name: "Australia", panel: "au", box: [[110, -9], [156, -45]] },
+  { name: "World", panel: null, box: [[-170, 75], [180, -50]] },
+];
 
 // ─── PIECES ──────────────────────────────────────────────────────────────────
 function StatusText({ def, size = 12.5 }) {
@@ -169,6 +172,28 @@ function Flag({ m }) {
 
 function CompanyDot({ company }) {
   return <span aria-hidden="true" style={{ display: "inline-block", width: 7, height: 7, borderRadius: 4, background: COMPANY_COLOR[company] || "#bbb", flexShrink: 0 }} />;
+}
+
+// A product in one line, to recognise it without remembering the brand name.
+const aboutOf = (p) => [p.inn, p.klass, p.dosing].filter(Boolean).join(" · ");
+const companyOf = (p) => p.company.replace("ViiV Healthcare", "ViiV");
+
+function ProductCard({ p }) {
+  return (
+    <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: "10px 14px", margin: "-2px 0 14px", display: "grid", gap: 3 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 13 }}>
+        <strong style={{ color: INK, fontWeight: 600 }}>{p.name}</strong>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: MUTED, fontSize: 12.5 }}><CompanyDot company={p.company} />{p.company}</span>
+        <span style={{ fontSize: 11.5, color: MUTED, border: `1px solid ${LINE}`, borderRadius: 4, padding: "0 6px" }}>{p.segment === "PrEP" ? "Prevention (PrEP)" : "Treatment"}</span>
+        <span style={{ fontSize: 11.5, color: MUTED, border: `1px solid ${LINE}`, borderRadius: 4, padding: "0 6px" }}>{p.stage}</span>
+      </div>
+      <div style={{ fontSize: 12.5, color: TEXT, lineHeight: 1.5 }}>
+        <span style={{ color: MUTED }}>Compound</span> {p.inn}<span style={{ color: "#cfcac2", margin: "0 7px" }}>·</span>
+        <span style={{ color: MUTED }}>Class</span> {p.klass}<span style={{ color: "#cfcac2", margin: "0 7px" }}>·</span>
+        <span style={{ color: MUTED }}>Regimen</span> {p.dosing}
+      </div>
+    </div>
+  );
 }
 
 function Segmented({ value, onChange, options, label }) {
@@ -249,6 +274,7 @@ function Detail({ x, onClose }) {
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}><Flag m={m} />{m.name}</div>
             <div style={{ fontSize: 17, fontWeight: 600, color: INK, marginTop: 6, lineHeight: 1.3 }}>{p.name}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12.5, color: MUTED, marginTop: 3 }}><CompanyDot company={p.company} />{p.company}<span style={{ color: "#cfcac2" }}>·</span>{p.segment === "PrEP" ? "Prevention (PrEP)" : "Treatment"}</div>
+            <div style={{ fontSize: 12.5, color: TEXT, marginTop: 3, lineHeight: 1.45 }}>{aboutOf(p)}</div>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "none", fontSize: 24, lineHeight: 1, color: MUTED, cursor: "pointer", padding: 4, margin: -4 }}>×</button>
         </div>
@@ -324,7 +350,10 @@ function LaunchBars({ rows, today, onPick, head }) {
                 aria-label={`${row.title}: ${LEVELS[pr.level].label}. Open details`} style={{ minHeight: 36, borderTop: `1px solid ${HAIR}`, cursor: "pointer" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                   {row.icon}
-                  <span style={{ fontSize: 13, color: INK, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.title}</span>
+                  <span style={{ minWidth: 0 }} title={row.about}>
+                    <span style={{ display: "block", fontSize: 13, color: INK, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.title}</span>
+                    {row.sub && <span style={{ display: "block", fontSize: 11.5, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.sub}</span>}
+                  </span>
                 </div>
                 <div style={{ position: "relative", height: 34 }}>
                   {years.map((y) => <span key={y} aria-hidden="true" style={{ position: "absolute", left: xp(`${y}-01-01`), top: 0, bottom: 0, borderLeft: `1px solid ${HAIR}` }} />)}
@@ -372,84 +401,200 @@ const RANK = { reimbursed: 0, approved: 0, review: 1, none: 2, unknown: 3 };
 const byProgress = (x, y) => RANK[x.pr.level] - RANK[y.pr.level] || (x.a || "9").localeCompare(y.a || "9") || x.title.localeCompare(y.title);
 
 // ─── MAP ─────────────────────────────────────────────────────────────────────
-function MapPanel({ id, features, levelOf, shown, active, onHover, onPick }) {
-  const panel = PANELS[id];
-  const { paths, labels } = useMemo(() => {
-    const proj = panel.proj().fitExtent([[8, 8], [panel.w - 8, panel.h - 8]], panel.fit);
-    proj.clipExtent([[0, 0], [panel.w, panel.h]]);
-    const path = geoPath(proj);
-    const drawn = features.map((f) => ({ id: Number(f.id), d: path(f) })).filter((x) => x.d);
-    const marks = MARKETS.filter((m) => m.panel === id).map((m) => ({ m, xy: proj(m.at) }));
-    return { paths: drawn, labels: marks };
-  }, [features, panel, id]);
-  const mine = (cid) => (BY_ID[cid]?.panel === id && shown.has(cid) ? 1 : 0);
-  // Tracked countries are drawn last so their outline sits on top of the neighbours'.
-  const order = [...paths].sort((a, b) => mine(a.id) - mine(b.id) || (a.id === active ? 1 : 0) - (b.id === active ? 1 : 0));
-  return (
-    <figure style={{ margin: 0, minWidth: 0, gridArea: id }}>
-      <figcaption style={{ fontSize: 11.5, fontWeight: 600, color: MUTED, marginBottom: 4 }}>{panel.title}</figcaption>
-      <svg viewBox={`0 0 ${panel.w} ${panel.h}`} style={{ display: "block", width: "100%", height: "auto", background: "#f4f7f9", borderRadius: 4 }} role="group" aria-label={`${panel.title} map`}>
-        <defs>
-          <pattern id={`hatch-${id}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <rect width="6" height="6" fill="#fff" /><rect width="2.5" height="6" fill="#d6cfc2" />
-          </pattern>
-        </defs>
-        {order.map(({ id: cid, d }) => {
-          const m = BY_ID[cid];
-          // Overseas bits of a tracked country (Saint Pierre and Miquelon in the North America panel) stay neutral.
-          if (!m || m.panel !== id || !shown.has(cid)) return <path key={cid} d={d} fill={UNTRACKED} stroke="#fff" strokeWidth={0.6} />;
-          const lv = levelOf(cid);
-          const on = active === cid;
-          return (
-            <path key={cid} d={d} fill={lv === "unknown" ? `url(#hatch-${id})` : LEVELS[lv].fill} stroke={on ? INK : "#fff"} strokeWidth={on ? 1.8 : 0.9} strokeLinejoin="round"
-              tabIndex={0} role="button" aria-label={`${m.name}: ${LEVELS[lv].label}`} style={{ cursor: "pointer", outline: "none" }}
-              onPointerMove={(e) => e.pointerType === "mouse" && onHover(cid, e)} onPointerLeave={() => onHover(null)}
-              onClick={() => onPick(cid)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPick(cid); } }} />
-          );
-        })}
-        {labels.filter(({ m }) => shown.has(m.id)).map(({ m, xy }) => xy && (
-          <text key={m.id} x={xy[0]} y={xy[1]} textAnchor="middle" dominantBaseline="central" pointerEvents="none"
-            className={id === "eu" ? "hiv-lbl" : "hiv-lbl hiv-lbl-inset"} style={{ fontWeight: 600, fontFamily: FONT, fill: LEVELS[levelOf(m.id)].ink, letterSpacing: 0.2 }}>
-            {m.short}
-          </text>
-        ))}
-      </svg>
-    </figure>
-  );
-}
+// One world map that can be dragged and zoomed. Base coordinates are a fixed
+// Natural Earth projection in a W × H box; panning and zooming only change the
+// transform of the group that holds the countries.
+const clampView = (v, h) => {
+  const k = Math.min(K_MAX, Math.max(1, v.k));
+  const fit = (t, lo, hi, size) => {
+    const a = lo * k, b = hi * k;
+    if (b - a <= size) return (size - a - b) / 2;
+    return Math.min(-a, Math.max(size - b, t));
+  };
+  return { k, x: fit(v.x, SPHERE[0][0], SPHERE[1][0], W), y: fit(v.y, SPHERE[0][1], SPHERE[1][1], h) };
+};
+const viewOf = (place, h) => {
+  // Meridians curve in this projection, so all four corners decide the extent.
+  const [[w, n], [e, so]] = place.box;
+  const pts = [[w, n], [e, n], [w, so], [e, so], [(w + e) / 2, n], [(w + e) / 2, so]].map((p) => PROJ(p));
+  const x0 = Math.min(...pts.map((p) => p[0])), x1 = Math.max(...pts.map((p) => p[0]));
+  const y0 = Math.min(...pts.map((p) => p[1])), y1 = Math.max(...pts.map((p) => p[1]));
+  const k = Math.min(W / Math.abs(x1 - x0), h / Math.abs(y1 - y0)) * 0.95;
+  return clampView({ k, x: W / 2 - k * (x0 + x1) / 2, y: h / 2 - k * (y0 + y1) / 2 }, h);
+};
+const zoomAt = (v, [px, py], f, h) => {
+  const k = Math.min(K_MAX, Math.max(1, v.k * f));
+  return clampView({ k, x: px - (px - v.x) * (k / v.k), y: py - (py - v.y) * (k / v.k) }, h);
+};
 
-function ProgressMap({ rows, onPick }) {
+function WorldMap({ rows, onPick }) {
   const [features, setFeatures] = useState(null);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [hover, setHover] = useState(null);
+  const [unit, setUnit] = useState(1);
+  const startPlace = PLACES.find((p) => rows.some((x) => x.m.panel === p.panel)) || PLACES[0];
+  // Phones get a taller map, so Europe fills the screen width.
+  const [vh] = useState(() => (window.innerWidth < 680 ? Math.round(W * 0.9) : H));
+  const [view, setView] = useState(() => viewOf(startPlace, vh));
+  const [placeName, setPlaceName] = useState(startPlace.name);
+  const svgRef = useRef(null);
   const wrap = useRef(null);
+  const ptrs = useRef(new Map());
+  const press = useRef(null);
+
   useEffect(() => {
     let alive = true;
     setFailed(false);
     loadAtlas().then((f) => alive && setFeatures(f)).catch(() => alive && setFailed(true));
     return () => { alive = false; };
   }, [attempt]);
-  const byMarket = Object.fromEntries(rows.map((x) => [x.m.id, x]));
-  const shown = new Set(rows.map((x) => x.m.id));
-  const levelOf = (id) => byMarket[id].pr.level;
-  const onHover = (id, e) => {
-    if (!id || !wrap.current) return setHover(null);
-    const r = wrap.current.getBoundingClientRect();
-    setHover({ id, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
+
+  // Screen pixels per map unit, so labels and outlines keep the same size on any screen and zoom.
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return undefined;
+    const ro = new ResizeObserver(() => setUnit(el.getBoundingClientRect().width / W || 1));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [features]);
+
+  const toMap = (e) => {
+    const r = svgRef.current.getBoundingClientRect();
+    return [(e.clientX - r.left) * (W / r.width), (e.clientY - r.top) * (vh / r.height)];
   };
-  const pick = (id) => { setHover(null); onPick(byMarket[id]); };
+
+  // The wheel zooms around the pointer. It needs a non-passive listener to stop the page scrolling.
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return undefined;
+    const wheel = (e) => { e.preventDefault(); const p = toMap(e); setView((v) => zoomAt(v, p, Math.exp(-e.deltaY * 0.0018), vh)); setPlaceName(null); };
+    el.addEventListener("wheel", wheel, { passive: false });
+    return () => el.removeEventListener("wheel", wheel);
+  }, [features, vh]);
+
+  const paths = useMemo(() => {
+    if (!features) return [];
+    const path = geoPath(PROJ);
+    // Antarctica is left out: nothing is tracked there and it takes a third of the height.
+    return features.filter((f) => f.id !== "010").map((f) => {
+      const id = Number(f.id);
+      // Width of the country's mainland, used to decide when its label fits.
+      const b = BY_ID[id] && path.bounds({ type: "Point", coordinates: BY_ID[id].at }) && (() => {
+        const geo = f.geometry.type === "MultiPolygon" ? { type: "Polygon", coordinates: [...f.geometry.coordinates].sort((p, q) => path.area({ type: "Polygon", coordinates: q }) - path.area({ type: "Polygon", coordinates: p }))[0] } : f.geometry;
+        const [[a], [c]] = path.bounds(geo);
+        return c - a;
+      })();
+      return { id, d: path(f), w: b || 0 };
+    }).filter((x) => x.d);
+  }, [features]);
+
+  const byMarket = Object.fromEntries(rows.map((x) => [x.m.id, x]));
+  const idOf = (e) => Number(e.target?.dataset?.id) || null;
+
+  const onDown = (e) => {
+    if (e.button && e.button !== 0) return;
+    svgRef.current.setPointerCapture(e.pointerId);
+    ptrs.current.set(e.pointerId, toMap(e));
+    press.current = { id: ptrs.current.size === 1 ? idOf(e) : null, moved: 0 };
+    setHover(null);
+  };
+  const onMove = (e) => {
+    if (!ptrs.current.has(e.pointerId)) {
+      // Plain hover with a mouse shows the summary of the country under it.
+      const id = idOf(e);
+      if (e.pointerType !== "mouse" || !id || !byMarket[id]) return setHover(null);
+      const r = wrap.current.getBoundingClientRect();
+      return setHover({ id, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width });
+    }
+    const prev = ptrs.current.get(e.pointerId);
+    const cur = toMap(e);
+    if (ptrs.current.size === 1) {
+      setView((v) => clampView({ ...v, x: v.x + cur[0] - prev[0], y: v.y + cur[1] - prev[1] }, vh));
+    } else if (ptrs.current.size === 2) {
+      // Pinch: zoom by the change in finger distance, around the point between them.
+      const other = [...ptrs.current.entries()].find(([k]) => k !== e.pointerId)[1];
+      const d0 = Math.hypot(prev[0] - other[0], prev[1] - other[1]);
+      const d1 = Math.hypot(cur[0] - other[0], cur[1] - other[1]);
+      if (d0 > 0) setView((v) => zoomAt(v, [(cur[0] + other[0]) / 2, (cur[1] + other[1]) / 2], d1 / d0, vh));
+    }
+    if (press.current) press.current.moved += Math.abs(cur[0] - prev[0]) + Math.abs(cur[1] - prev[1]);
+    if (press.current?.moved > 3) setPlaceName(null);
+    ptrs.current.set(e.pointerId, cur);
+  };
+  const onUp = (e) => {
+    if (!ptrs.current.has(e.pointerId)) return;
+    ptrs.current.delete(e.pointerId);
+    const p = press.current;
+    // A tap or click without dragging opens the country's details.
+    if (e.type === "pointerup" && p && p.id && byMarket[p.id] && p.moved * unit < 6 && ptrs.current.size === 0) onPick(byMarket[p.id]);
+    if (ptrs.current.size === 0) press.current = null;
+  };
+
+  const go = (place) => { setView(viewOf(place, vh)); setPlaceName(place.name); };
+  const zoomBy = (f) => setView((v) => zoomAt(v, [W / 2, vh / 2], f, vh));
+  const px = unit * view.k; // screen pixels per base unit at this zoom
   const hx = hover && byMarket[hover.id];
-  const panels = ["eu", "na", "au"].filter((id) => MARKETS.some((m) => m.panel === id && shown.has(m.id)));
+  const btn = { fontFamily: FONT, fontSize: 12.5, color: TEXT, background: "#fff", border: "1px solid #d3cec6", borderRadius: 6, padding: "5px 10px", cursor: "pointer" };
+
   return (
     <>
-      <div ref={wrap} className={`hiv-map hiv-map-${panels.join("-")}`} style={{ position: "relative" }}>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+        {PLACES.map((p) => (
+          <button key={p.name} onClick={() => go(p)} aria-pressed={placeName === p.name}
+            style={{ ...btn, ...(placeName === p.name ? { background: INK, color: "#fff", borderColor: INK } : {}) }}>{p.name}</button>
+        ))}
+        <span style={{ flex: 1 }} />
+        <button onClick={() => zoomBy(1.6)} aria-label="Zoom in" style={{ ...btn, width: 32, padding: "5px 0", fontWeight: 600 }}>+</button>
+        <button onClick={() => zoomBy(1 / 1.6)} aria-label="Zoom out" style={{ ...btn, width: 32, padding: "5px 0", fontWeight: 600 }}>−</button>
+      </div>
+      <div ref={wrap} style={{ position: "relative" }}>
         {!features ? (
-          <div style={{ gridColumn: "1 / -1", minHeight: 220, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 20, background: PAPER, borderRadius: 4, fontSize: 13, color: MUTED }}>
+          <div style={{ minHeight: 260, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 20, background: PAPER, borderRadius: 4, fontSize: 13, color: MUTED }}>
             {failed ? <span>The map could not be loaded. The launch sequence above still shows every market. <button onClick={() => setAttempt((a) => a + 1)} style={{ fontFamily: FONT, fontSize: 13, color: TEXT, background: "none", border: "none", padding: 0, textDecoration: "underline", cursor: "pointer" }}>Try again</button></span>
               : "Loading map…"}
           </div>
-        ) : panels.map((id) => <MapPanel key={id} id={id} features={features} levelOf={levelOf} shown={shown} active={hover?.id} onHover={onHover} onPick={pick} />)}
+        ) : (
+          <svg ref={svgRef} viewBox={`0 0 ${W} ${vh}`} className="lm-world" role="group" aria-label="World map. Drag to move, scroll or pinch to zoom."
+            onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={(e) => { if (!ptrs.current.has(e.pointerId)) setHover(null); }}
+            style={{ display: "block", width: "100%", height: "auto", background: "#f4f7f9", borderRadius: 4, touchAction: "none", cursor: ptrs.current.size ? "grabbing" : "grab", userSelect: "none" }}>
+            <defs>
+              <pattern id="lm-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform={`rotate(45) scale(${1 / view.k})`}>
+                <rect width="6" height="6" fill="#fff" /><rect width="2.5" height="6" fill="#d6cfc2" />
+              </pattern>
+            </defs>
+            <g transform={`translate(${view.x},${view.y}) scale(${view.k})`}>
+              {paths.map(({ id, d }) => {
+                const x = byMarket[id];
+                if (!x) return <path key={id} d={d} fill={UNTRACKED} stroke="#fff" strokeWidth={0.6} vectorEffect="non-scaling-stroke" />;
+                return null;
+              })}
+              {/* Tracked countries last, so their outline sits on top of the neighbours'. */}
+              {paths.filter(({ id }) => byMarket[id]).map(({ id, d }) => {
+                const x = byMarket[id];
+                const lv = x.pr.level;
+                const on = hover?.id === id;
+                return (
+                  <path key={id} d={d} data-id={id} fill={lv === "unknown" ? "url(#lm-hatch)" : LEVELS[lv].fill} stroke={on ? INK : "#fff"} strokeWidth={on ? 1.8 : 0.9} strokeLinejoin="round" vectorEffect="non-scaling-stroke"
+                    tabIndex={0} role="button" aria-label={`${x.m.name}: ${LEVELS[lv].label}. Open details`} style={{ cursor: "pointer", outline: "none" }}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPick(x); } }} />
+                );
+              })}
+              {rows.map((x) => {
+                const xy = PROJ(x.m.at);
+                // A label shows once the country is wide enough on screen to hold it.
+                const width = paths.find((q) => q.id === x.m.id)?.w || 0;
+                if (!xy || width * px < 32) return null;
+                return (
+                  <text key={x.m.id} x={xy[0]} y={xy[1]} textAnchor="middle" dominantBaseline="central" pointerEvents="none"
+                    style={{ fontSize: 12 / px, fontWeight: 600, fontFamily: FONT, fill: LEVELS[x.pr.level].ink, letterSpacing: 0.2 / px }}>
+                    {x.m.short}
+                  </text>
+                );
+              })}
+            </g>
+          </svg>
+        )}
         {hx && (
           <div role="tooltip" style={{ position: "absolute", left: Math.max(0, Math.min(hover.x + 14, hover.w - 330)), top: hover.y + 14, width: "max-content", maxWidth: 320, zIndex: 5, pointerEvents: "none", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: "9px 11px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, color: INK }}><Swatch level={hx.pr.level} />{hx.m.name}<span style={{ fontWeight: 400, color: MUTED }}>{LEVELS[hx.pr.level].label}</span></div>
@@ -459,7 +604,8 @@ function ProgressMap({ rows, onPick }) {
           </div>
         )}
       </div>
-      <LevelLegend />
+      <LevelLegend extra={<Key swatch={<span aria-hidden="true" style={{ display: "inline-block", width: 11, height: 11, borderRadius: 2, background: UNTRACKED, border: "1px solid rgba(0,0,0,0.12)" }} />}><span style={{ color: MUTED }}>Not tracked</span></Key>} />
+      <Hint>Drag to move around the world; scroll, pinch or use + and − to zoom. Select a coloured country for its decisions and sources.</Hint>
     </>
   );
 }
@@ -496,11 +642,11 @@ function Overview({ products, markets, today, onPick }) {
               <div className="lm-sticky" style={{ padding: "7px 12px", fontSize: 11.5, fontWeight: 600, color: MUTED, background: "#fff", borderTop: `1px solid ${LINE}`, textTransform: "uppercase", letterSpacing: 0.4, width: "max-content" }}>{g === "PrEP" ? "Prevention (PrEP)" : "Treatment"}</div>
               {rows.map((p) => (
                 <div key={p.id} style={{ display: "grid", gridTemplateColumns: cols, borderTop: `1px solid ${HAIR}`, alignItems: "stretch" }}>
-                  <div className="lm-sticky" style={{ padding: "8px 12px", background: "#fff", display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
+                  <div className="lm-sticky" title={`${p.name}: ${p.company}, ${aboutOf(p)}`} style={{ padding: "8px 12px", background: "#fff", display: "flex", alignItems: "center", gap: 7, minWidth: 0 }}>
                     <CompanyDot company={p.company} />
                     <span style={{ minWidth: 0 }}>
                       <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: INK, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</span>
-                      <span className="lm-sub" style={{ display: "block", fontSize: 11.5, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.company}</span>
+                      <span className="lm-sub" style={{ display: "block", fontSize: 11.5, color: MUTED, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{companyOf(p)} · {p.inn}</span>
                     </span>
                   </div>
                   {markets.map((m) => {
@@ -609,14 +755,14 @@ export default function HivLaunchMap() {
   // Rows for the current view.
   let rows = [];
   if (view === "product") rows = markets.map((m) => ({ ...launchOf(product, m, today), key: m.id, title: m.name, icon: <Flag m={m} /> })).sort(byProgress);
-  if (view === "country") rows = products.map((p) => ({ ...launchOf(p, market, today), key: p.id, title: p.name, icon: <CompanyDot company={p.company} /> })).sort(byProgress);
+  if (view === "country") rows = products.map((p) => ({ ...launchOf(p, market, today), key: p.id, title: p.name, sub: `${companyOf(p)} · ${p.inn}`, about: `${p.company}, ${aboutOf(p)}`, icon: <CompanyDot company={p.company} /> })).sort(byProgress);
   const allPairs = view === "overview" ? products.flatMap((p) => markets.map((m) => launchOf(p, m, today))) : rows;
 
   const productFilters = (
     <>
       <Segmented label="Segment" value={segment} onChange={setSegment} options={SEGMENTS} />
       <MultiSelect label="Company" allLabel="All companies" selected={companies} onChange={setCompanies} options={COMPANIES} />
-      <MultiSelect label="Product" allLabel="All products" selected={pickedAssets} onChange={setAssetIds} options={inScope.map((p) => ({ value: p.id, label: p.name }))} />
+      <MultiSelect label="Product" allLabel="All products" selected={pickedAssets} onChange={setAssetIds} options={inScope.map((p) => ({ value: p.id, label: `${p.name} (${p.inn})` }))} />
     </>
   );
   const marketFilters = (
@@ -634,20 +780,9 @@ export default function HivLaunchMap() {
         .lm-sticky { position: sticky; left: 0; z-index: 1; box-shadow: 1px 0 0 ${LINE}; }
         .hiv-ls { display: grid; grid-template-columns: 170px minmax(420px,1fr) 210px; column-gap: 14px; align-items: center; }
         .hiv-ls-scroll { overflow-x: auto; }
-        /* Europe is the main panel; the two insets sit beside it, or below it on phones. */
-        .hiv-map { display: grid; gap: 12px; align-items: start; grid-template-columns: minmax(0,1.6fr) minmax(0,1fr); grid-template-areas: "eu na" "eu au"; }
-        .hiv-map-eu { grid-template-columns: minmax(0,1fr); grid-template-areas: "eu"; max-width: 640px; }
-        .hiv-map-na, .hiv-map-au, .hiv-map-na-au { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-areas: "na au"; }
-        .hiv-map-eu-na { grid-template-areas: "eu na" "eu ."; }
-        .hiv-map-eu-au { grid-template-areas: "eu au" "eu ."; }
-        .hiv-lbl { font-size: 12.5px; }
-        .hiv-lbl-inset { font-size: 14px; }
-        .hiv-map path[role=button]:focus-visible { stroke: ${INK}; stroke-width: 1.8px; }
+        .lm-world path[role=button]:focus-visible { stroke: ${INK}; stroke-width: 2px; }
         @media (max-width: 760px) {
           .hiv-ls { grid-template-columns: 112px minmax(380px,1fr) 150px; column-gap: 10px; }
-          .hiv-map, .hiv-map-eu-na, .hiv-map-eu-au { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-areas: "eu eu" "na au"; }
-          .hiv-lbl { font-size: 17px; }
-          .hiv-lbl-inset { font-size: 24px; }
         }
       `}</style>
 
@@ -661,7 +796,7 @@ export default function HivLaunchMap() {
         <Segmented label="View" value={view} onChange={(v) => { setView(v); setDetail(null); }} options={VIEWS} />
         {view === "product" && (
           <Picker label="Product" value={product.id} onChange={setProductId}>
-            {["Treatment", "PrEP"].map((g) => <optgroup key={g} label={g === "PrEP" ? "Prevention (PrEP)" : "Treatment"}>{ALL.filter((p) => p.segment === g).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</optgroup>)}
+            {["Treatment", "PrEP"].map((g) => <optgroup key={g} label={g === "PrEP" ? "Prevention (PrEP)" : "Treatment"}>{ALL.filter((p) => p.segment === g).map((p) => <option key={p.id} value={p.id}>{p.name} ({p.inn})</option>)}</optgroup>)}
           </Picker>
         )}
         {view === "country" && (
@@ -677,9 +812,7 @@ export default function HivLaunchMap() {
       </div>
 
       {view === "product" && (
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", fontSize: 12.5, color: MUTED, margin: "-4px 0 12px" }}>
-          <CompanyDot company={product.company} />{product.company}<span style={{ color: "#cfcac2" }}>·</span>{product.stage}<span style={{ color: "#cfcac2" }}>·</span>{product.dosing}
-        </div>
+        <ProductCard p={product} />
       )}
 
       {(view === "product" ? markets.length : view === "country" ? products.length : products.length && markets.length) ? (
@@ -694,7 +827,7 @@ export default function HivLaunchMap() {
               </div>
               <div style={panelStyle}>
                 <Intro title="On the map">{LEVEL_ORDER.map((lv) => ({ lv, n: rows.filter((x) => x.pr.level === lv).length })).filter((c) => c.n).map((c, i) => <span key={c.lv}>{i ? ", " : ""}{LEVELS[c.lv].label.toLowerCase()} in {c.n}</span>)}</Intro>
-                <ProgressMap rows={rows} onPick={setDetail} />
+                <WorldMap rows={rows} onPick={setDetail} />
               </div>
             </>
           )}
