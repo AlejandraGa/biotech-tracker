@@ -61,3 +61,24 @@ export function applyDetections(products, auto) {
     return { ...p, reg, access, events };
   });
 }
+
+// Marks each status with what the website check last found for it: the page agrees,
+// lists nothing (for "no decision" statuses), or seems to say something different.
+export function applyConfirmations(products, auto) {
+  const conf = auto?.confirmations || {};
+  if (!Object.keys(conf).length) return products;
+  const mark = (id, cells) => {
+    let out = cells;
+    for (const k of Object.keys(cells || {})) {
+      const c = conf[`${id}:${k}`];
+      // A status the check itself just updated already says so; a result for a
+      // status the team has since changed in the sheet no longer applies.
+      if (!c || cells[k]?.auto) continue;
+      if (c.sig && c.sig !== JSON.stringify([cells[k]?.s || 'none', cells[k]?.date || ''])) continue;
+      if (out === cells) out = { ...cells };
+      out[k] = { ...cells[k], verified: c };
+    }
+    return out;
+  };
+  return products.map((p) => ({ ...p, reg: mark(p.id, p.reg), access: mark(p.id, p.access) }));
+}

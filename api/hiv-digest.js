@@ -13,11 +13,28 @@ import { join } from 'node:path';
 import { collectSignals } from './_lib/hivSignals.js';
 import { BASE, applyDetections, COLUMN_AGENCY } from '../src/hivData.js';
 import { ACCESS_BODIES } from '../src/hivAccessData.js';
+import { SHEET_ID, sheetCsvUrl, rowsFromCsv, unpackRows, applySheet } from '../src/hivSheet.js';
 
 // Decisions found by the daily page check (scripts/watch); shipped with each deploy.
 function readDetections() {
   try { return JSON.parse(readFileSync(join(process.cwd(), 'src', 'hivAutoDetections.json'), 'utf8')); }
   catch { return { lastRun: null, sources: {}, detections: [] }; }
+}
+
+// The team's sheet as it is now, or the copy saved by the website check if it cannot be read.
+async function readStatuses() {
+  const id = process.env.HIV_SHEET_ID || SHEET_ID;
+  if (id) {
+    try {
+      const r = await fetch(sheetCsvUrl(id), { signal: AbortSignal.timeout(10000) });
+      if (r.ok && /csv|text\/plain/.test(r.headers.get('content-type') || '')) {
+        const rows = rowsFromCsv(await r.text());
+        if (rows.length >= 10) return rows;
+      }
+    } catch { /* fall back to the saved copy */ }
+  }
+  try { return unpackRows(JSON.parse(readFileSync(join(process.cwd(), 'src', 'hivSheetSnapshot.json'), 'utf8'))); }
+  catch { return []; }
 }
 
 const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -101,7 +118,7 @@ export default async function handler(req, res) {
   try {
     const data = await collectSignals({ days });
     const auto = readDetections();
-    const digest = buildDigest(data, appUrl, auto, applyDetections(BASE, auto));
+    const digest = buildDigest(data, appUrl, auto, applyDetections(applySheet(BASE, await readStatuses()), auto));
 
     if (preview) {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
