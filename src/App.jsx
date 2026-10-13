@@ -21,13 +21,6 @@ function getSavedTickers() {
   catch { return null; }
 }
 
-function saveWatchlist(list) {
-  try {
-    const toSave = list.map(({ ticker, name, stage, note }) => ({ ticker, name, stage, note }));
-    localStorage.setItem(LS_KEY, JSON.stringify(toSave));
-  } catch {}
-}
-
 function getInitialWatchlist() {
   const saved = getSavedTickers();
   if (!saved) return DEFAULT_WATCHLIST;
@@ -129,113 +122,6 @@ function tagColor(tag) {
   if (t.includes('reimburse') || t.includes('pricing') || t.includes('nice') || t.includes('g-ba')) return { bg: 'rgba(5,150,105,0.07)', color: '#065f46', border: 'rgba(5,150,105,0.2)' };
   return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
 }
-
-function stageBadge(stage) {
-  if (stage === 'Commercial') return 'green';
-  if (stage && stage.includes('Phase')) return 'amber';
-  if (stage === 'Platform') return 'blue';
-  return 'purple';
-}
-
-// ─── STATIC HTA DATA (seed data; in production would come from NICE/G-BA RSS) ─
-const HTA_DATA = [
-  {
-    id: 'hta-1',
-    body: 'NICE',
-    country: 'UK',
-    date: 'May 9, 2025',
-    product: 'Lecanemab (Leqembi)',
-    company: 'Eisai / Biogen',
-    indication: 'Early Alzheimer\'s disease',
-    decision: 'Not recommended',
-    outcome: 'negative',
-    rationale: 'ICER above £30,000/QALY threshold. Committee concluded clinical benefit insufficient to justify cost at list price.',
-    mechanism: 'Anti-amyloid monoclonal antibody',
-    stage: 'Commercial',
-    source: 'https://www.nice.org.uk',
-    maSignal: 'Price negotiation likely needed. Uncertainty around long-term outcomes cited as key barrier.',
-  },
-  {
-    id: 'hta-2',
-    body: 'G-BA',
-    country: 'DE',
-    date: 'May 6, 2025',
-    product: 'Inavolisib (Itovebi)',
-    company: 'Roche / Genentech',
-    indication: 'PIK3CA-mutated HR+/HER2- breast cancer',
-    decision: 'Considerable added benefit',
-    outcome: 'positive',
-    rationale: 'Statistically significant OS benefit vs. standard of care in biomarker-selected population. G-BA granted "beträchtlicher Zusatznutzen".',
-    mechanism: 'PI3Kα inhibitor',
-    stage: 'Commercial',
-    source: 'https://www.g-ba.de',
-    maSignal: 'Strong HTA result supports premium pricing in Germany. Expect price negotiations to begin Q3 2025.',
-  },
-  {
-    id: 'hta-3',
-    body: 'HAS',
-    country: 'FR',
-    date: 'Apr 28, 2025',
-    product: 'Fidanacogene elaparvovec (Beqvez)',
-    company: 'Pfizer',
-    indication: 'Haemophilia B (adults)',
-    decision: 'ASMR III — Moderate improvement',
-    outcome: 'positive',
-    rationale: 'One-time gene therapy with durable factor IX expression. HAS acknowledged burden reduction vs. prophylaxis, with residual uncertainty on long-term durability.',
-    mechanism: 'AAV-based gene therapy',
-    stage: 'Commercial',
-    source: 'https://www.has-sante.fr',
-    maSignal: 'Moderate SMR/ASMR limits initial reimbursement scope. Managed entry agreement with outcomes-based component likely.',
-  },
-  {
-    id: 'hta-4',
-    body: 'NICE',
-    country: 'UK',
-    date: 'Apr 22, 2025',
-    product: 'Selpercatinib (Retsevmo)',
-    company: 'Eli Lilly',
-    indication: 'RET-mutant thyroid & lung cancers',
-    decision: 'Recommended (CDF)',
-    outcome: 'conditional',
-    rationale: 'Approved via Cancer Drugs Fund pending longer-term OS data. ICER acceptable with commercial discount in place.',
-    mechanism: 'RET kinase inhibitor',
-    stage: 'Commercial',
-    source: 'https://www.nice.org.uk',
-    maSignal: 'CDF listing is common for oncology. Companies should prepare for mandatory real-world evidence data collection.',
-  },
-  {
-    id: 'hta-5',
-    body: 'EUnetHTA',
-    country: 'EU',
-    date: 'Apr 15, 2025',
-    product: 'Nivolumab + relatlimab (Opdualag)',
-    company: 'Bristol-Myers Squibb',
-    indication: 'Unresectable / metastatic melanoma',
-    decision: 'Joint Clinical Assessment — Class IIb',
-    outcome: 'conditional',
-    rationale: 'First EU-level joint HTA under HTAR. Moderate certainty evidence for PFS benefit; OS data immature at time of assessment.',
-    mechanism: 'PD-1 + LAG-3 dual checkpoint blockade',
-    stage: 'Commercial',
-    source: 'https://www.eunethta.eu',
-    maSignal: 'First HTAR Joint Clinical Assessment result. Sets precedent for EU-wide submissions. National price negotiations remain separate.',
-  },
-  {
-    id: 'hta-6',
-    body: 'SMC',
-    country: 'SCO',
-    date: 'Apr 10, 2025',
-    product: 'Lutetium-177 PSMA (Pluvicto)',
-    company: 'Novartis',
-    indication: 'mCRPC, post-ARPI + taxane',
-    decision: 'Accepted (restricted)',
-    outcome: 'positive',
-    rationale: 'OS benefit of 4 months vs. standard of care. Accepted for use in patients meeting strict prior treatment criteria.',
-    mechanism: 'Radioligand therapy targeting PSMA',
-    stage: 'Commercial',
-    source: 'https://www.scottishmedicines.org.uk',
-    maSignal: 'Restricted population typical for RLT at launch. Label expansion studies ongoing; broader reimbursement possible.',
-  },
-];
 
 // ─── STATIC COMPETITIVE LANDSCAPE DATA ──────────────────────────────────────
 const COMPETITIVE_LANDSCAPE_DATA = [
@@ -378,237 +264,6 @@ async function callClaude(prompt) {
   });
   const data = await response.json();
   return data.content?.[0]?.text || 'Could not generate response.';
-}
-
-// ─── HTA OUTCOME HELPERS ────────────────────────────────────────────────────
-function htaOutcomeBadge(outcome) {
-  if (outcome === 'positive') return { bg: 'rgba(22,163,74,0.09)', color: '#15803d', border: 'rgba(22,163,74,0.3)', label: '✓ Recommended' };
-  if (outcome === 'negative') return { bg: 'rgba(200,16,46,0.08)', color: '#c8102e', border: 'rgba(200,16,46,0.3)', label: '✕ Not recommended' };
-  return { bg: 'rgba(161,98,7,0.08)', color: '#a16207', border: 'rgba(161,98,7,0.3)', label: '◐ Conditional' };
-}
-
-function htaBodyColor(body) {
-  const map = {
-    'NICE': { bg: '#1d3461', text: '#fff' },
-    'G-BA': { bg: '#1a1a1a', text: '#fff' },
-    'HAS': { bg: '#002395', text: '#fff' },
-    'EUnetHTA': { bg: '#003399', text: '#f5c518' },
-    'SMC': { bg: '#005EB8', text: '#fff' },
-    'PBAC': { bg: '#00843D', text: '#fff' },
-    'CADTH': { bg: '#c8102e', text: '#fff' },
-  };
-  return map[body] || { bg: '#555', text: '#fff' };
-}
-
-// ─── HTA Card ────────────────────────────────────────────────────────────────
-function HTACard({ item, callClaude }) {
-  const [expanded, setExpanded] = useState(false);
-  const [aiAnalysis, setAiAnalysis] = useState('');
-  const [loadingAI, setLoadingAI] = useState(false);
-  const outcome = htaOutcomeBadge(item.outcome);
-  const bodyStyle = htaBodyColor(item.body);
-
-  const handleAI = async () => {
-    if (aiAnalysis) { setExpanded(true); return; }
-    setLoadingAI(true);
-    setExpanded(true);
-    try {
-      const text = await callClaude(
-        `You are a market access expert at a pharmaceutical company. Analyze this HTA decision in 4 concise bullet points (use • as bullet):
-        Body: ${item.body} (${item.country})
-        Product: ${item.product} by ${item.company}
-        Indication: ${item.indication}
-        Decision: ${item.decision}
-        Rationale: ${item.rationale}
-        
-        Cover: (1) what this means for market access in this country, (2) implications for pricing/reimbursement negotiations, (3) what evidence gaps were highlighted, (4) what other companies in the same space should take away. Be specific and commercial, not academic.`
-      );
-      setAiAnalysis(text);
-    } catch { setAiAnalysis('Could not generate analysis.'); }
-    setLoadingAI(false);
-  };
-
-  return (
-    <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 10, marginBottom: 12, overflow: 'hidden', transition: 'box-shadow 0.15s' }}
-      onMouseOver={e => e.currentTarget.style.boxShadow = '0 3px 16px rgba(0,0,0,0.07)'}
-      onMouseOut={e => e.currentTarget.style.boxShadow = 'none'}>
-      {/* Header row */}
-      <div style={{ padding: '14px 18px', borderBottom: expanded ? '1px solid #f0ede8' : 'none' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-          {/* Body badge */}
-          <div style={{ flexShrink: 0, background: bodyStyle.bg, color: bodyStyle.text, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700, fontSize: 13, padding: '6px 12px', borderRadius: 6, minWidth: 56, textAlign: 'center' }}>
-            {item.body}
-            <div style={{ fontSize: 11.5, opacity: 0.75, fontWeight: 400, marginTop: 1 }}>{item.country}</div>
-          </div>
-          {/* Main info */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-              <span style={{ fontSize: 15, fontWeight: 700, color: '#111', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.product}</span>
-              <span style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>· {item.company}</span>
-            </div>
-            <div style={{ fontSize: 13, color: '#555', marginBottom: 8, lineHeight: 1.4 }}>{item.indication}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 12.5, padding: '3px 10px', borderRadius: 20, background: outcome.bg, color: outcome.color, border: `0.5px solid ${outcome.border}`, fontWeight: 700, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
-                {outcome.label}
-              </span>
-              <span style={{ fontSize: 12.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.date}</span>
-              <span style={{ fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", background: '#f5f2ed', padding: '2px 8px', borderRadius: 10 }}>{item.mechanism}</span>
-            </div>
-          </div>
-          {/* Actions */}
-          <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center' }}>
-            <button style={{ ...s.btn, fontSize: 13, padding: '5px 12px', background: '#065f46' }} onClick={handleAI}>
-              {loadingAI ? <><Spinner />Analyzing…</> : aiAnalysis ? 'MA Analysis ✓' : 'MA Analysis →'}
-            </button>
-            <button style={{ ...s.btnSm, fontSize: 12.5 }} onClick={() => setExpanded(x => !x)}>
-              {expanded ? '▲' : '▼'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Expanded body */}
-      {expanded && (
-        <div style={{ padding: '16px 18px', background: '#fdfcfa' }}>
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 6, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Committee Rationale</div>
-            <p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.rationale}</p>
-          </div>
-          <div style={{ marginBottom: aiAnalysis ? 12 : 0, padding: '10px 14px', background: 'rgba(5,150,105,0.05)', borderRadius: 6, border: '1px solid rgba(5,150,105,0.15)', borderLeft: '3px solid #065f46' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Market Access Signal</div>
-            <p style={{ fontSize: 13, color: '#2d4a3e', lineHeight: 1.65, margin: 0, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{item.maSignal}</p>
-          </div>
-          {loadingAI && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}><Spinner />Generating market access analysis…</div>}
-          {aiAnalysis && (
-            <div style={{ ...np.npAiBox, marginTop: 12, borderLeft: '3px solid #065f46', whiteSpace: 'pre-line' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#065f46', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>AI · Market Access Analysis</div>
-              {aiAnalysis}
-            </div>
-          )}
-          {item.source && (
-            <a href={item.source} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 10, fontSize: 12.5, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", textDecoration: 'none', fontWeight: 600 }}>
-              Source: {item.body} ↗
-            </a>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── HTA TAB ────────────────────────────────────────────────────────────────
-function HTATab({ callClaude }) {
-  const [bodyFilter, setBodyFilter] = useState('');
-  const [outcomeFilter, setOutcomeFilter] = useState('');
-  const [searchText, setSearchText] = useState('');
-  const [aiOverview, setAiOverview] = useState('');
-  const [loadingOverview, setLoadingOverview] = useState(false);
-
-  const bodies = ['NICE', 'G-BA', 'HAS', 'EUnetHTA', 'SMC'];
-  const outcomes = ['positive', 'negative', 'conditional'];
-
-  const filtered = HTA_DATA.filter(item => {
-    if (bodyFilter && item.body !== bodyFilter) return false;
-    if (outcomeFilter && item.outcome !== outcomeFilter) return false;
-    if (searchText) {
-      const hay = (item.product + ' ' + item.company + ' ' + item.indication + ' ' + item.body + ' ' + item.mechanism).toLowerCase();
-      if (!hay.includes(searchText.toLowerCase())) return false;
-    }
-    return true;
-  });
-
-  const positiveCount = HTA_DATA.filter(d => d.outcome === 'positive').length;
-  const negativeCount = HTA_DATA.filter(d => d.outcome === 'negative').length;
-  const conditionalCount = HTA_DATA.filter(d => d.outcome === 'conditional').length;
-
-  const handleOverview = async () => {
-    if (aiOverview) return;
-    setLoadingOverview(true);
-    try {
-      const text = await callClaude(
-        `You are a market access director. Based on these recent HTA decisions, write a 3-sentence strategic overview of current reimbursement trends in Europe for a small pharma company preparing submissions:
-        - NICE rejected lecanemab (Alzheimer's) citing ICER above threshold
-        - G-BA granted considerable benefit to inavolisib (breast cancer, biomarker-selected)
-        - HAS gave moderate ASMR to fidanacogene (gene therapy, haemophilia B)
-        - NICE conditionally approved selpercatinib via Cancer Drugs Fund
-        - EUnetHTA completed first joint clinical assessment under HTAR
-        Focus on: evidence standards trending, biomarker strategy, gene therapy pricing, CDF/MEA patterns. Be direct and actionable.`
-      );
-      setAiOverview(text);
-    } catch { setAiOverview('Could not generate overview.'); }
-    setLoadingOverview(false);
-  };
-
-  return (
-    <div>
-      {/* Header */}
-      <div style={{ borderTop: '3px solid #1a1a1a', borderBottom: '1px solid #1a1a1a', padding: '0.5rem 0', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>HTA & Reimbursement Decisions · Europe</span>
-        <span style={{ fontSize: 13, color: '#065f46', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>NICE · G-BA · HAS · EUnetHTA · SMC</span>
-      </div>
-
-      {/* Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px,1fr))', gap: 10, marginBottom: '1.25rem' }}>
-        {[
-          { label: 'Total decisions', val: HTA_DATA.length, color: '#1a1a1a' },
-          { label: 'Recommended', val: positiveCount, color: '#15803d' },
-          { label: 'Not recommended', val: negativeCount, color: '#c8102e' },
-          { label: 'Conditional', val: conditionalCount, color: '#a16207' },
-        ].map(m => (
-          <div key={m.label} style={s.metric}>
-            <div style={s.metricLabel}>{m.label}</div>
-            <div style={{ ...s.metricVal, color: m.color, fontSize: 26 }}>{m.val}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* AI Overview button */}
-      <div style={{ marginBottom: '1.25rem' }}>
-        <button style={{ ...s.btn, background: '#065f46', fontSize: 12.5, padding: '8px 16px' }} onClick={handleOverview}>
-          {loadingOverview ? <><Spinner />Analyzing trends…</> : aiOverview ? 'Strategic Overview ✓' : '→ Generate strategic overview for small pharma'}
-        </button>
-        {aiOverview && <div style={{ ...np.npAiBox, marginTop: 10, borderLeft: '3px solid #065f46' }}>{aiOverview}</div>}
-      </div>
-
-      {/* Filters */}
-      <div style={{ background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, padding: '14px 16px', marginBottom: '1.25rem' }}>
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>HTA body</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {['', ...bodies].map(b => (
-              <button key={b} onClick={() => setBodyFilter(b)} style={{ padding: '4px 12px', borderRadius: 4, border: bodyFilter === b ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: bodyFilter === b ? '#1a1a1a' : 'transparent', color: bodyFilter === b ? '#fff' : '#555', fontSize: 12.5, fontWeight: bodyFilter === b ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s' }}>
-                {b || 'All'}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginBottom: 6 }}>Outcome</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {[{ key: '', label: 'All' }, { key: 'positive', label: '✓ Recommended' }, { key: 'negative', label: '✕ Not recommended' }, { key: 'conditional', label: '◐ Conditional' }].map(o => (
-              <button key={o.key} onClick={() => setOutcomeFilter(o.key)} style={{ padding: '4px 12px', borderRadius: 4, border: outcomeFilter === o.key ? `1.5px solid ${o.key === 'positive' ? '#15803d' : o.key === 'negative' ? '#c8102e' : o.key === 'conditional' ? '#a16207' : '#1a1a1a'}` : '1px solid #d1ccc4', background: outcomeFilter === o.key ? (o.key === 'positive' ? 'rgba(22,163,74,0.08)' : o.key === 'negative' ? 'rgba(200,16,46,0.08)' : o.key === 'conditional' ? 'rgba(161,98,7,0.08)' : '#1a1a1a') : 'transparent', color: outcomeFilter === o.key ? (o.key === 'positive' ? '#15803d' : o.key === 'negative' ? '#c8102e' : o.key === 'conditional' ? '#a16207' : '#fff') : '#555', fontSize: 12.5, fontWeight: outcomeFilter === o.key ? 700 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
-                {o.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input style={{ ...np.filterInput }} value={searchText} onChange={e => setSearchText(e.target.value)} placeholder="Search by product, company, indication, MoA…" />
-          {searchText && <button style={s.btnSm} onClick={() => setSearchText('')}>Clear</button>}
-        </div>
-      </div>
-
-      {/* Decisions list */}
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderBottom: '1px solid #e5e0d8', paddingBottom: 4 }}>
-        Recent decisions · {filtered.length} shown
-      </div>
-      {filtered.map(item => <HTACard key={item.id} item={item} callClaude={callClaude} />)}
-
-      <div style={{ marginTop: '2rem', padding: '12px 16px', background: '#faf8f4', borderRadius: 6, border: '1px solid #e5e0d8', fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1.6 }}>
-        Decisions sourced from <strong style={{ color: '#555' }}>NICE, G-BA, HAS, SMC, EUnetHTA</strong> public databases. Updated weekly. Production version would pull live from official RSS/APIs.
-      </div>
-    </div>
-  );
 }
 
 // ─── STAGE BADGE HELPER ──────────────────────────────────────────────────────
@@ -973,233 +628,8 @@ function PublicationsTab({ watchlist }) {
   );
 }
 
-function AnalystRatingBar({ buy, hold, sell }) {
-  const total = buy + hold + sell;
-  if (total === 0) return null;
-  const buyPct = Math.round((buy / total) * 100);
-  const holdPct = Math.round((hold / total) * 100);
-  const sellPct = 100 - buyPct - holdPct;
-  let verdict = 'Hold', verdictColor = '#a16207';
-  if (buyPct >= 60) { verdict = 'Strong Buy'; verdictColor = '#15803d'; }
-  else if (buyPct >= 45) { verdict = 'Buy'; verdictColor = '#16a34a'; }
-  else if (sellPct >= 45) { verdict = 'Strong Sell'; verdictColor = '#c8102e'; }
-  else if (sellPct >= 30) { verdict = 'Sell'; verdictColor = '#dc2626'; }
-  return (
-    <div style={{ marginTop: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: 12.5, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Analyst Consensus</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: verdictColor, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{verdict}</span>
-      </div>
-      <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', display: 'flex', marginBottom: 8 }}>
-        <div style={{ width: `${buyPct}%`, background: '#16a34a' }} />
-        <div style={{ width: `${holdPct}%`, background: '#d97706' }} />
-        <div style={{ width: `${sellPct}%`, background: '#dc2626' }} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>
-        <span style={{ color: '#15803d' }}>Buy {buyPct}%</span>
-        <span style={{ color: '#a16207' }}>Hold {holdPct}%</span>
-        <span style={{ color: '#dc2626' }}>Sell {sellPct}%</span>
-      </div>
-    </div>
-  );
-}
-
-function PriceTarget({ current, target }) {
-  if (!target || !current || current === 0) return null;
-  const upside = (((target - current) / current) * 100).toFixed(1);
-  const isUp = target >= current;
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10, padding: '8px 12px', background: isUp ? 'rgba(22,163,74,0.05)' : 'rgba(220,38,38,0.05)', borderRadius: 6, border: `1px solid ${isUp ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)'}`, flexWrap: 'wrap' }}>
-      <div>
-        <div style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>12-mo Price Target</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a' }}>${target.toFixed(2)}</div>
-      </div>
-      <div style={{ borderLeft: '1px solid #e5e0d8', paddingLeft: 10 }}>
-        <div style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", }}>vs Current</div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: isUp ? '#16a34a' : '#dc2626' }}>{isUp ? '▲' : '▼'} {Math.abs(upside)}%</div>
-      </div>
-    </div>
-  );
-}
-
-function SentimentPills({ sentiments }) {
-  if (!sentiments || sentiments.length === 0) return null;
-  const colorMap = {
-    bullish: { bg: 'rgba(22,163,74,0.08)', color: '#15803d', border: 'rgba(22,163,74,0.25)', icon: '↑' },
-    bearish: { bg: 'rgba(220,38,38,0.08)', color: '#dc2626', border: 'rgba(220,38,38,0.25)', icon: '↓' },
-    neutral: { bg: 'rgba(100,100,100,0.08)', color: '#555', border: 'rgba(100,100,100,0.2)', icon: '→' },
-    cautious: { bg: 'rgba(161,98,7,0.08)', color: '#a16207', border: 'rgba(161,98,7,0.25)', icon: '—' },
-    speculative: { bg: 'rgba(109,40,217,0.08)', color: '#6d28d9', border: 'rgba(109,40,217,0.25)', icon: '*' },
-  };
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-      {sentiments.map((sent, i) => { const c = colorMap[sent.tone?.toLowerCase()] || colorMap.neutral; return <span key={i} style={{ fontSize: 12.5, padding: '4px 10px', borderRadius: 20, background: c.bg, color: c.color, border: `0.5px solid ${c.border}`, fontWeight: 600, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{c.icon} {sent.label}</span>; })}
-    </div>
-  );
-}
-
-function StockCard({ stock, onRemove, onLoadDetail, onStageUpdate }) {
-  const [expanded, setExpanded] = useState(false);
-  const [detail, setDetail] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-
-  const handleExpand = async () => {
-    const next = !expanded;
-    setExpanded(next);
-    if (next && !detail) {
-      setLoadingDetail(true);
-      try { const result = await onLoadDetail(stock, onStageUpdate); setDetail(result); }
-      catch { setDetail({ error: 'Could not load details.' }); }
-      setLoadingDetail(false);
-    }
-  };
-
-  return (
-    <div style={{ ...s.card, padding: 0, overflow: 'hidden', marginBottom: 12 }}>
-      <div style={{ padding: '14px 18px', cursor: 'pointer', borderBottom: expanded ? '1px solid #e5e0d8' : 'none' }} onClick={handleExpand}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
-              <span style={s.ticker}>{stock.ticker}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>{stock.name}</span>
-              <span style={s.badge(stageBadge(stock.stage))}>{stock.stage}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {stock.price > 0 && <span style={{ fontSize: 20, fontWeight: 700, color: '#1a1a1a', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>${stock.price.toFixed(2)}</span>}
-              {stock.price > 0 && <span style={{ ...(stock.change >= 0 ? s.priceUp : s.priceDown), fontSize: 14, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{stock.change >= 0 ? '▲' : '▼'} {Math.abs(stock.change).toFixed(1)}%</span>}
-              {stock.mktcap !== '—' && <span style={{ fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Mkt cap: {stock.mktcap}</span>}
-            </div>
-            <p style={{ ...s.muted, marginTop: 6, fontSize: 13, lineHeight: 1.5 }}>{stock.note}</p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <span style={{ fontSize: 18, color: '#bbb', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>⌄</span>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 20, lineHeight: 1, padding: '0 2px' }} onClick={e => { e.stopPropagation(); onRemove(stock.ticker); }}>×</button>
-          </div>
-        </div>
-      </div>
-      {expanded && (
-        <div style={{ padding: '16px 18px', background: '#fdfcfa' }}>
-          {loadingDetail && <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 13, padding: '12px 0' }}><Spinner />Loading company intelligence…</div>}
-          {detail && !detail.error && (
-            <div>
-              {detail.about && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>About</div><p style={{ fontSize: 13, color: '#333', lineHeight: 1.7, margin: 0 }}>{detail.about}</p></div>}
-              <hr style={s.divider} />
-              {detail.ratings && <div style={{ marginBottom: 16 }}><div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 4, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Analyst Ratings</div><AnalystRatingBar buy={detail.ratings.buy} hold={detail.ratings.hold} sell={detail.ratings.sell} /></div>}
-              {detail.priceTarget && stock.price > 0 && <div style={{ marginBottom: 16 }}><PriceTarget current={stock.price} target={detail.priceTarget} /></div>}
-              <hr style={s.divider} />
-              {detail.sentiments && detail.sentiments.length > 0 && (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 6, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Investor Sentiment</div>
-                  <SentimentPills sentiments={detail.sentiments} />
-                  {detail.sentimentSummary && <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6, marginTop: 10, marginBottom: 0 }}>{detail.sentimentSummary}</p>}
-                </div>
-              )}
-              {detail.risks && detail.risks.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', marginBottom: 8, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Key Risks</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {detail.risks.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, color: '#555', lineHeight: 1.5 }}><span style={{ color: '#c8102e', flexShrink: 0 }}>▸</span><span>{r}</span></div>)}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          {detail?.error && <div style={{ color: '#c8102e', fontSize: 13 }}>{detail.error}</div>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function SearchBar({ onAdd, watchlist }) {
-  const [val, setVal] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSugg, setShowSugg] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [error, setError] = useState('');
-  const debounceRef = React.useRef(null);
-
-  const searchTickers = async (query) => {
-    if (!query || query.length < 2) { setSuggestions([]); setShowSugg(false); return; }
-    setSearching(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) { setSuggestions(data.slice(0, 7)); setShowSugg(true); }
-      else { setSuggestions([]); setShowSugg(true); }
-    } catch { setSuggestions([]); }
-    setSearching(false);
-  };
-
-  const handleChange = (e) => {
-    const v = e.target.value; setVal(v); setError('');
-    clearTimeout(debounceRef.current);
-    if (v.trim().length >= 2) debounceRef.current = setTimeout(() => searchTickers(v.trim()), 350);
-    else { setSuggestions([]); setShowSugg(false); }
-  };
-
-  const handleSelect = async (ticker, name) => {
-    setVal(''); setSuggestions([]); setShowSugg(false); setError('');
-    if (watchlist.find(s => s.ticker === ticker)) { setError(`${ticker} is already in your watchlist.`); return; }
-    setAdding(true); await onAdd(ticker, name); setAdding(false);
-  };
-
-  const handleManualAdd = async () => {
-    const t = val.trim().toUpperCase(); if (!t) return;
-    const match = suggestions.find(s => s.ticker === t);
-    if (match) { handleSelect(match.ticker, match.name); return; }
-    setAdding(true); setError('');
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(t)}`);
-      const data = await res.json();
-      const exact = Array.isArray(data) && data.find(s => s.ticker === t);
-      if (exact) await handleSelect(exact.ticker, exact.name);
-      else setError(`"${t}" not found. Check the ticker symbol and try again.`);
-    } catch { setError('Search failed. Please try again.'); }
-    setAdding(false); setVal('');
-  };
-
-  const tickerStyle = { fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontSize: 13, fontWeight: 600, color: '#c8102e', background: 'rgba(200,16,46,0.07)', padding: '2px 7px', borderRadius: 4, border: '0.5px solid rgba(200,16,46,0.2)', flexShrink: 0 };
-
-  return (
-    <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <div style={{ position: 'relative', flex: 1 }}>
-          <input style={{ ...s.input, borderColor: error ? '#fca5a5' : undefined }} value={val} onChange={handleChange} onKeyDown={e => e.key === 'Enter' && handleManualAdd()} onBlur={() => setTimeout(() => setShowSugg(false), 200)} onFocus={() => suggestions.length > 0 && setShowSugg(true)} placeholder="Search: 'Moderna', 'CRSP', 'Gilead'…" disabled={adding} />
-          {showSugg && (
-            <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #e5e0d8', borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.1)', zIndex: 100, marginTop: 4, overflow: 'hidden' }}>
-              {suggestions.length === 0 && !searching && <div style={{ padding: '12px 14px', fontSize: 13, color: '#888', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>No results for "{val}"</div>}
-              {suggestions.map((item, i) => {
-                const alreadyIn = watchlist.find(s => s.ticker === item.ticker);
-                return <div key={item.ticker} style={{ padding: '10px 14px', cursor: alreadyIn ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 10, borderBottom: i < suggestions.length - 1 ? '1px solid #f5f3ef' : 'none', opacity: alreadyIn ? 0.5 : 1 }} onMouseDown={() => !alreadyIn && handleSelect(item.ticker, item.name)} onMouseOver={e => { if (!alreadyIn) e.currentTarget.style.background = '#faf8f4'; }} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                  <span style={tickerStyle}>{item.ticker}</span>
-                  <span style={{ fontSize: 13, color: '#333', flex: 1 }}>{item.name}</span>
-                  {alreadyIn ? <span style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>already added</span> : <span style={{ fontSize: 12.5, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>+ Add</span>}
-                </div>;
-              })}
-            </div>
-          )}
-        </div>
-        <button style={{ ...s.btn, minWidth: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: adding ? 0.7 : 1, flexShrink: 0 }} onClick={handleManualAdd} disabled={adding || !val.trim()}>
-          {adding ? <><Spinner />Adding…</> : 'Add →'}
-        </button>
-      </div>
-      {error && <div style={{ marginTop: 8, fontSize: 13, color: '#dc2626', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>— {error}</div>}
-    </div>
-  );
-}
-
 export default function App() {
-  const [watchlist, setWatchlist] = useState(getInitialWatchlist);
-
-  const setAndSaveWatchlist = useCallback((updater) => {
-    setWatchlist(prev => {
-      const next = typeof updater === 'function' ? updater(prev) : updater;
-      saveWatchlist(next);
-      return next;
-    });
-  }, []);
+  const [watchlist] = useState(getInitialWatchlist);
 
   const [tab, setTab] = useState('news');
   const [newsFilter, setNewsFilter] = useState('');
@@ -1226,37 +656,6 @@ export default function App() {
     fetchPress();
   }, []);
 
-  React.useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        const tickers = watchlist.map(s => s.ticker);
-        const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers }) });
-        const data = await res.json();
-        setAndSaveWatchlist(prev => prev.map(stock => { const updated = data.find(d => d.ticker === stock.ticker); return updated ? { ...stock, ...updated } : stock; }));
-      } catch {}
-    };
-    fetchPrices();
-  }, []);
-
-  const addTicker = useCallback(async (val, knownName) => {
-    if (!val || watchlist.find(s => s.ticker === val)) return;
-    setAndSaveWatchlist(prev => [...prev, { ticker: val, name: knownName || val, price: 0, change: 0, mktcap: '—', stage: 'Unknown', note: 'Loading price data…' }]);
-    try {
-      const res = await fetch('/api/stocks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tickers: [val] }) });
-      const data = await res.json();
-      if (data[0]) setAndSaveWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, ...data[0], name: data[0].name || knownName || val } : s));
-      else setAndSaveWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Price data unavailable.' } : s));
-    } catch { setAndSaveWatchlist(prev => prev.map(s => s.ticker === val ? { ...s, note: 'Could not fetch price data.' } : s)); }
-  }, [watchlist, setAndSaveWatchlist]);
-
-  const removeTicker = useCallback((ticker) => {
-    setAndSaveWatchlist(prev => prev.filter(s => s.ticker !== ticker));
-  }, [setAndSaveWatchlist]);
-
-  const updateStage = useCallback((ticker, stage) => {
-    setAndSaveWatchlist(prev => prev.map(s => s.ticker === ticker ? { ...s, stage } : s));
-  }, [setAndSaveWatchlist]);
-
   const getSummary = useCallback(async (key, prompt) => {
     if (summaries[key]) return;
     setLoading(prev => ({ ...prev, [key]: true }));
@@ -1264,27 +663,6 @@ export default function App() {
     catch { setSummaries(prev => ({ ...prev, [key]: 'Error generating summary.' })); }
     setLoading(prev => ({ ...prev, [key]: false }));
   }, [summaries]);
-
-  const loadStockDetail = useCallback(async (stock, onStageUpdate) => {
-    const prompt = `You are a financial data assistant. Return ONLY valid JSON, no markdown, no explanation.
-For the biotech/pharma company ${stock.ticker} (${stock.name}), return this exact JSON structure:
-{
-  "stage": "one of exactly: Preclinical | Phase 1 | Phase 1/2 | Phase 2 | Phase 2/3 | Phase 3 | Commercial | Platform | Private | Unknown",
-  "about": "2-3 sentence description",
-  "ratings": { "buy": 0, "hold": 0, "sell": 0 },
-  "priceTarget": null,
-  "sentiments": [{ "label": "tag", "tone": "bullish|bearish|neutral|cautious|speculative" }],
-  "sentimentSummary": "1-2 sentences",
-  "risks": ["Risk 1", "Risk 2", "Risk 3"]
-}
-Return ONLY the JSON object.`;
-    const raw = await callClaude(prompt);
-    try {
-      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
-      if (parsed.stage && parsed.stage !== 'Unknown' && onStageUpdate) onStageUpdate(stock.ticker, parsed.stage);
-      return parsed;
-    } catch { return { error: 'Could not parse company data.' }; }
-  }, []);
 
   const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
   const CATEGORY_KEYWORDS = {
@@ -1310,19 +688,14 @@ Return ONLY the JSON object.`;
     return true;
   });
 
-  const gainers = watchlist.filter(s => s.change >= 0).length;
-  const losers = watchlist.filter(s => s.change < 0).length;
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const featured = filteredNews[0];
   const secondary = filteredNews.slice(1);
 
-  // Updated tabs: FDA removed, HTA and Competitive Landscape added
   const TABS = [
     { key: 'news', label: 'News' },
-    { key: 'watchlist', label: 'Watchlist' },
     { key: 'publications', label: 'Publications' },
     { key: 'calendar', label: 'Calendar' },
-    { key: 'hta', label: 'HTA & Reimbursement' },
     { key: 'landscape', label: 'HIV Competitive Intelligence' },
   ];
 
@@ -1349,8 +722,6 @@ Return ONLY the JSON object.`;
           .featured-headline { font-size: 22px !important; }
           .story-row { flex-direction: column !important; gap: 10px !important; }
           .story-thumb { width: 100% !important; height: 160px !important; }
-          .watchlist-top { flex-direction: column !important; align-items: stretch !important; }
-          .watchlist-stats { flex-wrap: wrap !important; justify-content: flex-start !important; }
           .cat-filter-bar { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; padding-bottom: 4px; }
           .cat-filter-bar::-webkit-scrollbar { display: none; }
           .cat-filter-bar button { flex-shrink: 0 !important; }
@@ -1485,36 +856,11 @@ Return ONLY the JSON object.`;
         </div>
       )}
 
-      {/* ══ WATCHLIST ══ */}
-      {tab === 'watchlist' && (
-        <div>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: '1.25rem', flexWrap: 'wrap' }} className="watchlist-top">
-            <div style={{ flex: 1, minWidth: 240 }}><SearchBar onAdd={addTicker} watchlist={watchlist} /></div>
-            <div style={{ display: 'flex', gap: 12, background: '#f0ede8', borderRadius: 6, padding: '8px 14px', border: '1px solid #e5e0d8', alignItems: 'center', flexShrink: 0 }} className="watchlist-stats">
-              {[{ label: 'Watching', val: watchlist.length, color: '#555' }, { label: 'Gainers', val: gainers, color: '#16a34a' }, { label: 'Losers', val: losers, color: '#c8102e' }].map((m, i) => (
-                <React.Fragment key={m.label}>
-                  {i > 0 && <span style={{ color: '#ddd', fontSize: 13 }}>|</span>}
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", lineHeight: 1 }}>{m.val}</div>
-                    <div style={{ fontSize: 11.5, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", marginTop: 2 }}>{m.label}</div>
-                  </div>
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-          <div style={{ fontSize: 12.5, color: '#aaa', marginBottom: 12, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Click any card to expand company details, analyst ratings &amp; investor sentiment</div>
-          {watchlist.map(stock => <StockCard key={stock.ticker} stock={stock} onRemove={removeTicker} onLoadDetail={loadStockDetail} onStageUpdate={updateStage} />)}
-        </div>
-      )}
-
       {/* ══ PUBLICATIONS ══ */}
       {tab === 'publications' && <PublicationsTab watchlist={watchlist} />}
 
       {/* ══ CALENDAR ══ */}
       {tab === 'calendar' && <CatalystCalendar watchlist={watchlist} callClaude={callClaude} />}
-
-      {/* ══ HTA & REIMBURSEMENT ══ */}
-      {tab === 'hta' && <HTATab callClaude={callClaude} />}
 
       {/* ══ COMPETITIVE LANDSCAPE ══ */}
       {tab === 'landscape' && <CompetitiveLandscape />}
