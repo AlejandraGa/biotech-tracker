@@ -3,6 +3,9 @@
 
 .tab-short { display: none; }
 
+/* Stop iOS from enlarging text when the phone is turned sideways. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 @media (max-width: 760px) {
   /* Signal rows and timeline rows: date on the left, source above the text. */
   .hiv-tl, .sig-row {
@@ -30,6 +33,12 @@
   /* News: keep the main column inside the screen (a grid column otherwise
      grows to the width of the category chips). */
   .news-layout > * { min-width: 0; }
+  .news-layout { overflow-wrap: anywhere; }
+  .news-layout a { overflow-wrap: anywhere; }
+
+  /* 16px fields: iOS zooms the whole page into any field smaller than that
+     when it is tapped, and the page stays zoomed afterwards. */
+  input, select, textarea { font-size: 16px !important; }
   .news-sidebar { margin-top: 1rem; }
 
   /* Dropdown filters: one per line, labels aligned */
@@ -42,9 +51,6 @@
   .metric-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
   .metric-grid > div { padding: 8px 12px !important; }
   .metric-grid > div > div:last-child { font-size: 19px !important; }
-
-  /* Calendar heatmap: weeks wide enough for their labels, scrolling sideways */
-  .cal-heat-grid { grid-template-columns: repeat(12, 58px) !important; }
 
   /* HIV CI: headline figures two-up */
   .hiv-stats { grid-template-columns: 1fr 1fr !important; }

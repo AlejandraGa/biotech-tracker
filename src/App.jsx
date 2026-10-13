@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import CatalystCalendar from './CatalystCalendar';
 import CompetitiveLandscape from './CompetitiveLandscape';
 import MultiSelect from './MultiSelect';
 
@@ -676,7 +675,6 @@ export default function App() {
   const TABS = [
     { key: 'news', label: 'News' },
     { key: 'publications', label: 'Publications' },
-    { key: 'calendar', label: 'Calendar' },
     { key: 'landscape', label: 'HIV Competitive Intelligence', short: 'HIV CI' },
   ];
 
@@ -702,9 +700,8 @@ export default function App() {
           .featured-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
           .featured-headline { font-size: 22px !important; }
           .story-row { flex-direction: column !important; gap: 10px !important; }
-          .cat-filter-bar { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; padding-bottom: 4px; }
-          .cat-filter-bar::-webkit-scrollbar { display: none; }
-          .cat-filter-bar button { flex-shrink: 0 !important; }
+          .cat-filter-bar { flex-wrap: wrap !important; overflow-x: visible !important; padding-bottom: 0 !important; }
+          .cat-filter-bar button { padding: 5px 11px !important; font-size: 12.5px !important; }
           .app-header-right { display: flex; align-items: center; gap: 10px; }
         }
       `}</style>
@@ -849,9 +846,6 @@ export default function App() {
 
       {/* ══ PUBLICATIONS ══ */}
       {tab === 'publications' && <PublicationsTab watchlist={watchlist} />}
-
-      {/* ══ CALENDAR ══ */}
-      {tab === 'calendar' && <CatalystCalendar watchlist={watchlist} callClaude={callClaude} />}
 
       {/* ══ COMPETITIVE LANDSCAPE ══ */}
       {tab === 'landscape' && <CompetitiveLandscape />}
