@@ -92,15 +92,17 @@ function MultiSelect({ label, allLabel, selected, onChange, options }) {
     document.addEventListener("keydown", esc);
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
   }, [open]);
+  // `selected` is null when everything is ticked, and [] when "All" was unticked to start a fresh pick;
+  // nothing ticked filters nothing out.
   const opts = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
-  const isAll = selected.length === 0 || selected.length === opts.length;
+  const isAll = selected === null || selected.length === opts.length;
   const isOn = (v) => isAll || selected.includes(v);
-  const picked = opts.filter((o) => selected.includes(o.value));
-  const summary = isAll ? allLabel : picked.length <= 2 ? picked.map((o) => o.label).join(", ") : `${picked.length} of ${opts.length} selected`;
+  const picked = isAll ? [] : opts.filter((o) => selected.includes(o.value));
+  const summary = isAll ? allLabel : !picked.length ? "None ticked (showing all)" : picked.length <= 2 ? picked.map((o) => o.label).join(", ") : `${picked.length} of ${opts.length} selected`;
   const toggle = (v) => {
     const base = isAll ? opts.map((o) => o.value) : selected;
     const next = base.includes(v) ? base.filter((x) => x !== v) : [...base, v];
-    onChange(next.length === opts.length ? [] : next);
+    onChange(next.length === opts.length ? null : next);
   };
   return (
     <div ref={ref} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
@@ -114,7 +116,7 @@ function MultiSelect({ label, allLabel, selected, onChange, options }) {
       {open && (
         <div role="listbox" aria-multiselectable="true" style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: 6, minWidth: 220, maxHeight: 320, overflowY: "auto" }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", fontSize: 13, fontWeight: 600, color: INK, cursor: "pointer", borderBottom: `1px solid ${HAIR}`, marginBottom: 2 }}>
-            <input type="checkbox" checked={isAll} onChange={() => onChange([])} />
+            <input type="checkbox" checked={isAll} onChange={() => onChange(isAll ? [] : null)} />
             {allLabel}
           </label>
           {opts.map((o) => (
@@ -315,16 +317,17 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
-  const [areas, setAreas] = useState([]);
-  const [countrySel, setCountrySel] = useState([]);
-  const [assetIds, setAssetIds] = useState([]);
+  const [areas, setAreas] = useState(null);
+  const [countrySel, setCountrySel] = useState(null);
+  const [assetIds, setAssetIds] = useState(null);
   const [openId, setOpenId] = useState(null);
 
   const inScope = useMemo(() => ALL.filter((p) =>
     (segment === "All" || p.segment === segment) && (company === "All" || p.company.includes(company))
   ), [ALL, segment, company]);
-  const pickedAssets = assetIds.filter((id) => inScope.some((p) => p.id === id));
-  const products = pickedAssets.length ? inScope.filter((p) => pickedAssets.includes(p.id)) : inScope;
+  // null = every box ticked; an empty pick also shows everything.
+  const pickedAssets = assetIds && assetIds.filter((id) => inScope.some((p) => p.id === id));
+  const products = pickedAssets?.length ? inScope.filter((p) => pickedAssets.includes(p.id)) : inScope;
   const open = ALL.find((p) => p.id === openId);
 
   // Headline numbers, computed from the dataset
@@ -346,11 +349,11 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const allCols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
   // Region narrows the columns; country narrows them further, to one market.
   const regions = [...new Set(allCols.map((c) => c.area))];
-  const pickedAreas = areas.filter((a) => regions.includes(a));
-  const regionCols = pickedAreas.length ? allCols.filter((c) => pickedAreas.includes(c.area)) : allCols;
+  const pickedAreas = areas && areas.filter((a) => regions.includes(a));
+  const regionCols = pickedAreas?.length ? allCols.filter((c) => pickedAreas.includes(c.area)) : allCols;
   const countries = [...new Set(regionCols.flatMap(marketsOf))].sort();
-  const pickedCountries = countrySel.filter((c) => countries.includes(c));
-  const cols = pickedCountries.length ? regionCols.filter((c) => marketsOf(c).some((m) => pickedCountries.includes(m))) : regionCols;
+  const pickedCountries = countrySel && countrySel.filter((c) => countries.includes(c));
+  const cols = pickedCountries?.length ? regionCols.filter((c) => marketsOf(c).some((m) => pickedCountries.includes(m))) : regionCols;
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
