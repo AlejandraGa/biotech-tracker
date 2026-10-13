@@ -1,6 +1,6 @@
 // api/rss.js — Vercel serverless function
 // Fetches HIV news: HIV-specific feeds plus trade press filtered to HIV stories
-import { isHivNews, stripPublisher, gnews } from './_lib/hivNews.js';
+import { isHivNews, stripPublisher, gnews, storyCompetitors, storyImpact, groupSameStory } from './_lib/hivNews.js';
 import { tagProduct } from './_lib/hivSignals.js';
 
 // Companies active in HIV — ticker + name variants to detect in headlines
@@ -32,6 +32,10 @@ const RSS_FEEDS = [
   { url: gnews('lenacapavir OR cabotegravir OR islatravir OR bictegravir OR doravirine OR Yeztugo OR Apretude OR Cabenuva OR Biktarvy OR Dovato'), source: 'Google News' },
   { url: gnews('"ViiV Healthcare" OR "Gilead HIV" OR "Merck HIV"'), source: 'Google News' },
   { url: gnews('HIV UNAIDS OR PEPFAR OR "Global Fund"'), source: 'Google News' },
+  // HIV specialist outlets and the competitors' own newsrooms
+  { url: gnews('HIV site:aidsmap.com'), source: 'aidsmap' },
+  { url: gnews('HIV site:natap.org'), source: 'NATAP' },
+  { url: gnews('HIV (site:gilead.com OR site:viivhealthcare.com OR site:gsk.com OR site:merck.com OR site:jnj.com)'), source: 'Company newsroom' },
   { url: 'https://www.biopharmadive.com/feeds/news/', source: 'BioPharma Dive' },
   { url: 'https://endpts.com/feed/', source: 'Endpoints News' },
   { url: 'https://www.fiercebiotech.com/rss/xml', source: 'Fierce Biotech' },
@@ -130,17 +134,22 @@ function parseRSS(xml, source) {
     const detected = detectCompanies(title + ' ' + description);
     const ticker = detected.length === 1 ? detected[0].ticker : '';
     const companies = detected; // all matches, for display
+    const { products, competitors } = storyCompetitors(title + ' ' + description);
+    const impact = storyImpact(title + ' ' + description, competitors.length > 0 || products.length > 0);
 
     items.push({
       headline: title,
       summary,
       source: publisher || source,
       date,
-      dateObj: dateObj ? dateObj.toISOString() : '',
+      dateObj: dateObj && !isNaN(dateObj) ? dateObj.toISOString() : '',
       link,
       tag,
       ticker,
       companies,
+      products,
+      competitors,
+      impact,
       ...subject,
     });
   }
@@ -235,6 +244,8 @@ export default async function handler(req, res) {
 
     // Source priority weights — higher = shown first when same date
     const SOURCE_PRIORITY = {
+      'aidsmap': 12,
+      'NATAP': 12,
       'EATG': 11,
       'BioPharma Dive': 10,
       'Endpoints News': 9,
@@ -256,8 +267,12 @@ export default async function handler(req, res) {
       const aRecent = (now - dateA) < RECENT_WINDOW;
       const bRecent = (now - dateB) < RECENT_WINDOW;
 
-      // Both recent: sort by source priority first, then date
+      // Both recent: higher impact first, then source priority, then date
       if (aRecent && bRecent) {
+        const IMPACT_RANK = { High: 2, Medium: 1, Low: 0 };
+        const iA = IMPACT_RANK[a.impact] || 0;
+        const iB = IMPACT_RANK[b.impact] || 0;
+        if (iB !== iA) return iB - iA;
         const pA = SOURCE_PRIORITY[a.source] || 0;
         const pB = SOURCE_PRIORITY[b.source] || 0;
         if (pB !== pA) return pB - pA;
@@ -270,8 +285,11 @@ export default async function handler(req, res) {
       return dateB - dateA;
     });
 
-    // Remove internal dateObj field before sending
-    const clean = allArticles.map(({ dateObj, ...rest }) => rest);
+    // One entry per story; the other outlets go in alsoIn
+    allArticles = groupSameStory(allArticles);
+
+    // Send the publication date as YYYY-MM-DD for the weekly brief
+    const clean = allArticles.map(({ dateObj, ...rest }) => ({ ...rest, published: dateObj ? dateObj.slice(0, 10) : '' }));
 
     return res.status(200).json(clean.slice(0, 80));
 

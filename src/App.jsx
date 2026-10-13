@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import CatalystCalendar from './CatalystCalendar';
 import CompetitiveLandscape from './CompetitiveLandscape';
+import MultiSelect from './MultiSelect';
 
 const DEFAULT_WATCHLIST = [
   { ticker: 'MRNA', name: 'Moderna', price: 0, change: 0, mktcap: '—', stage: 'Commercial', note: 'RSV vaccine Phase 3 readout due Q3' },
@@ -210,6 +211,39 @@ const np = {
   filterInput: { background: '#fff', border: '1px solid #d1ccc4', borderRadius: 6, padding: '7px 12px', color: '#1a1a1a', fontSize: 13, outline: 'none', flex: 1, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
   npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
+
+const IMPACT_STYLE = {
+  High: { color: '#b91c1c', bg: 'rgba(185,28,28,0.07)' },
+  Medium: { color: '#92580a', bg: 'rgba(146,88,10,0.08)' },
+  Low: { color: '#6b6760', bg: '#f3f0ea' },
+};
+const NEWS_FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+
+function ImpactPill({ impact }) {
+  if (!impact) return null;
+  const c = IMPACT_STYLE[impact] || IMPACT_STYLE.Low;
+  return <span title="Estimated from the type of news: approvals, results, prices and guidelines on a competitor are high" style={{ fontSize: 12, fontWeight: 600, padding: '2px 8px', borderRadius: 3, color: c.color, background: c.bg, fontFamily: NEWS_FONT, whiteSpace: 'nowrap' }}>{impact} impact</span>;
+}
+
+// Competitors and products named in the story, then the other outlets that ran it.
+function StoryMeta({ story }) {
+  const who = [...(story.competitors || []), ...(story.products || [])];
+  const also = story.alsoIn || [];
+  if (!who.length && !also.length) return null;
+  return (
+    <div style={{ fontSize: 12.5, color: '#777', margin: '0 0 8px 0', fontFamily: NEWS_FONT, lineHeight: 1.6 }}>
+      {who.length > 0 && <span style={{ color: '#444', fontWeight: 500 }}>{who.join(' · ')}</span>}
+      {who.length > 0 && also.length > 0 && <span> · </span>}
+      {also.length > 0 && <span>Also in: {also.map((o, i) => (
+        <React.Fragment key={o.source}>{i > 0 && ', '}{o.link ? <a href={o.link} target="_blank" rel="noopener noreferrer" style={{ color: '#777' }}>{o.source}</a> : o.source}</React.Fragment>
+      ))}</span>}
+    </div>
+  );
+}
+
+const briefKey = () => `catalyst-weekly-brief-${new Date().toISOString().slice(0, 10)}`;
+function readBrief() { try { return localStorage.getItem(briefKey()) || ''; } catch { return ''; } }
+function saveBrief(text) { try { localStorage.setItem(briefKey(), text); } catch {} }
 
 function Spinner() {
   return <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />;
@@ -599,6 +633,11 @@ export default function App() {
   const [pressReleases, setPressReleases] = useState([]);
   const [loadingPress, setLoadingPress] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [companySel, setCompanySel] = useState([]);
+  const [productSel, setProductSel] = useState([]);
+  const [impactSel, setImpactSel] = useState([]);
+  const [brief, setBrief] = useState(readBrief);
+  const [briefLoading, setBriefLoading] = useState(false);
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -626,6 +665,9 @@ export default function App() {
   }, [summaries]);
 
   const newsSource = realNews;
+  const companyOptions = ['Gilead', 'ViiV/GSK', 'MSD', 'J&J'];
+  const productOptions = [...new Set(newsSource.flatMap(n => n.products || []))].sort();
+  const impactOptions = ['High', 'Medium', 'Low'];
   const CATEGORY_KEYWORDS = {
     'Treatment': ['treatment', 'antiretroviral', 'regimen', 'switch', 'suppress', 'biktarvy', 'dovato', 'cabenuva', 'sunlenca', 'bixlenvo', 'idvynso'],
     'Prevention / PrEP': ['prep', 'prevention', 'prophylaxis', 'yeztugo', 'yeytuo', 'apretude', 'descovy', 'truvada', 'mk-8527'],
@@ -643,11 +685,29 @@ export default function App() {
       const hay = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
       if (!kws.some(kw => hay.includes(kw)) && !(n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()))) return false;
     }
+    if (companySel.length && !(n.competitors || []).some(c => companySel.includes(c))) return false;
+    if (productSel.length && !(n.products || []).some(p => productSel.includes(p))) return false;
+    if (impactSel.length && !impactSel.includes(n.impact)) return false;
     if (newsFilter) { if (!(n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '') + ' ' + (n.companies || []).map(c => c.companyName).join(' ')).toLowerCase().includes(newsFilter.toLowerCase())) return false; }
     return true;
   });
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  // Weekly brief: generated only on request, from the last 7 days' headlines, and kept for the day.
+  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  const weekStories = newsSource.filter(n => n.published && n.published >= weekAgo && !isPaywalled(n))
+    .sort((a, b) => impactOptions.indexOf(a.impact) - impactOptions.indexOf(b.impact))
+    .slice(0, 25);
+  const generateBrief = async () => {
+    setBriefLoading(true);
+    const list = weekStories.map(n => `- [${n.published}] ${n.headline} (${n.source})`).join('\n');
+    try {
+      const text = await callClaude(`You are a competitive intelligence analyst for an HIV launch readiness team. From these HIV news headlines of the last 7 days, write exactly 3 bullet points on what matters most this week for the HIV market and its competitors (Gilead, ViiV/GSK, MSD, J&J) and for access. One sentence each, each starting with "• ". Use only facts from the headlines; do not invent numbers or dates.\n\n${list}`);
+      setBrief(text); saveBrief(text);
+    } catch { setBrief('The brief could not be generated right now.'); }
+    setBriefLoading(false);
+  };
+
   const featured = filteredNews[0];
   const secondary = filteredNews.slice(1);
 
@@ -737,6 +797,23 @@ export default function App() {
               <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or company…" />
               {newsFilter && <button style={{ ...s.btnSm, fontSize: 12.5 }} onClick={() => setNewsFilter('')}>Clear</button>}
             </div>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+              <MultiSelect label="Competitor" allLabel="All competitors" selected={companySel} onChange={setCompanySel} options={companyOptions} />
+              {productOptions.length > 0 && <MultiSelect label="Product" allLabel="All products" selected={productSel} onChange={setProductSel} options={productOptions} />}
+              <MultiSelect label="Impact" allLabel="All" selected={impactSel} onChange={setImpactSel} options={impactOptions} />
+            </div>
+            {!loadingNews && weekStories.length > 0 && (
+              <div style={{ border: '1px solid #e5e0d8', borderRadius: 6, padding: '12px 16px', marginBottom: '1.5rem', background: '#fff' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: NEWS_FONT }}>What matters this week</div>
+                  {!brief && <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={generateBrief} disabled={briefLoading}>{briefLoading ? <><Spinner />Writing…</> : 'Generate brief →'}</button>}
+                </div>
+                {brief
+                  ? <div style={{ fontSize: 14, lineHeight: 1.7, color: '#333', marginTop: 8, whiteSpace: 'pre-line', fontFamily: NEWS_FONT }}>{brief}</div>
+                  : <div style={{ fontSize: 13, color: '#888', marginTop: 6, fontFamily: NEWS_FONT }}>Three lines on the {weekStories.length} most relevant stories of the last 7 days.</div>}
+                {brief && <div style={{ fontSize: 12, color: '#999', marginTop: 8, fontFamily: NEWS_FONT }}>AI-generated from this week's headlines. Check the sources before sharing.</div>}
+              </div>
+            )}
             {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading HIV news…</div>}
             {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>{realNews.length === 0 ? 'No HIV news could be loaded right now.' : 'No stories match your filter.'}</div>}
             {!loadingNews && featured && (
@@ -744,9 +821,10 @@ export default function App() {
                 <div style={np.sectionLabel}>Top Story</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' }} className="featured-grid">
                   <div>
-                    <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}><div style={np.tagPill(featured.tag)}>{featured.tag}</div><ImpactPill impact={featured.impact} /></div>
                     <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
                     <div style={np.featuredByline}>{featured.source} · {featured.date}{featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 12.5, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}</div>
+                    <StoryMeta story={featured} />
                     {featured.summary && <p style={np.featuredSummary}>{featured.summary}</p>}
                     <div style={{ marginTop: 14 }}>
                       <button style={s.btn} onClick={() => getSummary('news-0', `You are a competitive intelligence analyst covering HIV treatment and prevention. Explain this news in 3-4 sentences, including what it means for the HIV market: "${featured.headline}". Context: ${featured.summary || 'none'}. Be direct.`)}>
@@ -771,10 +849,12 @@ export default function App() {
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
                             <span style={np.tagPill(n.tag)}>{n.tag}</span>
+                            <span style={{ marginBottom: 8 }}><ImpactPill impact={n.impact} /></span>
                             <span style={{ fontSize: 12.5, color: '#999', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.source} · {n.date}</span>
                             {n.link && <a href={n.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12.5, color: '#c8102e', textDecoration: 'none', fontWeight: 600 }}>↗</a>}
                           </div>
                           <p style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: '#111', margin: '0 0 6px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.headline}</p>
+                          <StoryMeta story={n} />
                           {n.summary && <p style={{ fontSize: 13, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.summary}</p>}
                           <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `You are a competitive intelligence analyst covering HIV treatment and prevention. Explain this news in 3-4 sentences, including what it means for the HIV market: "${n.headline}". Context: ${n.summary || 'none'}.`)}>
                             {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
