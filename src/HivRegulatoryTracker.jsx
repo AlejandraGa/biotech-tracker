@@ -11,8 +11,8 @@ const AGENCY_TAG = {
   TLV: "TLV / NT-rådet (Sweden)", Medicinradet: "Medicinrådet (Denmark)", "Nye Metoder": "Nye Metoder (Norway)", "Health Canada": "Health Canada", "CDA-AMC": "CDA-AMC (Canada)", TGA: "TGA (Australia)", PBAC: "PBAC (Australia)",
 };
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
-const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", area: "UK & Ireland", hint: "Marketing authorisation" }, ...EXTRA_REGULATORS];
-const areasOf = (cols) => ["All countries", ...new Set(cols.map((c) => c.area))];
+const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", area: "United Kingdom", hint: "Marketing authorisation" }, ...EXTRA_REGULATORS];
+const ALL_REGIONS = "All regions", ALL_COUNTRIES = "All countries", ALL_ASSETS = "All assets";
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
 const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
 
@@ -74,6 +74,18 @@ function Segmented({ value, onChange, options, label }) {
         </button>
       ))}
     </div>
+  );
+}
+
+function Select({ label, value, onChange, options }) {
+  return (
+    <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
+      {label}
+      <select value={value} onChange={(e) => onChange(e.target.value)}
+        style={{ fontFamily: FONT, fontSize: 12.5, color: TEXT, padding: "6px 28px 6px 10px", border: "1px solid #d3cec6", borderRadius: 6, background: "#fff", cursor: "pointer", maxWidth: 240 }}>
+        {options.map((o) => <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>)}
+      </select>
+    </label>
   );
 }
 
@@ -162,7 +174,7 @@ function Drawer({ p, onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 700, display: "flex", justifyContent: "flex-end", background: "rgba(20,18,15,0.28)" }} onClick={onClose}>
       <aside role="dialog" aria-label={`${p.name} regulatory detail`} onClick={(e) => e.stopPropagation()}
-        style={{ width: "min(500px,100%)", height: "100%", background: "#fff", overflowY: "auto", boxShadow: "-8px 0 30px rgba(0,0,0,0.12)", fontFamily: FONT }}>
+        style={{ width: "min(760px,100%)", height: "100%", background: "#fff", overflowY: "auto", boxShadow: "-8px 0 30px rgba(0,0,0,0.12)", fontFamily: FONT }}>
         <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${LINE}`, position: "sticky", top: 0, background: "#fff" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
             <div>
@@ -253,12 +265,15 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
-  const [area, setArea] = useState("All countries");
+  const [area, setArea] = useState(ALL_REGIONS);
+  const [country, setCountry] = useState(ALL_COUNTRIES);
+  const [assetId, setAssetId] = useState(ALL_ASSETS);
   const [openId, setOpenId] = useState(null);
 
-  const products = useMemo(() => ALL.filter((p) =>
+  const inScope = useMemo(() => ALL.filter((p) =>
     (segment === "All" || p.segment === segment) && (company === "All" || p.company.includes(company))
   ), [ALL, segment, company]);
+  const products = inScope.some((p) => p.id === assetId) ? inScope.filter((p) => p.id === assetId) : inScope;
   const open = ALL.find((p) => p.id === openId);
 
   // Headline numbers, computed from the dataset
@@ -278,9 +293,13 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   ];
 
   const allCols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
-  const areas = areasOf(allCols);
-  const activeArea = areas.includes(area) ? area : "All countries";
-  const cols = activeArea === "All countries" ? allCols : allCols.filter((c) => c.area === activeArea);
+  // Region narrows the columns; country narrows them further, to one market.
+  const regions = [ALL_REGIONS, ...new Set(allCols.map((c) => c.area))];
+  const activeArea = regions.includes(area) ? area : ALL_REGIONS;
+  const regionCols = activeArea === ALL_REGIONS ? allCols : allCols.filter((c) => c.area === activeArea);
+  const countries = [ALL_COUNTRIES, ...new Set(regionCols.map((c) => c.region))];
+  const activeCountry = countries.includes(country) ? country : ALL_COUNTRIES;
+  const cols = activeCountry === ALL_COUNTRIES ? regionCols : regionCols.filter((c) => c.region === activeCountry);
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
@@ -291,9 +310,9 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         .hiv-row:hover, .hiv-row:focus-visible { background: ${PAPER} !important; outline: none; }
         .hiv-sticky { position: sticky; left: 0; z-index: 1; box-shadow: 1px 0 0 ${LINE}; }
         .sig-row:hover { background: ${PAPER}; }
-        /* Wide screens: the table scrolls with the page and its header sticks to the top.
-           Narrow screens: it scrolls inside its own frame so the first column can stay pinned. */
-        @media (max-width: 1080px) { .hiv-matrix { overflow: auto; max-height: 80vh; } }
+        /* The table scrolls inside its own frame, sideways and down, so the page itself never
+           shifts; the asset column and the header row stay pinned. */
+        .hiv-matrix { overflow: auto; max-height: 78vh; }
         @media (max-width: 760px) {
           .hiv-tl, .sig-row { grid-template-columns: 78px minmax(0,1fr) !important; }
           .hiv-tl > span:nth-child(2), .sig-row > span:nth-child(2) { display: none; }
@@ -318,13 +337,13 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
-      {view !== "Timeline" && (
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ fontSize: 12.5, color: MUTED }}>Countries</span>
-          <Segmented label="Countries" value={activeArea} onChange={setArea} options={areas} />
-          <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>
-        </div>
-      )}
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+        {view !== "Timeline" && <Select label="Region" value={activeArea} onChange={(v) => { setArea(v); setCountry(ALL_COUNTRIES); }} options={regions} />}
+        {view !== "Timeline" && <Select label="Country" value={activeCountry} onChange={setCountry} options={countries} />}
+        <Select label="Asset" value={inScope.some((p) => p.id === assetId) ? assetId : ALL_ASSETS} onChange={setAssetId}
+          options={[{ value: ALL_ASSETS, label: ALL_ASSETS }, ...inScope.map((p) => ({ value: p.id, label: p.name }))]} />
+        {view !== "Timeline" && <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>}
+      </div>
 
       {products.length === 0 && <div style={{ padding: "2rem", textAlign: "center", fontSize: 13.5, color: MUTED, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6 }}>No assets match these filters.</div>}
 

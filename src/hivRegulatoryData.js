@@ -8,9 +8,9 @@ export const VERIFIED_ON = '2026-10-09';
 
 export const AGENCIES = [
   { key: 'fda', label: 'FDA', region: 'United States', area: 'United States', hint: 'Approval decision' },
-  { key: 'chmp', label: 'EMA · CHMP', region: 'European Union', area: 'EU (central)', hint: 'Scientific opinion' },
-  { key: 'ec', label: 'European Commission', region: 'European Union', area: 'EU (central)', hint: 'Marketing authorisation' },
-  { key: 'ch', label: 'Swissmedic', region: 'Switzerland', area: 'DACH', hint: 'Authorisation decision' },
+  { key: 'chmp', label: 'EMA · CHMP', region: 'European Union', area: 'European Union', hint: 'Scientific opinion' },
+  { key: 'ec', label: 'European Commission', region: 'European Union', area: 'European Union', hint: 'Marketing authorisation' },
+  { key: 'ch', label: 'Swissmedic', region: 'Switzerland', area: 'Switzerland', hint: 'Authorisation decision' },
 ];
 
 // status → label, glyph and colours. Glyph + label carry the meaning; colour is secondary.

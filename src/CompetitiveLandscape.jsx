@@ -376,7 +376,7 @@ export default function CompetitiveLandscape() {
       {/* Page title */}
       <div style={{ margin:"0.25rem 0 1.25rem", fontFamily:mono }}>
         <h1 style={{ fontSize:24, fontWeight:600, color:"#1a1a1a", margin:"0 0 6px", letterSpacing:"-0.3px", lineHeight:1.25 }}>HIV competitive intelligence</h1>
-        <p style={{ fontSize:14, color:"#6b6760", lineHeight:1.55, margin:0, maxWidth:760 }}>Where each competitor stands with regulators and reimbursement bodies in 18 markets, what has changed recently, and the clinical pipeline behind it.</p>
+        <p style={{ fontSize:14, color:"#6b6760", lineHeight:1.55, margin:0 }}>Where each competitor stands with regulators and reimbursement bodies in 18 markets, what has changed recently, and the clinical pipeline behind it.</p>
       </div>
 
       <WhatChanged feed={feed} onSeeAll={()=>setSection("activity")} />
