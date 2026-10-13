@@ -3,6 +3,7 @@ import { AGENCIES, STATUS, PRODUCTS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRe
 import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
 import { MORE_ACCESS, MORE_EVENTS, MORE_VERIFIED_ON } from "./hivAccessMore";
 import { applyLive } from "./liveStatus";
+import HivProgressMap from "./HivProgressMap";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
 const AGENCY_TAG = {
@@ -355,6 +356,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const pickedCountries = countrySel && countrySel.filter((c) => countries.includes(c));
   const cols = pickedCountries?.length ? regionCols.filter((c) => marketsOf(c).some((m) => pickedCountries.includes(m))) : regionCols;
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
+  const matrix = view === "Regulatory" || view === "Reimbursement";
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
 
@@ -387,22 +389,22 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
       {/* Controls */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Timeline"]} />
+        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Timeline", "Map"]} />
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        {view !== "Timeline" && <MultiSelect label="Region" allLabel="All regions" selected={pickedAreas} onChange={setAreas} options={regions} />}
-        {view !== "Timeline" && <MultiSelect label="Country" allLabel="All countries" selected={pickedCountries} onChange={setCountrySel} options={countries} />}
+        {matrix && <MultiSelect label="Region" allLabel="All regions" selected={pickedAreas} onChange={setAreas} options={regions} />}
+        {matrix && <MultiSelect label="Country" allLabel="All countries" selected={pickedCountries} onChange={setCountrySel} options={countries} />}
         <MultiSelect label="Asset" allLabel="All assets" selected={pickedAssets} onChange={setAssetIds}
           options={inScope.map((p) => ({ value: p.id, label: p.name }))} />
-        {view !== "Timeline" && <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>}
+        {matrix && <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>}
       </div>
 
       {products.length === 0 && <div style={{ padding: "2rem", textAlign: "center", fontSize: 13.5, color: MUTED, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6 }}>No assets match these filters.</div>}
 
       {/* Matrix */}
-      {view !== "Timeline" && products.length > 0 && (
+      {matrix && products.length > 0 && (
         <>
           <div className="hiv-matrix" style={{ border: `1px solid ${LINE}`, borderRadius: 6, background: "#fff" }}>
             <div style={{ minWidth: 250 + cols.length * 172 }}>
@@ -439,6 +441,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
       )}
 
       {view === "Timeline" && products.length > 0 && <Timeline products={products} />}
+      {view === "Map" && products.length > 0 && <HivProgressMap products={products} onOpen={setOpenId} />}
 
       {/* Earlier pipeline */}
       {early.length > 0 && segment !== "PrEP" && (
