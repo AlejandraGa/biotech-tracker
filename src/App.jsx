@@ -110,7 +110,7 @@ function tagColor(tag) {
   if (t.includes('regulat') || t.includes('fda') || t.includes('ema') || t.includes('hta')) return { bg: 'rgba(29,78,216,0.07)', color: '#1d4ed8', border: 'rgba(29,78,216,0.2)' };
   if (t.includes('partner') || t.includes('deal')) return { bg: 'rgba(161,98,7,0.07)', color: '#a16207', border: 'rgba(161,98,7,0.2)' };
   if (t.includes('conference')) return { bg: 'rgba(190,18,60,0.07)', color: '#be123c', border: 'rgba(190,18,60,0.2)' };
-  if (t.includes('reimburse') || t.includes('pricing') || t.includes('nice') || t.includes('g-ba')) return { bg: 'rgba(5,150,105,0.07)', color: '#065f46', border: 'rgba(5,150,105,0.2)' };
+  if (t.includes('access') || t.includes('reimburse') || t.includes('pricing') || t.includes('nice') || t.includes('g-ba')) return { bg: 'rgba(5,150,105,0.07)', color: '#065f46', border: 'rgba(5,150,105,0.2)' };
   return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
 }
 
@@ -211,34 +211,36 @@ const np = {
   npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
 
-function FallbackGraphic({ seed }) {
-  const palettes = [
-    { bg: '#1a1033', lines: '#7c6af7', circles: '#a78bfa' },
-    { bg: '#0a1a1a', lines: '#34d399', circles: '#6ee7b7' },
-    { bg: '#1a1000', lines: '#fbbf24', circles: '#fde68a' },
-    { bg: '#0a0a1a', lines: '#60a5fa', circles: '#93c5fd' },
-    { bg: '#1a0a1a', lines: '#f472b6', circles: '#fbcfe8' },
-  ];
-  const p = palettes[seed % palettes.length];
+// Category icons for stories without their own image (simple strokes on a 24px grid).
+const TAG_ICONS = {
+  'Regulatory': 'M7 3h7l4 4v14H7z M14 3v4h4 M10 14l2 2 4-4',
+  'Trial Results': 'M4 20h16 M7 20v-6 M12 20V8 M17 20v-9',
+  'Conference': 'M4 6h16v10H4z M12 16v4 M8 20h8',
+  'Access & Policy': 'M12 4v16 M5 8h14 M5 8l-3 6h6z M19 8l-3 6h6z M8 20h8',
+  'Partnership': 'M9 12a4 4 0 1 0 0.01 0 M15 12a4 4 0 1 0 0.01 0',
+  'Market': 'M4 18l5-6 4 3 7-8 M15 7h5v5',
+};
+const DEFAULT_ICON = 'M5 5h14v14H5z M8 9h8 M8 12h8 M8 15h5';
+
+function CategoryTile({ tag, height }) {
+  const c = tagColor(tag);
   return (
-    <svg width="100%" height="100%" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', borderRadius: 8 }}>
-      <rect width="260" height="160" fill={p.bg} />
-      {[0,1,2,3,4].map(i => <line key={`h${i}`} x1="0" y1={32*i} x2="260" y2={32*i} stroke={p.lines} strokeOpacity="0.12" strokeWidth="0.5" />)}
-      {[0,1,2,3,4,5,6].map(i => <line key={`v${i}`} x1={40*i} y1="0" x2={40*i} y2="160" stroke={p.lines} strokeOpacity="0.12" strokeWidth="0.5" />)}
-      <circle cx="130" cy="80" r="50" fill="none" stroke={p.lines} strokeOpacity="0.25" strokeWidth="1" />
-      <circle cx="130" cy="80" r="30" fill="none" stroke={p.circles} strokeOpacity="0.2" strokeWidth="1" />
-      <circle cx="130" cy="80" r="10" fill={p.lines} fillOpacity="0.3" />
-    </svg>
+    <div style={{ width: '100%', height, borderRadius: 8, background: c.bg, border: `1px solid ${c.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+      <svg width={height > 120 ? 44 : 30} height={height > 120 ? 44 : 30} viewBox="0 0 24 24" fill="none" stroke={c.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d={TAG_ICONS[tag] || DEFAULT_ICON} />
+      </svg>
+      {height > 120 && <span style={{ fontSize: 12.5, fontWeight: 600, color: c.color, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{tag || 'HIV News'}</span>}
+    </div>
   );
 }
 
-function NewsImage({ photoKeyword, seed = 0, height = 160 }) {
+// The article's own image when the feed provides one, otherwise a category tile.
+function NewsImage({ image, tag, height = 160 }) {
   const [imgError, setImgError] = React.useState(false);
-  const imgUrl = `https://picsum.photos/seed/${encodeURIComponent(photoKeyword || seed)}/600/300`;
-  if (imgError) return <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden' }}><FallbackGraphic seed={seed} /></div>;
+  if (!image || imgError) return <CategoryTile tag={tag} height={height} />;
   return (
     <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden', background: '#f0ede8' }}>
-      <img src={imgUrl} alt="" onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block', opacity: 0.85 }} />
+      <img src={image} alt="" referrerPolicy="no-referrer" onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block' }} />
     </div>
   );
 }
@@ -789,7 +791,7 @@ export default function App() {
                     {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
                   </div>
                   <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
-                    <NewsImage photoKeyword={featured.photoKeyword} seed={0} height={200} />
+                    <NewsImage image={featured.image} tag={featured.tag} height={200} />
                   </div>
                 </div>
               </div>
@@ -805,7 +807,7 @@ export default function App() {
                         onMouseOver={e => e.currentTarget.style.background = '#faf8f5'}
                         onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
                         <div style={{ flexShrink: 0, width: 130, height: 90, borderRadius: 6, overflow: 'hidden' }} className="story-thumb">
-                          <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={90} />
+                          <NewsImage image={n.image} tag={n.tag} height={90} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>

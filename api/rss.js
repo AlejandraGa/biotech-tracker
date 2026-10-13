@@ -123,7 +123,7 @@ function parseRSS(xml, source) {
     else if (text.includes('partner') || text.includes('deal') || text.includes('acqui') || text.includes('merger') || text.includes('licens')) tag = 'Partnership';
     else if (text.includes('earning') || text.includes('revenue') || text.includes('sales') || text.includes('quarter')) tag = 'Market';
 
-    const photoKeyword = extractPhotoKeyword(title, tag);
+    const image = extractImage(block);
 
     // Detect company mentions in headline + summary
     const detected = detectCompanies(title + ' ' + description);
@@ -140,34 +140,21 @@ function parseRSS(xml, source) {
       tag,
       ticker,
       companies,
-      photoKeyword,
+      image,
     });
   }
 
   return items;
 }
 
-function extractPhotoKeyword(title, tag) {
-  const t = title.toLowerCase();
-  if (t.includes('hiv') || t.includes('aids')) return 'HIV virus research';
-  if (t.includes('cancer') || t.includes('oncol') || t.includes('tumor')) return 'cancer research laboratory';
-  if (t.includes('vaccine') || t.includes('immuniz')) return 'vaccine syringe medical';
-  if (t.includes('alzheimer') || t.includes('dementia') || t.includes('neuro')) return 'brain neuroscience';
-  if (t.includes('diabetes') || t.includes('insulin') || t.includes('glp')) return 'diabetes insulin medical';
-  if (t.includes('crispr') || t.includes('gene edit') || t.includes('gene therapy')) return 'DNA genetics laboratory';
-  if (t.includes('mrna') || t.includes('rna')) return 'mRNA molecule science';
-  if (t.includes('fda') || t.includes('approv') || t.includes('regulat') || t.includes('ema')) return 'FDA medicine approval';
-  if (t.includes('merger') || t.includes('acqui') || t.includes('deal') || t.includes('invest') || t.includes('ipo')) return 'pharmaceutical business deal';
-  if (t.includes('clinical trial') || t.includes('phase')) return 'clinical trial patient doctor';
-  if (t.includes('antibody') || t.includes('immuno')) return 'antibody immunology research';
-  if (t.includes('heart') || t.includes('cardio')) return 'heart cardiology medical';
-  if (t.includes('rare disease') || t.includes('orphan')) return 'rare disease laboratory';
-  if (t.includes('manufactur') || t.includes('supply chain')) return 'pharmaceutical manufacturing';
-  if (t.includes('obesity') || t.includes('weight loss')) return 'obesity medicine health';
-  if (t.includes('ai') || t.includes('artificial intel') || t.includes('machine learn')) return 'artificial intelligence technology';
-  if (tag === 'Finance') return 'pharmaceutical stock finance';
-  if (tag === 'Conference') return 'medical conference doctors';
-  return 'pharmaceutical research laboratory';
+// The article's own picture, if the feed carries one (media tags, enclosure or an <img>).
+function extractImage(block) {
+  const m = /<media:(?:content|thumbnail)[^>]*url="([^"]+)"/i.exec(block)
+    || /<enclosure[^>]*url="([^"]+)"[^>]*type="image/i.exec(block)
+    || /<img[^>]*src="([^"]+)"/i.exec(block.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'));
+  const url = m ? m[1].replace(/&amp;/g, '&') : '';
+  // Skip tracking pixels and Google News logos.
+  return /^https:\/\//.test(url) && !/feedburner|pixel|1x1|gstatic\.com|googleusercontent/i.test(url) ? url : '';
 }
 
 // Deduplicate by headline similarity
