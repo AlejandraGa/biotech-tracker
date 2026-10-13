@@ -12,6 +12,10 @@ const AGENCY_TAG = {
 };
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
 const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", area: "United Kingdom", hint: "Marketing authorisation" }, ...EXTRA_REGULATORS];
+// The EU authorisation (EMA opinion, Commission decision) applies in every EU/EEA market we track,
+// so those countries list both EU columns when picked on their own.
+const EU_MARKETS = ["Austria", "Belgium", "Denmark", "France", "Germany", "Ireland", "Italy", "Netherlands", "Norway", "Portugal", "Spain", "Sweden"];
+const marketsOf = (c) => (c.region === "European Union" ? EU_MARKETS : [c.region]);
 const ALL_REGIONS = "All regions", ALL_COUNTRIES = "All countries", ALL_ASSETS = "All assets";
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
 const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
@@ -297,9 +301,9 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const regions = [ALL_REGIONS, ...new Set(allCols.map((c) => c.area))];
   const activeArea = regions.includes(area) ? area : ALL_REGIONS;
   const regionCols = activeArea === ALL_REGIONS ? allCols : allCols.filter((c) => c.area === activeArea);
-  const countries = [ALL_COUNTRIES, ...new Set(regionCols.map((c) => c.region))];
+  const countries = [ALL_COUNTRIES, ...[...new Set(regionCols.flatMap(marketsOf))].sort()];
   const activeCountry = countries.includes(country) ? country : ALL_COUNTRIES;
-  const cols = activeCountry === ALL_COUNTRIES ? regionCols : regionCols.filter((c) => c.region === activeCountry);
+  const cols = activeCountry === ALL_COUNTRIES ? regionCols : regionCols.filter((c) => marketsOf(c).includes(activeCountry));
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
