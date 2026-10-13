@@ -764,7 +764,7 @@ export default function App() {
             {!loadingNews && featured && (
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={np.sectionLabel}>Top Story</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' }} className="featured-grid">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' }} className="featured-grid">
                   <div>
                     <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                     <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
@@ -776,9 +776,6 @@ export default function App() {
                       </button>
                     </div>
                     {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
-                  </div>
-                  <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
-                    <StoryCard story={featured} height={200} />
                   </div>
                 </div>
               </div>
