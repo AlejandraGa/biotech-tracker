@@ -250,11 +250,11 @@ function LaunchTimeline({ p, progress, today }) {
         @media (max-width: 760px) { .hiv-ls { grid-template-columns: 112px minmax(380px,1fr) 150px; column-gap: 10px; } }
       `}</style>
       <div className="hiv-ls-scroll">
-        <div style={{ minWidth: 640 }}>
+        <div className="hiv-ls-inner" style={{ minWidth: 640 }}>
           {/* Year axis */}
           <div className="hiv-ls" style={{ height: 22 }}>
             <span />
-            <div style={{ position: "relative", height: "100%" }}>
+            <div className="hiv-ls-axis" style={{ position: "relative", height: "100%" }}>
               {years.filter((y, i) => i % step === 0).map((y) => <span key={y} style={{ position: "absolute", left: x(`${y}-01-01`), bottom: 4, fontSize: 11.5, color: MUTED, transform: "translateX(-50%)", fontVariantNumeric: "tabular-nums" }}>{y}</span>)}
               <span style={{ position: "absolute", left: x(today), bottom: 4, fontSize: 11.5, color: INK, fontWeight: 600, transform: "translateX(-50%)", background: "#fff", padding: "0 3px" }}>Today</span>
             </div>

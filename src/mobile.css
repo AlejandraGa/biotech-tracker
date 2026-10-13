@@ -60,6 +60,15 @@
   .hiv-asset-head { grid-template-columns: 1fr !important; gap: 4px !important; }
   .hiv-asset-head > :last-child { justify-self: start; }
 
+  /* Map view launch sequence: fit the screen instead of scrolling sideways;
+     the time-to-reimbursement note moves under each bar. */
+  .hiv-ls-inner { min-width: 0 !important; }
+  .hiv-ls { grid-template-columns: 104px minmax(0, 1fr) !important; column-gap: 10px !important; padding: 4px 0; }
+  .hiv-ls-axis > span:nth-child(even):not(:last-child) { display: none; }
+  .hiv-ls-axis > span:last-child { transform: translateX(-100%) !important; }
+  .hiv-ls > :nth-child(3) { grid-column: 2; }
+  .hiv-ls:first-child > :nth-child(3) { display: none; }
+
   /* Clinical pipeline search form */
   .cl-inputs { grid-template-columns: 1fr !important; }
 }
