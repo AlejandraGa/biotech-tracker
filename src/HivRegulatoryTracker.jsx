@@ -1,21 +1,39 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AGENCIES, STATUS, PRODUCTS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRegulatoryData";
-import { ACCESS_BODIES, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
+import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
+import { MORE_ACCESS, MORE_EVENTS, MORE_VERIFIED_ON } from "./hivAccessMore";
 import { applyLive } from "./liveStatus";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
-const AGENCY_TAG = { FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Dachverband: "Dachverband (Austria)", Company: "Company update" };
+const AGENCY_TAG = {
+  FDA: "FDA", CHMP: "EMA · CHMP", EC: "European Commission", Swissmedic: "Swissmedic", MHRA: "MHRA", NICE: "NICE", "G-BA": "G-BA", HAS: "HAS", BAG: "BAG", Dachverband: "Dachverband (Austria)", Company: "Company update",
+  SMC: "SMC (Scotland)", NCPE: "NCPE / HSE (Ireland)", AIFA: "AIFA (Italy)", Spain: "Ministry of Health (Spain)", INFARMED: "INFARMED (Portugal)", Zorginstituut: "Zorginstituut (Netherlands)", RIZIV: "RIZIV / INAMI (Belgium)",
+  TLV: "TLV / NT-rådet (Sweden)", Medicinradet: "Medicinrådet (Denmark)", "Nye Metoder": "Nye Metoder (Norway)", "Health Canada": "Health Canada", "CDA-AMC": "CDA-AMC (Canada)", TGA: "TGA (Australia)", PBAC: "PBAC (Australia)",
+};
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
-const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", hint: "Marketing authorisation" }];
+const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kingdom", area: "United Kingdom", hint: "Marketing authorisation" }, ...EXTRA_REGULATORS];
+// The EU authorisation (EMA opinion, Commission decision) applies in every EU/EEA market we track,
+// so those countries list both EU columns when picked on their own.
+const EU_MARKETS = ["Austria", "Belgium", "Denmark", "France", "Germany", "Ireland", "Italy", "Netherlands", "Norway", "Portugal", "Spain", "Sweden"];
+const marketsOf = (c) => (c.region === "European Union" ? EU_MARKETS : [c.region]);
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
 const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
+
+const UNVERIFIED = { s: "none", note: "Not verified" };
 
 // Curated regulatory data joined with the market-access data for each asset.
 const BASE = PRODUCTS.map((p) => {
   const a = ACCESS[p.id];
   if (!a) return { ...p, access: {} };
-  const { mhra, events, watch, ...access } = a;
-  return { ...p, reg: { ...p.reg, mhra }, access, events: [...p.events, ...events], watch: watch || p.watch };
+  const { hc, tga, ...more } = MORE_ACCESS[p.id] || {};
+  const { mhra, events, watch, ...own } = a;
+  const curated = { ...own, ...more };
+  // Bodies added later default to "not verified", or "not authorised" for assets with no EU authorisation.
+  const unauthorised = curated.gba?.note === "Not authorised here";
+  const fallback = unauthorised ? curated.gba : UNVERIFIED;
+  const regFallback = unauthorised ? { s: "none", note: "No public announcement found" } : UNVERIFIED;
+  const access = Object.fromEntries(ACCESS_BODIES.map((b) => [b.key, curated[b.key] || fallback]));
+  return { ...p, reg: { ...p.reg, mhra, hc: hc || regFallback, tga: tga || regFallback }, access, events: [...p.events, ...events, ...(MORE_EVENTS[p.id] || [])], watch: watch || p.watch };
 });
 const OUTCOME = {
   approved: STATUS.approved,
@@ -51,7 +69,7 @@ function SourceLink({ href, children = "Source" }) {
 
 function Segmented({ value, onChange, options, label }) {
   return (
-    <div role="group" aria-label={label} style={{ display: "inline-flex", border: `1px solid #d3cec6`, borderRadius: 6, overflow: "hidden", background: "#fff" }}>
+    <div role="group" aria-label={label} style={{ display: "inline-flex", flexWrap: "wrap", maxWidth: "100%", border: `1px solid #d3cec6`, borderRadius: 6, overflow: "hidden", background: "#fff" }}>
       {options.map((o, i) => (
         <button key={o} onClick={() => onChange(o)} aria-pressed={value === o}
           style={{ padding: "6px 13px", fontSize: 12.5, fontFamily: FONT, cursor: "pointer", border: "none", borderLeft: i ? `1px solid #d3cec6` : "none", background: value === o ? INK : "#fff", color: value === o ? "#fff" : TEXT, fontWeight: value === o ? 500 : 400 }}>
@@ -60,6 +78,65 @@ function Segmented({ value, onChange, options, label }) {
       ))}
     </div>
   );
+}
+
+// Multi-select dropdown. "All" ticks every box; an empty selection is stored as "all", so unticking one box shows the rest.
+function MultiSelect({ label, allLabel, selected, onChange, options }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
+  }, [open]);
+  const opts = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
+  const isAll = selected.length === 0 || selected.length === opts.length;
+  const isOn = (v) => isAll || selected.includes(v);
+  const picked = opts.filter((o) => selected.includes(o.value));
+  const summary = isAll ? allLabel : picked.length <= 2 ? picked.map((o) => o.label).join(", ") : `${picked.length} of ${opts.length} selected`;
+  const toggle = (v) => {
+    const base = isAll ? opts.map((o) => o.value) : selected;
+    const next = base.includes(v) ? base.filter((x) => x !== v) : [...base, v];
+    onChange(next.length === opts.length ? [] : next);
+  };
+  return (
+    <div ref={ref} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
+      {label}
+      <span style={{ position: "relative" }}>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-haspopup="listbox" aria-expanded={open}
+        style={{ fontFamily: FONT, fontSize: 12.5, color: TEXT, padding: "6px 10px", border: "1px solid #d3cec6", borderRadius: 6, background: "#fff", cursor: "pointer", minWidth: 150, maxWidth: 260, display: "inline-flex", justifyContent: "space-between", gap: 10 }}>
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{summary}</span>
+        <span aria-hidden="true" style={{ color: MUTED }}>▾</span>
+      </button>
+      {open && (
+        <div role="listbox" aria-multiselectable="true" style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: 6, minWidth: 220, maxHeight: 320, overflowY: "auto" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", fontSize: 13, fontWeight: 600, color: INK, cursor: "pointer", borderBottom: `1px solid ${HAIR}`, marginBottom: 2 }}>
+            <input type="checkbox" checked={isAll} onChange={() => onChange([])} />
+            {allLabel}
+          </label>
+          {opts.map((o) => (
+            <label key={o.value} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", fontSize: 13, color: TEXT, cursor: "pointer", borderRadius: 4 }}>
+              <input type="checkbox" checked={isOn(o.value)} onChange={() => toggle(o.value)} />
+              {o.label}
+            </label>
+          ))}
+        </div>
+      )}
+      </span>
+    </div>
+  );
+}
+
+// Development stage, always shown in the same place: top right of the asset cell.
+function StagePill({ stage }) {
+  if (!stage) return null;
+  const tone = /^marketed/i.test(stage) ? { color: "#166534", bg: "rgba(22,101,52,0.08)" }
+    : /review/i.test(stage) ? { color: "#92580a", bg: "rgba(146,88,10,0.09)" }
+    : { color: MUTED, bg: "#f3f0ea" };
+  return <span style={{ fontSize: 11, fontWeight: 500, color: tone.color, background: tone.bg, borderRadius: 10, padding: "2px 8px", whiteSpace: "nowrap", lineHeight: 1.5 }}>{stage}</span>;
 }
 
 // ─── MATRIX ──────────────────────────────────────────────────────────────────
@@ -90,9 +167,9 @@ function ProductRow({ p, active, onOpen, cols, pick }) {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
       style={{ display: "grid", gridTemplateColumns: gridFor(cols.length), borderTop: `1px solid ${LINE}`, cursor: "pointer", background: active ? PAPER : "#fff" }}>
       <div className="hiv-sticky" style={{ padding: "11px 16px", minWidth: 0, background: "inherit" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: INK }}>{p.name}</span>
-          <span style={{ fontSize: 11.5, color: FAINT }}>{p.stage}</span>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", alignItems: "start", gap: 8 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.35 }}>{p.name}</span>
+          <StagePill stage={p.stage} />
         </div>
         {showInn && <div style={{ fontSize: 12.5, color: TEXT, marginTop: 1, lineHeight: 1.4 }}>{p.inn}</div>}
         <div style={{ fontSize: 12, color: MUTED, marginTop: 3, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
@@ -147,7 +224,7 @@ function Drawer({ p, onClose }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 700, display: "flex", justifyContent: "flex-end", background: "rgba(20,18,15,0.28)" }} onClick={onClose}>
       <aside role="dialog" aria-label={`${p.name} regulatory detail`} onClick={(e) => e.stopPropagation()}
-        style={{ width: "min(500px,100%)", height: "100%", background: "#fff", overflowY: "auto", boxShadow: "-8px 0 30px rgba(0,0,0,0.12)", fontFamily: FONT }}>
+        style={{ width: "min(760px,100%)", height: "100%", background: "#fff", overflowY: "auto", boxShadow: "-8px 0 30px rgba(0,0,0,0.12)", fontFamily: FONT }}>
         <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${LINE}`, position: "sticky", top: 0, background: "#fff" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
             <div>
@@ -238,11 +315,16 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
+  const [areas, setAreas] = useState([]);
+  const [countrySel, setCountrySel] = useState([]);
+  const [assetIds, setAssetIds] = useState([]);
   const [openId, setOpenId] = useState(null);
 
-  const products = useMemo(() => ALL.filter((p) =>
+  const inScope = useMemo(() => ALL.filter((p) =>
     (segment === "All" || p.segment === segment) && (company === "All" || p.company.includes(company))
   ), [ALL, segment, company]);
+  const pickedAssets = assetIds.filter((id) => inScope.some((p) => p.id === id));
+  const products = pickedAssets.length ? inScope.filter((p) => pickedAssets.includes(p.id)) : inScope;
   const open = ALL.find((p) => p.id === openId);
 
   // Headline numbers, computed from the dataset
@@ -256,12 +338,19 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
   const stats = [
     { label: "Assets tracked", value: products.length, sub: `${products.filter((p) => p.segment === "Treatment").length} treatment, ${products.filter((p) => p.segment === "PrEP").length} PrEP` },
-    { label: "Decisions in the last 12 months", value: decisions12m.length, sub: decisions12m.slice(0, 3).map((e) => e.product.split(" ·")[0]).join(", ") || "None" },
+    { label: "Decisions in the last 12 months", value: decisions12m.length, sub: [...new Set(decisions12m.map((e) => e.product.split(" ·")[0]))].slice(0, 3).join(", ") || "None" },
     { label: "Under review now", value: underReview.length, sub: underReview.map((x) => `${x.p.name.split(" ·")[0]} at ${x.a.label.replace("EMA · ", "")}`).join(", ") || "None" },
     { label: "Next dated decision", value: nextDated ? fmtDate(nextDated.date) : "None", sub: nextDated ? `${nextDated.product}, ${AGENCY_TAG[nextDated.agency]}` : "No published dates" },
   ];
 
-  const cols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
+  const allCols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
+  // Region narrows the columns; country narrows them further, to one market.
+  const regions = [...new Set(allCols.map((c) => c.area))];
+  const pickedAreas = areas.filter((a) => regions.includes(a));
+  const regionCols = pickedAreas.length ? allCols.filter((c) => pickedAreas.includes(c.area)) : allCols;
+  const countries = [...new Set(regionCols.flatMap(marketsOf))].sort();
+  const pickedCountries = countrySel.filter((c) => countries.includes(c));
+  const cols = pickedCountries.length ? regionCols.filter((c) => marketsOf(c).some((m) => pickedCountries.includes(m))) : regionCols;
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
@@ -272,9 +361,9 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         .hiv-row:hover, .hiv-row:focus-visible { background: ${PAPER} !important; outline: none; }
         .hiv-sticky { position: sticky; left: 0; z-index: 1; box-shadow: 1px 0 0 ${LINE}; }
         .sig-row:hover { background: ${PAPER}; }
-        /* Wide screens: the table scrolls with the page and its header sticks to the top.
-           Narrow screens: it scrolls inside its own frame so the first column can stay pinned. */
-        @media (max-width: 1080px) { .hiv-matrix { overflow: auto; max-height: 80vh; } }
+        /* The table scrolls inside its own frame, sideways and down, so the page itself never
+           shifts; the asset column and the header row stay pinned. */
+        .hiv-matrix { overflow: auto; max-height: 78vh; }
         @media (max-width: 760px) {
           .hiv-tl, .sig-row { grid-template-columns: 78px minmax(0,1fr) !important; }
           .hiv-tl > span:nth-child(2), .sig-row > span:nth-child(2) { display: none; }
@@ -298,6 +387,13 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Timeline"]} />
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
+      </div>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+        {view !== "Timeline" && <MultiSelect label="Region" allLabel="All regions" selected={pickedAreas} onChange={setAreas} options={regions} />}
+        {view !== "Timeline" && <MultiSelect label="Country" allLabel="All countries" selected={pickedCountries} onChange={setCountrySel} options={countries} />}
+        <MultiSelect label="Asset" allLabel="All assets" selected={pickedAssets} onChange={setAssetIds}
+          options={inScope.map((p) => ({ value: p.id, label: p.name }))} />
+        {view !== "Timeline" && <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>}
       </div>
 
       {products.length === 0 && <div style={{ padding: "2rem", textAlign: "center", fontSize: 13.5, color: MUTED, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6 }}>No assets match these filters.</div>}
@@ -365,8 +461,8 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         {liveResult.checked > 0
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA, EMA and Swiss reimbursement columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
-        Swissmedic, MHRA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
-        Reimbursement entries (NICE, G-BA, HAS, Spezialitätenliste, Erstattungskodex) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)}; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
+        Swissmedic, MHRA, Health Canada, TGA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
+        Reimbursement entries ({ACCESS_BODIES.map((b) => b.label).join(", ")}) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)} for NICE, G-BA, HAS, BAG and the Dachverband and on {fmtDate(MORE_VERIFIED_ON)} for the rest; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
         "No public filing" means no announcement was found, not that none exists.
       </p>
 

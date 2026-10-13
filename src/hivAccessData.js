@@ -5,12 +5,31 @@
 
 export const ACCESS_VERIFIED_ON = '2026-10-10';
 
+// `area` drives the country filter above the table.
 export const ACCESS_BODIES = [
-  { key: 'nice', label: 'NICE', region: 'England', hint: 'Technology appraisal' },
-  { key: 'gba', label: 'G-BA', region: 'Germany', hint: 'Added-benefit assessment' },
-  { key: 'has', label: 'HAS', region: 'France', hint: 'Transparency Committee opinion' },
-  { key: 'sl', label: 'BAG · Spezialitätenliste', region: 'Switzerland', hint: 'Listing and public price' },
-  { key: 'eko', label: 'Dachverband · Erstattungskodex', region: 'Austria', hint: 'Reimbursement listing' },
+  { key: 'gba', label: 'G-BA', region: 'Germany', area: 'DACH', hint: 'Added-benefit assessment' },
+  { key: 'sl', label: 'BAG · Spezialitätenliste', region: 'Switzerland', area: 'DACH', hint: 'Listing and public price' },
+  { key: 'eko', label: 'Dachverband · Erstattungskodex', region: 'Austria', area: 'DACH', hint: 'Reimbursement listing' },
+  { key: 'nice', label: 'NICE', region: 'England', area: 'UK & Ireland', hint: 'Technology appraisal' },
+  { key: 'smc', label: 'SMC', region: 'Scotland', area: 'UK & Ireland', hint: 'Medicines advice' },
+  { key: 'ie', label: 'NCPE · HSE', region: 'Ireland', area: 'UK & Ireland', hint: 'HTA and reimbursement' },
+  { key: 'has', label: 'HAS', region: 'France', area: 'Rest of EU', hint: 'Transparency Committee opinion' },
+  { key: 'it', label: 'AIFA', region: 'Italy', area: 'Rest of EU', hint: 'Reimbursement class' },
+  { key: 'es', label: 'Ministry of Health · CIPM', region: 'Spain', area: 'Rest of EU', hint: 'Price and funding' },
+  { key: 'pt', label: 'INFARMED', region: 'Portugal', area: 'Rest of EU', hint: 'Public funding decision' },
+  { key: 'nl', label: 'Zorginstituut', region: 'Netherlands', area: 'Rest of EU', hint: 'GVS reimbursement advice' },
+  { key: 'be', label: 'RIZIV · INAMI', region: 'Belgium', area: 'Rest of EU', hint: 'Reimbursement' },
+  { key: 'se', label: 'TLV · NT-rådet', region: 'Sweden', area: 'Nordics', hint: 'Subsidy or recommendation' },
+  { key: 'dk', label: 'Medicinrådet', region: 'Denmark', area: 'Nordics', hint: 'Recommendation' },
+  { key: 'no', label: 'Nye Metoder', region: 'Norway', area: 'Nordics', hint: 'Introduction decision' },
+  { key: 'cda', label: 'CDA-AMC', region: 'Canada', area: 'Canada & Australia', hint: 'Reimbursement recommendation' },
+  { key: 'pbac', label: 'PBAC · PBS', region: 'Australia', area: 'Canada & Australia', hint: 'Recommendation and listing' },
+];
+
+// Regulators outside the FDA / EMA / Swissmedic / MHRA set; they join the regulatory view.
+export const EXTRA_REGULATORS = [
+  { key: 'hc', label: 'Health Canada', region: 'Canada', area: 'Canada & Australia', hint: 'Notice of Compliance' },
+  { key: 'tga', label: 'TGA', region: 'Australia', area: 'Canada & Australia', hint: 'ARTG registration' },
 ];
 
 const S = {
