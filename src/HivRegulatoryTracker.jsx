@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AGENCIES, STATUS, PRODUCTS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRegulatoryData";
 import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
 import { MORE_ACCESS, MORE_EVENTS, MORE_VERIFIED_ON } from "./hivAccessMore";
@@ -16,7 +16,6 @@ const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kin
 // so those countries list both EU columns when picked on their own.
 const EU_MARKETS = ["Austria", "Belgium", "Denmark", "France", "Germany", "Ireland", "Italy", "Netherlands", "Norway", "Portugal", "Spain", "Sweden"];
 const marketsOf = (c) => (c.region === "European Union" ? EU_MARKETS : [c.region]);
-const ALL_REGIONS = "All regions", ALL_COUNTRIES = "All countries", ALL_ASSETS = "All assets";
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
 const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
 
@@ -81,15 +80,47 @@ function Segmented({ value, onChange, options, label }) {
   );
 }
 
-function Select({ label, value, onChange, options }) {
+// Multi-select dropdown: nothing ticked means everything is shown.
+function MultiSelect({ label, allLabel, selected, onChange, options }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const close = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const esc = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
+  }, [open]);
+  const opts = options.map((o) => (typeof o === "string" ? { value: o, label: o } : o));
+  const picked = opts.filter((o) => selected.includes(o.value));
+  const summary = picked.length === 0 ? allLabel : picked.length <= 2 ? picked.map((o) => o.label).join(", ") : `${picked.length} selected`;
+  const toggle = (v) => onChange(selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v]);
   return (
-    <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
+    <div ref={ref} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
       {label}
-      <select value={value} onChange={(e) => onChange(e.target.value)}
-        style={{ fontFamily: FONT, fontSize: 12.5, color: TEXT, padding: "6px 28px 6px 10px", border: "1px solid #d3cec6", borderRadius: 6, background: "#fff", cursor: "pointer", maxWidth: 240 }}>
-        {options.map((o) => <option key={o.value ?? o} value={o.value ?? o}>{o.label ?? o}</option>)}
-      </select>
-    </label>
+      <span style={{ position: "relative" }}>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-haspopup="listbox" aria-expanded={open}
+        style={{ fontFamily: FONT, fontSize: 12.5, color: TEXT, padding: "6px 10px", border: "1px solid #d3cec6", borderRadius: 6, background: "#fff", cursor: "pointer", minWidth: 150, maxWidth: 260, display: "inline-flex", justifyContent: "space-between", gap: 10 }}>
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{summary}</span>
+        <span aria-hidden="true" style={{ color: MUTED }}>▾</span>
+      </button>
+      {open && (
+        <div role="listbox" aria-multiselectable="true" style={{ position: "absolute", top: "calc(100% + 4px)", left: 0, zIndex: 20, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, boxShadow: "0 8px 24px rgba(0,0,0,0.10)", padding: 6, minWidth: 220, maxHeight: 320, overflowY: "auto" }}>
+          <button type="button" onClick={() => onChange([])} disabled={!selected.length}
+            style={{ width: "100%", textAlign: "left", fontFamily: FONT, fontSize: 12.5, padding: "6px 8px", border: "none", background: "none", color: selected.length ? "#1e40af" : FAINT, cursor: selected.length ? "pointer" : "default" }}>
+            {allLabel}
+          </button>
+          {opts.map((o) => (
+            <label key={o.value} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", fontSize: 13, color: TEXT, cursor: "pointer", borderRadius: 4 }}>
+              <input type="checkbox" checked={selected.includes(o.value)} onChange={() => toggle(o.value)} />
+              {o.label}
+            </label>
+          ))}
+        </div>
+      )}
+      </span>
+    </div>
   );
 }
 
@@ -269,15 +300,16 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
   const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
   const [company, setCompany] = useState("All");
-  const [area, setArea] = useState(ALL_REGIONS);
-  const [country, setCountry] = useState(ALL_COUNTRIES);
-  const [assetId, setAssetId] = useState(ALL_ASSETS);
+  const [areas, setAreas] = useState([]);
+  const [countrySel, setCountrySel] = useState([]);
+  const [assetIds, setAssetIds] = useState([]);
   const [openId, setOpenId] = useState(null);
 
   const inScope = useMemo(() => ALL.filter((p) =>
     (segment === "All" || p.segment === segment) && (company === "All" || p.company.includes(company))
   ), [ALL, segment, company]);
-  const products = inScope.some((p) => p.id === assetId) ? inScope.filter((p) => p.id === assetId) : inScope;
+  const pickedAssets = assetIds.filter((id) => inScope.some((p) => p.id === id));
+  const products = pickedAssets.length ? inScope.filter((p) => pickedAssets.includes(p.id)) : inScope;
   const open = ALL.find((p) => p.id === openId);
 
   // Headline numbers, computed from the dataset
@@ -291,19 +323,19 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
   const stats = [
     { label: "Assets tracked", value: products.length, sub: `${products.filter((p) => p.segment === "Treatment").length} treatment, ${products.filter((p) => p.segment === "PrEP").length} PrEP` },
-    { label: "Decisions in the last 12 months", value: decisions12m.length, sub: decisions12m.slice(0, 3).map((e) => e.product.split(" ·")[0]).join(", ") || "None" },
+    { label: "Decisions in the last 12 months", value: decisions12m.length, sub: [...new Set(decisions12m.map((e) => e.product.split(" ·")[0]))].slice(0, 3).join(", ") || "None" },
     { label: "Under review now", value: underReview.length, sub: underReview.map((x) => `${x.p.name.split(" ·")[0]} at ${x.a.label.replace("EMA · ", "")}`).join(", ") || "None" },
     { label: "Next dated decision", value: nextDated ? fmtDate(nextDated.date) : "None", sub: nextDated ? `${nextDated.product}, ${AGENCY_TAG[nextDated.agency]}` : "No published dates" },
   ];
 
   const allCols = view === "Reimbursement" ? ACCESS_BODIES : REG_COLS;
   // Region narrows the columns; country narrows them further, to one market.
-  const regions = [ALL_REGIONS, ...new Set(allCols.map((c) => c.area))];
-  const activeArea = regions.includes(area) ? area : ALL_REGIONS;
-  const regionCols = activeArea === ALL_REGIONS ? allCols : allCols.filter((c) => c.area === activeArea);
-  const countries = [ALL_COUNTRIES, ...[...new Set(regionCols.flatMap(marketsOf))].sort()];
-  const activeCountry = countries.includes(country) ? country : ALL_COUNTRIES;
-  const cols = activeCountry === ALL_COUNTRIES ? regionCols : regionCols.filter((c) => marketsOf(c).includes(activeCountry));
+  const regions = [...new Set(allCols.map((c) => c.area))];
+  const pickedAreas = areas.filter((a) => regions.includes(a));
+  const regionCols = pickedAreas.length ? allCols.filter((c) => pickedAreas.includes(c.area)) : allCols;
+  const countries = [...new Set(regionCols.flatMap(marketsOf))].sort();
+  const pickedCountries = countrySel.filter((c) => countries.includes(c));
+  const cols = pickedCountries.length ? regionCols.filter((c) => marketsOf(c).some((m) => pickedCountries.includes(m))) : regionCols;
   const pick = view === "Reimbursement" ? (p, k) => p.access?.[k] : (p, k) => p.reg[k];
   const groups = ["Treatment", "PrEP"].filter((g) => segment === "All" || segment === g);
   const early = EARLY_PIPELINE.filter((e) => company === "All" || e.company.includes(company));
@@ -342,10 +374,10 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        {view !== "Timeline" && <Select label="Region" value={activeArea} onChange={(v) => { setArea(v); setCountry(ALL_COUNTRIES); }} options={regions} />}
-        {view !== "Timeline" && <Select label="Country" value={activeCountry} onChange={setCountry} options={countries} />}
-        <Select label="Asset" value={inScope.some((p) => p.id === assetId) ? assetId : ALL_ASSETS} onChange={setAssetId}
-          options={[{ value: ALL_ASSETS, label: ALL_ASSETS }, ...inScope.map((p) => ({ value: p.id, label: p.name }))]} />
+        {view !== "Timeline" && <MultiSelect label="Region" allLabel="All regions" selected={pickedAreas} onChange={setAreas} options={regions} />}
+        {view !== "Timeline" && <MultiSelect label="Country" allLabel="All countries" selected={pickedCountries} onChange={setCountrySel} options={countries} />}
+        <MultiSelect label="Asset" allLabel="All assets" selected={pickedAssets} onChange={setAssetIds}
+          options={inScope.map((p) => ({ value: p.id, label: p.name }))} />
         {view !== "Timeline" && <span style={{ fontSize: 12, color: FAINT }}>{cols.length} of {allCols.length} {view === "Reimbursement" ? "bodies" : "regulators"} shown</span>}
       </div>
 
