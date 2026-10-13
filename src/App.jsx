@@ -217,9 +217,6 @@ function StoryMeta({ story }) {
   );
 }
 
-const briefKey = () => `catalyst-weekly-brief-${new Date().toISOString().slice(0, 10)}`;
-function readBrief() { try { return localStorage.getItem(briefKey()) || ''; } catch { return ''; } }
-function saveBrief(text) { try { localStorage.setItem(briefKey(), text); } catch {} }
 
 function Spinner() {
   return <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />;
@@ -611,8 +608,9 @@ export default function App() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [companySel, setCompanySel] = useState(null);
   const [productSel, setProductSel] = useState(null);
-  const [brief, setBrief] = useState(readBrief);
-  const [briefLoading, setBriefLoading] = useState(false);
+  // Weekly brief: written once a day on the server (/api/brief) and shared by every visitor.
+  const [brief, setBrief] = useState('');
+  const [briefState, setBriefState] = useState('loading');
 
   React.useEffect(() => {
     const fetchNews = async () => {
@@ -621,6 +619,12 @@ export default function App() {
       setLoadingNews(false);
     };
     fetchNews();
+  }, []);
+
+  React.useEffect(() => {
+    fetch('/api/brief').then(r => r.json())
+      .then(d => { setBrief(d.brief || ''); setBriefState(d.brief ? 'ok' : d.error ? 'error' : 'none'); })
+      .catch(() => setBriefState('error'));
   }, []);
 
   React.useEffect(() => {
@@ -642,7 +646,6 @@ export default function App() {
   const newsSource = realNews;
   const companyOptions = ['Gilead', 'ViiV/GSK', 'MSD', 'J&J'];
   const productOptions = [...new Set(newsSource.flatMap(n => n.products || []))].sort();
-  const impactOptions = ['High', 'Medium', 'Low'];
   const CATEGORY_KEYWORDS = {
     'Treatment': ['treatment', 'antiretroviral', 'regimen', 'switch', 'suppress', 'biktarvy', 'dovato', 'cabenuva', 'sunlenca', 'bixlenvo', 'idvynso'],
     'Prevention / PrEP': ['prep', 'prevention', 'prophylaxis', 'yeztugo', 'yeytuo', 'apretude', 'descovy', 'truvada', 'mk-8527'],
@@ -667,28 +670,6 @@ export default function App() {
   });
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  // Weekly brief: generated only on request, from the last 7 days' headlines, and kept for the day.
-  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-  const weekStories = newsSource.filter(n => n.published && n.published >= weekAgo && !isPaywalled(n))
-    .sort((a, b) => impactOptions.indexOf(a.impact) - impactOptions.indexOf(b.impact))
-    .slice(0, 25);
-  const briefStarted = React.useRef(false);
-  const generateBrief = async () => {
-    setBriefLoading(true);
-    const list = weekStories.map(n => `- [${n.published}] ${n.headline} (${n.source})`).join('\n');
-    try {
-      const text = await callClaude(`You are a competitive intelligence analyst for an HIV launch readiness team. From these HIV news headlines of the last 7 days, write exactly 3 bullet points on what matters most this week for the HIV market and its competitors (Gilead, ViiV/GSK, MSD, J&J) and for access. One sentence each, each starting with "• ". Use only facts from the headlines; do not invent numbers or dates.\n\n${list}`);
-      setBrief(text); saveBrief(text);
-    } catch { setBrief('The brief could not be generated right now.'); }
-    setBriefLoading(false);
-  };
-  // Written once the news has loaded, then kept for the rest of the day.
-  React.useEffect(() => {
-    if (loadingNews || brief || briefStarted.current || weekStories.length === 0) return;
-    briefStarted.current = true;
-    generateBrief();
-  });
-
   const featured = filteredNews[0];
   const secondary = filteredNews.slice(1);
 
@@ -782,14 +763,14 @@ export default function App() {
               <MultiSelect label="Competitor" allLabel="All competitors" selected={companySel} onChange={setCompanySel} options={companyOptions} />
               {productOptions.length > 0 && <MultiSelect label="Product" allLabel="All products" selected={productSel} onChange={setProductSel} options={productOptions} />}
             </div>
-            {!loadingNews && weekStories.length > 0 && (
+            {(briefState === 'loading' || briefState === 'ok') && (
               <div style={{ border: '1px solid #e5e0d8', borderRadius: 6, padding: '12px 16px', marginBottom: '1.5rem', background: '#fff' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: NEWS_FONT }}>What matters this week</div>
                 </div>
                 {brief
                   ? <div style={{ fontSize: 14, lineHeight: 1.7, color: '#333', marginTop: 8, whiteSpace: 'pre-line', fontFamily: NEWS_FONT }}>{brief}</div>
-                  : <div style={{ fontSize: 13, color: '#888', marginTop: 6, fontFamily: NEWS_FONT }}>{briefLoading || !briefStarted.current ? <><Spinner />Summarising the last 7 days…</> : 'The summary could not be written right now.'}</div>}
+                  : <div style={{ fontSize: 13, color: '#888', marginTop: 6, fontFamily: NEWS_FONT }}>{briefState === 'loading' ? <><Spinner />Summarising the last 7 days…</> : 'The summary could not be written right now.'}</div>}
                 {brief && <div style={{ fontSize: 12, color: '#999', marginTop: 8, fontFamily: NEWS_FONT }}>AI-generated from this week's headlines. Check the sources before sharing.</div>}
               </div>
             )}
