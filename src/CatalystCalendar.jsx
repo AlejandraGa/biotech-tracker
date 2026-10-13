@@ -333,7 +333,7 @@ function CatalystHeatmap({ weeks, onWeekClick, selectedWeek }) {
       </div>
       {/* Scrollable on mobile */}
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(44px, 1fr))', gap: 4, minWidth: 480 }}>
+        <div className="cal-heat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, minmax(44px, 1fr))', gap: 4, minWidth: 480 }}>
           {weeks.map((week, i) => {
             const intensity = week.intensity / max;
             const isSelected = selectedWeek === i;

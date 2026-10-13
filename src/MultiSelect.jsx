@@ -28,7 +28,7 @@ export default function MultiSelect({ label, allLabel, selected, onChange, optio
     onChange(next.length === opts.length ? null : next);
   };
   return (
-    <div ref={ref} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
+    <div ref={ref} className="ms" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12.5, color: MUTED }}>
       {label}
       <span style={{ position: "relative" }}>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-haspopup="listbox" aria-expanded={open}

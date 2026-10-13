@@ -20,7 +20,8 @@ const REG_COLS = [...AGENCIES, { key: "mhra", label: "MHRA", region: "United Kin
 const EU_MARKETS = ["Austria", "Belgium", "Denmark", "France", "Germany", "Ireland", "Italy", "Netherlands", "Norway", "Portugal", "Spain", "Sweden"];
 const marketsOf = (c) => (c.region === "European Union" ? EU_MARKETS : [c.region]);
 const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.label } : ALL_STATUS[cell?.s || "none"]);
-const gridFor = (n) => `minmax(250px,1.3fr) repeat(${n}, minmax(168px,1fr))`;
+// Column widths come from CSS variables so phones can use narrower columns (see mobile.css).
+const gridFor = (n) => `minmax(var(--asset-col, 250px),1.3fr) repeat(${n}, minmax(var(--status-col, 168px),1fr))`;
 
 // Curated data, with any decisions found by the daily page check laid over it.
 const BASE = applyDetections(CURATED, AUTO);
@@ -158,7 +159,7 @@ function ProductRow({ p, active, onOpen, cols, pick }) {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
       style={{ display: "grid", gridTemplateColumns: gridFor(cols.length), borderTop: `1px solid ${LINE}`, cursor: "pointer", background: active ? PAPER : "#fff" }}>
       <div className="hiv-sticky" style={{ padding: "11px 16px", minWidth: 0, background: "inherit" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", alignItems: "start", gap: 8 }}>
+        <div className="hiv-asset-head" style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", alignItems: "start", gap: 8 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.35 }}>{p.name}</span>
           <StagePill stage={p.stage} />
         </div>
@@ -357,15 +358,10 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
         /* The table scrolls inside its own frame, sideways and down, so the page itself never
            shifts; the asset column and the header row stay pinned. */
         .hiv-matrix { overflow: auto; max-height: 78vh; }
-        @media (max-width: 760px) {
-          .hiv-tl, .sig-row { grid-template-columns: 78px minmax(0,1fr) !important; }
-          .hiv-tl > span:nth-child(2), .sig-row > span:nth-child(2) { display: none; }
-          .hiv-early { grid-template-columns: 1fr !important; gap: 2px !important; }
-        }
       `}</style>
 
       {/* Headline numbers */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", border: `1px solid ${LINE}`, borderRadius: 6, background: "#fff", marginBottom: 20, overflow: "hidden" }}>
+      <div className="hiv-stats" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", border: `1px solid ${LINE}`, borderRadius: 6, background: "#fff", marginBottom: 20, overflow: "hidden" }}>
         {stats.map((m, i) => (
           <div key={m.label} style={{ padding: "14px 16px", borderLeft: i ? `1px solid ${HAIR}` : "none" }}>
             <div style={{ fontSize: 12.5, color: MUTED }}>{m.label}</div>
@@ -395,7 +391,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
       {matrix && products.length > 0 && (
         <>
           <div className="hiv-matrix" style={{ border: `1px solid ${LINE}`, borderRadius: 6, background: "#fff" }}>
-            <div style={{ minWidth: 250 + cols.length * 172 }}>
+            <div style={{ minWidth: `calc(var(--asset-col, 250px) + ${cols.length} * (var(--status-col, 168px) + 4px))` }}>
               <div style={{ display: "grid", gridTemplateColumns: gridFor(cols.length), position: "sticky", top: 0, zIndex: 3, background: PAPER, boxShadow: `0 1px 0 ${LINE}`, borderRadius: "6px 6px 0 0" }}>
                 <div className="hiv-sticky" style={{ padding: "10px 16px", fontSize: 12, fontWeight: 600, color: MUTED, background: PAPER }}>Asset</div>
                 {cols.map((a) => (

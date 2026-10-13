@@ -1,0 +1,74 @@
+/* Phone and small-tablet layout. Components use inline styles, so these rules
+   target class names and need !important to win over them. */
+
+.tab-short { display: none; }
+
+@media (max-width: 760px) {
+  /* Signal rows and timeline rows: date on the left, source above the text. */
+  .hiv-tl, .sig-row {
+    grid-template-columns: 76px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+    row-gap: 1px !important;
+    align-items: start !important;
+  }
+  .hiv-tl > :nth-child(1), .sig-row > :nth-child(1) { grid-column: 1; grid-row: 1 / span 2; }
+  .hiv-tl > :nth-child(2), .sig-row > :nth-child(2) { grid-column: 2; grid-row: 1; }
+  .hiv-tl > :nth-child(3), .sig-row > :nth-child(3) { grid-column: 2; grid-row: 2; }
+  .hiv-early { grid-template-columns: 1fr !important; gap: 2px !important; }
+}
+
+@media (max-width: 680px) {
+  /* Header and main tabs */
+  .app-root { padding: 0.9rem 1rem 2.5rem !important; }
+  .app-header { flex-direction: row !important; align-items: center !important; padding-bottom: 0.8rem !important; }
+  .app-header-right { display: none !important; }
+  .app-tabs { gap: 0 !important; }
+  .app-tabs button { padding: 10px 10px !important; }
+  .tab-long { display: none; }
+  .tab-short { display: inline; }
+
+  /* News: keep the main column inside the screen (a grid column otherwise
+     grows to the width of the category chips). */
+  .news-layout > * { min-width: 0; }
+  .news-sidebar { margin-top: 1rem; }
+
+  /* Dropdown filters: one per line, labels aligned */
+  .ms { display: flex !important; width: 100%; }
+  .ms > :first-child { flex: 1; }
+  .ms button { width: 100%; max-width: none !important; min-width: 0 !important; }
+  .ms [role="listbox"] { right: 0; min-width: 0 !important; }
+
+  /* Publications: compact two-up figures */
+  .metric-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .metric-grid > div { padding: 8px 12px !important; }
+  .metric-grid > div > div:last-child { font-size: 19px !important; }
+
+  /* Calendar heatmap: weeks wide enough for their labels, scrolling sideways */
+  .cal-heat-grid { grid-template-columns: repeat(12, 58px) !important; }
+
+  /* HIV CI: headline figures two-up */
+  .hiv-stats { grid-template-columns: 1fr 1fr !important; }
+  .hiv-stats > div { padding: 10px 12px !important; border-left: none !important; border-top: 1px solid #f0ede8; }
+  .hiv-stats > div:nth-child(-n+2) { border-top: none; }
+  .hiv-stats > div:nth-child(even) { border-left: 1px solid #f0ede8 !important; }
+  .hiv-stats > div > div:nth-child(2) { font-size: 20px !important; }
+
+  /* Regulatory and reimbursement matrix: narrower columns so a status column
+     shows next to the pinned asset name. */
+  .hiv-matrix { --asset-col: 148px; --status-col: 138px; max-height: 70vh; }
+  .hiv-matrix .hiv-sticky { padding-left: 12px !important; padding-right: 10px !important; }
+  .hiv-asset-head { grid-template-columns: 1fr !important; gap: 4px !important; }
+  .hiv-asset-head > :last-child { justify-self: start; }
+
+  /* Map view launch sequence: fit the screen instead of scrolling sideways;
+     the time-to-reimbursement note moves under each bar. */
+  .hiv-ls-inner { min-width: 0 !important; }
+  .hiv-ls { grid-template-columns: 104px minmax(0, 1fr) !important; column-gap: 10px !important; padding: 4px 0; }
+  .hiv-ls-axis > span:nth-child(even):not(:last-child) { display: none; }
+  .hiv-ls-axis > span:last-child { transform: translateX(-100%) !important; }
+  .hiv-ls > :nth-child(3) { grid-column: 2; }
+  .hiv-ls:first-child > :nth-child(3) { display: none; }
+
+  /* Clinical pipeline search form */
+  .cl-inputs { grid-template-columns: 1fr !important; }
+}
