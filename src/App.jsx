@@ -211,36 +211,23 @@ const np = {
   npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
 
-// Category icons for stories without their own image (simple strokes on a 24px grid).
-const TAG_ICONS = {
-  'Regulatory': 'M7 3h7l4 4v14H7z M14 3v4h4 M10 14l2 2 4-4',
-  'Trial Results': 'M4 20h16 M7 20v-6 M12 20V8 M17 20v-9',
-  'Conference': 'M4 6h16v10H4z M12 16v4 M8 20h8',
-  'Access & Policy': 'M12 4v16 M5 8h14 M5 8l-3 6h6z M19 8l-3 6h6z M8 20h8',
-  'Partnership': 'M9 12a4 4 0 1 0 0.01 0 M15 12a4 4 0 1 0 0.01 0',
-  'Market': 'M4 18l5-6 4 3 7-8 M15 7h5v5',
-};
-const DEFAULT_ICON = 'M5 5h14v14H5z M8 9h8 M8 12h8 M8 15h5';
+// Card next to each story: which product and company it is about.
+const COMPANY_COLORS = [
+  [/gilead/i, '#c8102e'], [/viiv|gsk/i, '#7c3aed'], [/merck|msd/i, '#0369a1'], [/j&j|johnson|janssen/i, '#b45309'], [/policy/i, '#555555'],
+];
+const SEGMENT_LABELS = { Prevention: 'Prevention · PrEP', Treatment: 'Treatment', Access: 'Access & policy' };
 
-function CategoryTile({ tag, height }) {
-  const c = tagColor(tag);
+function StoryCard({ story, height }) {
+  const color = (COMPANY_COLORS.find(([re]) => re.test(story.company || '')) || [null, '#1a1a1a'])[1];
+  const big = height > 120;
+  const font = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  const title = story.product || story.company || 'HIV';
+  const overline = story.product ? story.company : (story.company ? 'Company' : 'HIV news');
   return (
-    <div style={{ width: '100%', height, borderRadius: 8, background: c.bg, border: `1px solid ${c.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-      <svg width={height > 120 ? 44 : 30} height={height > 120 ? 44 : 30} viewBox="0 0 24 24" fill="none" stroke={c.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d={TAG_ICONS[tag] || DEFAULT_ICON} />
-      </svg>
-      {height > 120 && <span style={{ fontSize: 12.5, fontWeight: 600, color: c.color, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{tag || 'HIV News'}</span>}
-    </div>
-  );
-}
-
-// The article's own image when the feed provides one, otherwise a category tile.
-function NewsImage({ image, tag, height = 160 }) {
-  const [imgError, setImgError] = React.useState(false);
-  if (!image || imgError) return <CategoryTile tag={tag} height={height} />;
-  return (
-    <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden', background: '#f0ede8' }}>
-      <img src={image} alt="" referrerPolicy="no-referrer" onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block' }} />
+    <div style={{ width: '100%', height, boxSizing: 'border-box', borderRadius: 8, background: '#fff', border: '1px solid #e5e0d8', borderLeft: `4px solid ${color}`, padding: big ? '16px 18px' : '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontFamily: font }}>
+      <div style={{ fontSize: big ? 12.5 : 11, fontWeight: 600, color: '#888', letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{overline || ' '}</div>
+      <div style={{ fontSize: big ? 22 : 14.5, fontWeight: 700, color, lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{title}</div>
+      <div style={{ fontSize: big ? 13 : 11.5, color: '#555', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{SEGMENT_LABELS[story.segment] || story.source || ''}</div>
     </div>
   );
 }
@@ -791,7 +778,7 @@ export default function App() {
                     {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
                   </div>
                   <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
-                    <NewsImage image={featured.image} tag={featured.tag} height={200} />
+                    <StoryCard story={featured} height={200} />
                   </div>
                 </div>
               </div>
@@ -806,8 +793,8 @@ export default function App() {
                       <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start' }} className="story-row"
                         onMouseOver={e => e.currentTarget.style.background = '#faf8f5'}
                         onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                        <div style={{ flexShrink: 0, width: 130, height: 90, borderRadius: 6, overflow: 'hidden' }} className="story-thumb">
-                          <NewsImage image={n.image} tag={n.tag} height={90} />
+                        <div style={{ flexShrink: 0, width: 150, height: 90, borderRadius: 6, overflow: 'hidden' }} className="story-thumb">
+                          <StoryCard story={n} height={90} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>

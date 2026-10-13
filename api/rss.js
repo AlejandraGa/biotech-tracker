@@ -1,11 +1,12 @@
 // api/rss.js — Vercel serverless function
 // Fetches HIV news: HIV-specific feeds plus trade press filtered to HIV stories
 import { isHivNews, stripPublisher, gnews } from './_lib/hivNews.js';
+import { tagProduct } from './_lib/hivSignals.js';
 
 // Companies active in HIV — ticker + name variants to detect in headlines
 const KNOWN_COMPANIES = [
   { ticker: 'GILD', names: ['Gilead'] },
-  { ticker: 'GSK',  names: ['ViiV', 'GSK', 'GlaxoSmithKline'] },
+  { ticker: 'GSK',  names: ['ViiV Healthcare', 'ViiV', 'GSK', 'GlaxoSmithKline'] },
   { ticker: 'MRK',  names: ['Merck', 'MSD'] },
   { ticker: 'JNJ',  names: ['Johnson & Johnson', 'J&J', 'Janssen'] },
 ];
@@ -123,7 +124,7 @@ function parseRSS(xml, source) {
     else if (text.includes('partner') || text.includes('deal') || text.includes('acqui') || text.includes('merger') || text.includes('licens')) tag = 'Partnership';
     else if (text.includes('earning') || text.includes('revenue') || text.includes('sales') || text.includes('quarter')) tag = 'Market';
 
-    const image = extractImage(block);
+    const subject = storySubject(title + ' ' + description, detectCompanies(title + ' ' + description));
 
     // Detect company mentions in headline + summary
     const detected = detectCompanies(title + ' ' + description);
@@ -140,21 +141,25 @@ function parseRSS(xml, source) {
       tag,
       ticker,
       companies,
-      image,
+      ...subject,
     });
   }
 
   return items;
 }
 
-// The article's own picture, if the feed carries one (media tags, enclosure or an <img>).
-function extractImage(block) {
-  const m = /<media:(?:content|thumbnail)[^>]*url="([^"]+)"/i.exec(block)
-    || /<enclosure[^>]*url="([^"]+)"[^>]*type="image/i.exec(block)
-    || /<img[^>]*src="([^"]+)"/i.exec(block.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'));
-  const url = m ? m[1].replace(/&amp;/g, '&') : '';
-  // Skip tracking pixels and Google News logos.
-  return /^https:\/\//.test(url) && !/feedburner|pixel|1x1|gstatic\.com|googleusercontent/i.test(url) ? url : '';
+// What the story is about, for the card next to it: tracked product and company,
+// else an HIV policy body, else the company alone.
+const POLICY_BODIES = [['pepfar', 'PEPFAR'], ['unaids', 'UNAIDS'], ['global fund', 'Global Fund'], ['world health organization', 'WHO'], ['who ', 'WHO']];
+function storySubject(text, companies) {
+  const lower = text.toLowerCase();
+  const t = tagProduct(lower);
+  const segment = /prep\b|prevent|prophylaxis/.test(lower) ? 'Prevention' : /treatment|suppress|switch|regimen|antiretroviral therapy/.test(lower) ? 'Treatment' : '';
+  if (t.product) return { company: t.company, product: t.product, segment };
+  const body = POLICY_BODIES.find(([kw]) => lower.includes(kw));
+  if (body) return { company: 'Policy', product: body[1], segment: 'Access' };
+  if (companies.length) return { company: companies[0].companyName, product: '', segment };
+  return { company: '', product: '', segment };
 }
 
 // Deduplicate by headline similarity
