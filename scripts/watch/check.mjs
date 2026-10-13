@@ -145,10 +145,21 @@ Answer with JSON only, no other text:
   return out;
 }
 
+// Confirms the key works without spending tokens (listing models is free).
+async function keyStatus() {
+  if (!process.env.ANTHROPIC_API_KEY) return 'missing';
+  try {
+    const r = await fetch(`${process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com'}/v1/models?limit=1`, { headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' } });
+    return r.ok ? 'ok' : `rejected (HTTP ${r.status})`;
+  } catch (e) { return `unreachable (${e.message})`; }
+}
+
 async function main() {
   const state = readJson(STATE_FILE, {});
+  const claudeKey = await keyStatus();
+  console.log(`Claude API key: ${claudeKey}`);
   const output = readJson(OUT_FILE, { lastRun: null, sources: {}, detections: [] });
-  const hasKey = Boolean(process.env.ANTHROPIC_API_KEY);
+  const hasKey = claudeKey === 'ok';
   let calls = 0;
   const found = [];
   const sources = {};
@@ -193,7 +204,7 @@ async function main() {
 
   // Newer detections replace older ones for the same product and column.
   const kept = output.detections.filter((d) => !found.some((f) => f.product === d.product && f.column === d.column && f.date === d.date && f.s === d.s));
-  const next = { lastRun: today, model: MODEL, claudeCalls: calls, sources, detections: [...kept, ...found].sort((a, b) => (b.detectedAt + (b.date || '')).localeCompare(a.detectedAt + (a.date || ''))) };
+  const next = { lastRun: today, model: MODEL, claudeKey, claudeCalls: calls, sources, detections: [...kept, ...found].sort((a, b) => (b.detectedAt + (b.date || '')).localeCompare(a.detectedAt + (a.date || ''))) };
   console.log(`\n${WATCHES.length} pages, ${Object.values(sources).filter((s) => !s.ok).length} unreachable, ${calls} read by Claude, ${found.length} new decisions.`);
   if (DRY) return;
   writeFileSync(STATE_FILE, JSON.stringify(state, null, 1) + '\n');

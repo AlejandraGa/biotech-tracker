@@ -81,7 +81,7 @@ export function buildDigest(data, appUrl = '', auto = { detections: [] }, produc
       </table>` : ''}
     ${failed.length ? `<p style="font-size:12px;color:#92580a;margin:24px 0 0;line-height:1.5">Not checked this week (source did not respond): ${esc(failed.map((f) => f.name).join(', '))}.</p>` : ''}
     ${appUrl ? `<p style="margin:26px 0 0"><a href="${esc(appUrl)}" style="font-size:13px;color:#c8102e">Open the full activity log</a></p>` : ''}
-    <p style="font-size:11px;color:#9a948a;margin:22px 0 0;line-height:1.5">Compiled automatically from public sources (openFDA, EMA, Swissmedic, the Swiss Spezialitätenliste, the daily check of ${ACCESS_BODIES.length + 4} regulator and reimbursement websites, company and trade news, ClinicalTrials.gov). Check the linked source before relying on an item.</p>
+    <p style="font-size:11px;color:#9a948a;margin:22px 0 0;line-height:1.5">Compiled automatically from public sources (openFDA, EMA, Swissmedic, the Swiss Spezialitätenliste, the daily check of regulator and reimbursement websites, company and trade news, ClinicalTrials.gov). Check the linked source before relying on an item.</p>
   </div></body></html>`;
 
   const text = [subject, '',
