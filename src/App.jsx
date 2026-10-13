@@ -73,15 +73,6 @@ const TOPIC_FILTERS = [
   { key: 'rna', label: 'RNA / mRNA', keywords: ['mrna', 'rna', 'antisense', 'sirna', 'oligonucleotide'] },
 ];
 
-const NEWS_DATA = [
-  { ticker: 'MRNA', headline: 'Moderna reports positive Phase 3 data for mRNA-1345 RSV vaccine in older adults', source: 'BioPharma Dive', date: 'May 10, 2025', tag: 'Trial Results', summary: "Moderna's RSV vaccine candidate demonstrated 83.7% efficacy against RSV lower respiratory tract disease in adults 60+." },
-  { ticker: 'EDIT', headline: 'Editas Medicine announces EDIT-301 patient data showing durable HbF induction', source: 'Fierce Biotech', date: 'May 8, 2025', tag: 'Clinical Data', summary: 'EDIT-301 uses AsCas12a to edit the BCL11A enhancer. Early patient data shows sustained elevation above therapeutic threshold.' },
-  { ticker: 'RXRX', headline: 'Recursion and Roche expand AI partnership to neurological disease targets', source: 'Reuters', date: 'May 7, 2025', tag: 'Partnership', summary: "Recursion's platform partnership with Roche is being extended to include CNS targets." },
-  { ticker: 'BEAM', headline: 'Beam Therapeutics presents BEAM-302 alpha-1 antitrypsin deficiency data at ATS 2025', source: 'STAT News', date: 'May 6, 2025', tag: 'Conference', summary: 'BEAM-302 uses base editing to correct the Z-allele mutation.' },
-  { ticker: 'KYMR', headline: "Kymera's KY1005 shows strong EASI-75 response in atopic dermatitis Phase 2", source: 'Evaluate Pharma', date: 'May 5, 2025', tag: 'Trial Results', summary: '68% EASI-75 response at week 16 vs 18% placebo.' },
-  { ticker: 'MRNA', headline: "FDA accepts PDUFA date for Moderna's flu-COVID combination vaccine", source: 'FDA News', date: 'May 3, 2025', tag: 'Regulatory', summary: 'PDUFA date of December 2025 set for mRNA-1083.' },
-];
-
 const PAYWALLED_DOMAINS = [
   'statnews.com', 'endpoints.com', 'endpts.com', 'fiercebiotech.com',
   'fiercepharma.com', 'evaluate.com', 'evaluategroup.com', 'informa.com',
@@ -119,7 +110,7 @@ function tagColor(tag) {
   if (t.includes('regulat') || t.includes('fda') || t.includes('ema') || t.includes('hta')) return { bg: 'rgba(29,78,216,0.07)', color: '#1d4ed8', border: 'rgba(29,78,216,0.2)' };
   if (t.includes('partner') || t.includes('deal')) return { bg: 'rgba(161,98,7,0.07)', color: '#a16207', border: 'rgba(161,98,7,0.2)' };
   if (t.includes('conference')) return { bg: 'rgba(190,18,60,0.07)', color: '#be123c', border: 'rgba(190,18,60,0.2)' };
-  if (t.includes('reimburse') || t.includes('pricing') || t.includes('nice') || t.includes('g-ba')) return { bg: 'rgba(5,150,105,0.07)', color: '#065f46', border: 'rgba(5,150,105,0.2)' };
+  if (t.includes('access') || t.includes('reimburse') || t.includes('pricing') || t.includes('nice') || t.includes('g-ba')) return { bg: 'rgba(5,150,105,0.07)', color: '#065f46', border: 'rgba(5,150,105,0.2)' };
   return { bg: 'rgba(109,40,217,0.07)', color: '#5b21b6', border: 'rgba(109,40,217,0.2)' };
 }
 
@@ -220,34 +211,23 @@ const np = {
   npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
 
-function FallbackGraphic({ seed }) {
-  const palettes = [
-    { bg: '#1a1033', lines: '#7c6af7', circles: '#a78bfa' },
-    { bg: '#0a1a1a', lines: '#34d399', circles: '#6ee7b7' },
-    { bg: '#1a1000', lines: '#fbbf24', circles: '#fde68a' },
-    { bg: '#0a0a1a', lines: '#60a5fa', circles: '#93c5fd' },
-    { bg: '#1a0a1a', lines: '#f472b6', circles: '#fbcfe8' },
-  ];
-  const p = palettes[seed % palettes.length];
-  return (
-    <svg width="100%" height="100%" viewBox="0 0 260 160" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', borderRadius: 8 }}>
-      <rect width="260" height="160" fill={p.bg} />
-      {[0,1,2,3,4].map(i => <line key={`h${i}`} x1="0" y1={32*i} x2="260" y2={32*i} stroke={p.lines} strokeOpacity="0.12" strokeWidth="0.5" />)}
-      {[0,1,2,3,4,5,6].map(i => <line key={`v${i}`} x1={40*i} y1="0" x2={40*i} y2="160" stroke={p.lines} strokeOpacity="0.12" strokeWidth="0.5" />)}
-      <circle cx="130" cy="80" r="50" fill="none" stroke={p.lines} strokeOpacity="0.25" strokeWidth="1" />
-      <circle cx="130" cy="80" r="30" fill="none" stroke={p.circles} strokeOpacity="0.2" strokeWidth="1" />
-      <circle cx="130" cy="80" r="10" fill={p.lines} fillOpacity="0.3" />
-    </svg>
-  );
-}
+// Card next to each story: which product and company it is about.
+const COMPANY_COLORS = [
+  [/gilead/i, '#c8102e'], [/viiv|gsk/i, '#7c3aed'], [/merck|msd/i, '#0369a1'], [/j&j|johnson|janssen/i, '#b45309'], [/policy/i, '#555555'],
+];
+const SEGMENT_LABELS = { Prevention: 'Prevention · PrEP', Treatment: 'Treatment', Access: 'Access & policy' };
 
-function NewsImage({ photoKeyword, seed = 0, height = 160 }) {
-  const [imgError, setImgError] = React.useState(false);
-  const imgUrl = `https://picsum.photos/seed/${encodeURIComponent(photoKeyword || seed)}/600/300`;
-  if (imgError) return <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden' }}><FallbackGraphic seed={seed} /></div>;
+function StoryCard({ story, height }) {
+  const color = (COMPANY_COLORS.find(([re]) => re.test(story.company || '')) || [null, '#1a1a1a'])[1];
+  const big = height > 120;
+  const font = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+  const title = story.product || story.company || 'HIV';
+  const overline = story.product ? story.company : (story.company ? 'Company' : 'HIV news');
   return (
-    <div style={{ width: '100%', height, borderRadius: 8, overflow: 'hidden', background: '#f0ede8' }}>
-      <img src={imgUrl} alt="" onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8, display: 'block', opacity: 0.85 }} />
+    <div style={{ width: '100%', height, boxSizing: 'border-box', borderRadius: 8, background: '#fff', border: '1px solid #e5e0d8', borderLeft: `4px solid ${color}`, padding: big ? '16px 18px' : '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontFamily: font }}>
+      <div style={{ fontSize: big ? 12.5 : 11, fontWeight: 600, color: '#888', letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{overline || ' '}</div>
+      <div style={{ fontSize: big ? 22 : 14.5, fontWeight: 700, color, lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{title}</div>
+      <div style={{ fontSize: big ? 13 : 11.5, color: '#555', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{SEGMENT_LABELS[story.segment] || story.source || ''}</div>
     </div>
   );
 }
@@ -636,8 +616,9 @@ export default function App() {
   const [summaries, setSummaries] = useState({});
   const [loading, setLoading] = useState({});
   const [realNews, setRealNews] = useState([]);
-  const [loadingNews, setLoadingNews] = useState(false);
+  const [loadingNews, setLoadingNews] = useState(true);
   const [pressReleases, setPressReleases] = useState([]);
+  const [loadingPress, setLoadingPress] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('');
 
   React.useEffect(() => {
@@ -652,6 +633,7 @@ export default function App() {
   React.useEffect(() => {
     const fetchPress = async () => {
       try { const res = await fetch('/api/press'); const data = await res.json(); if (Array.isArray(data) && data.length > 0) setPressReleases(data); } catch {}
+      setLoadingPress(false);
     };
     fetchPress();
   }, []);
@@ -664,17 +646,15 @@ export default function App() {
     setLoading(prev => ({ ...prev, [key]: false }));
   }, [summaries]);
 
-  const newsSource = realNews.length > 0 ? realNews : NEWS_DATA;
+  const newsSource = realNews;
   const CATEGORY_KEYWORDS = {
-    'Pharma': ['pharma', 'drug', 'medicine', 'therapeutic'],
-    'Biotech': ['biotech', 'biologic', 'biosimilar', 'gene', 'cell therapy', 'crispr', 'mrna'],
-    'Regulatory': ['fda', 'ema', 'regulatory', 'approval', 'pdufa', 'nda', 'bla', 'chmp'],
-    'HTA / Reimbursement': ['nice', 'g-ba', 'has ', 'hta', 'reimburse', 'pricing', 'qaly', 'icer', 'cost-effective'],
-    'Clinical Trials': ['trial', 'phase', 'clinical', 'readout', 'efficacy', 'endpoint'],
+    'Treatment': ['treatment', 'antiretroviral', 'regimen', 'switch', 'suppress', 'biktarvy', 'dovato', 'cabenuva', 'sunlenca', 'bixlenvo', 'idvynso'],
+    'Prevention / PrEP': ['prep', 'prevention', 'prophylaxis', 'yeztugo', 'yeytuo', 'apretude', 'descovy', 'truvada', 'mk-8527'],
+    'Regulatory': ['fda', 'ema', 'chmp', 'swissmedic', 'regulatory', 'approv', 'pdufa', 'nda', 'filing'],
+    'Access & Policy': ['access', 'price', 'pricing', 'reimburs', 'nice', 'g-ba', 'pepfar', 'unaids', 'global fund', 'generic', 'guideline'],
+    'Clinical Trials': ['trial', 'phase', 'clinical', 'readout', 'efficacy', 'endpoint', 'data'],
+    'Conferences': ['croi', 'ias ', 'aids 20', 'idweek', 'eacs', 'glasgow', 'conference', 'congress'],
     'Deals': ['deal', 'partner', 'acqui', 'merger', 'licens', 'collaboration'],
-    'Gene Therapy': ['gene therapy', 'gene edit', 'crispr', 'aav', 'base edit', 'prime edit'],
-    'AI': ['artificial intel', ' ai ', 'machine learn', 'algorithm', 'digital', 'data-driven'],
-    'Oncology': ['cancer', 'oncol', 'tumor', 'immuno-oncol', 'checkpoint', 'car-t'],
   };
 
   const filteredNews = newsSource.filter(n => {
@@ -684,7 +664,7 @@ export default function App() {
       const hay = (n.headline + ' ' + (n.tag || '') + ' ' + (n.summary || '')).toLowerCase();
       if (!kws.some(kw => hay.includes(kw)) && !(n.tag && n.tag.toLowerCase().includes(categoryFilter.toLowerCase()))) return false;
     }
-    if (newsFilter) { if (!(n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '')).toLowerCase().includes(newsFilter.toLowerCase())) return false; }
+    if (newsFilter) { if (!(n.headline + ' ' + (n.ticker || '') + ' ' + (n.tag || '') + ' ' + (n.companies || []).map(c => c.companyName).join(' ')).toLowerCase().includes(newsFilter.toLowerCase())) return false; }
     return true;
   });
 
@@ -768,37 +748,34 @@ export default function App() {
           <div style={np.wrapper}>
             <div style={np.datebar}>
               <span style={np.datebarText}>{today}</span>
-              <span style={{ ...np.datebarText, color: '#c8102e' }}>{filteredNews.length} {filteredNews.length === 1 ? 'story' : 'stories'}{realNews.length > 0 ? ' · Live' : ' · Sample'}</span>
+              <span style={{ ...np.datebarText, color: '#c8102e' }}>{filteredNews.length} {filteredNews.length === 1 ? 'story' : 'stories'} · HIV · Live</span>
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: '1rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', paddingBottom: 4 }} className="cat-filter-bar">
-              {['All', 'Pharma', 'Biotech', 'Regulatory', 'HTA / Reimbursement', 'Clinical Trials', 'Deals', 'Gene Therapy', 'AI', 'Oncology'].map(cat => (
+              {['All', ...Object.keys(CATEGORY_KEYWORDS)].map(cat => (
                 <button key={cat} onClick={() => setCategoryFilter(cat === 'All' ? '' : cat)} style={{ padding: '5px 14px', borderRadius: 4, border: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '1.5px solid #1a1a1a' : '1px solid #d1ccc4', background: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#1a1a1a' : 'transparent', color: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? '#fff' : '#555', fontSize: 13, fontWeight: (categoryFilter === cat || (cat === 'All' && !categoryFilter)) ? 600 : 400, cursor: 'pointer', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", transition: 'all 0.15s', whiteSpace: 'nowrap', flexShrink: 0 }}>{cat}</button>
               ))}
             </div>
             <div style={np.filterBar}>
-              <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or ticker…" />
+              <input style={np.filterInput} value={newsFilter} onChange={e => setNewsFilter(e.target.value)} placeholder="Search by keyword or company…" />
               {newsFilter && <button style={{ ...s.btnSm, fontSize: 12.5 }} onClick={() => setNewsFilter('')}>Clear</button>}
             </div>
-            {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading news…</div>}
-            {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>No stories match your filter.</div>}
+            {loadingNews && <div style={{ textAlign: 'center', color: '#888', padding: '3rem', fontSize: 13 }}><Spinner />Loading HIV news…</div>}
+            {!loadingNews && filteredNews.length === 0 && <div style={{ textAlign: 'center', color: '#555', padding: '3rem', fontSize: 14 }}>{realNews.length === 0 ? 'No HIV news could be loaded right now.' : 'No stories match your filter.'}</div>}
             {!loadingNews && featured && (
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={np.sectionLabel}>Top Story</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' }} className="featured-grid">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem', borderBottom: '1px solid #d1ccc4', paddingBottom: '1.5rem', marginBottom: '1.5rem' }} className="featured-grid">
                   <div>
                     <div style={np.tagPill(featured.tag)}>{featured.tag}</div>
                     <h2 style={np.featuredHeadline} className="featured-headline">{featured.headline}</h2>
                     <div style={np.featuredByline}>{featured.source} · {featured.date}{featured.link && <a href={featured.link} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, color: '#c8102e', fontSize: 12.5, textDecoration: 'none', fontWeight: 600 }}>Read full article ↗</a>}</div>
                     {featured.summary && <p style={np.featuredSummary}>{featured.summary}</p>}
                     <div style={{ marginTop: 14 }}>
-                      <button style={s.btn} onClick={() => getSummary('news-0', `You are a clinical data expert and biotech analyst. Explain this news in 3-4 sentences: "${featured.headline}". Context: ${featured.summary}. Be direct.`)}>
+                      <button style={s.btn} onClick={() => getSummary('news-0', `You are a competitive intelligence analyst covering HIV treatment and prevention. Explain this news in 3-4 sentences, including what it means for the HIV market: "${featured.headline}". Context: ${featured.summary || 'none'}. Be direct.`)}>
                         {loading['news-0'] ? <><Spinner />Analyzing…</> : 'AI analysis →'}
                       </button>
                     </div>
                     {summaries['news-0'] && <div style={np.npAiBox}>{summaries['news-0']}</div>}
-                  </div>
-                  <div style={{ borderRadius: 8, overflow: 'hidden', alignSelf: 'flex-start' }}>
-                    <NewsImage photoKeyword={featured.photoKeyword} seed={0} height={200} />
                   </div>
                 </div>
               </div>
@@ -813,8 +790,8 @@ export default function App() {
                       <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start' }} className="story-row"
                         onMouseOver={e => e.currentTarget.style.background = '#faf8f5'}
                         onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                        <div style={{ flexShrink: 0, width: 130, height: 90, borderRadius: 6, overflow: 'hidden' }} className="story-thumb">
-                          <NewsImage photoKeyword={n.photoKeyword} seed={idx} height={90} />
+                        <div style={{ flexShrink: 0, width: 150, height: 90, borderRadius: 6, overflow: 'hidden' }} className="story-thumb">
+                          <StoryCard story={n} height={90} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
@@ -824,7 +801,7 @@ export default function App() {
                           </div>
                           <p style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: '#111', margin: '0 0 6px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.headline}</p>
                           {n.summary && <p style={{ fontSize: 13, lineHeight: 1.7, color: '#555', margin: '0 0 10px 0', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{n.summary}</p>}
-                          <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `Explain this biotech news in 3-4 sentences: "${n.headline}". Context: ${n.summary}.`)}>
+                          <button style={{ ...s.btn, fontSize: 13, padding: '4px 10px' }} onClick={() => getSummary(`news-${idx}`, `You are a competitive intelligence analyst covering HIV treatment and prevention. Explain this news in 3-4 sentences, including what it means for the HIV market: "${n.headline}". Context: ${n.summary || 'none'}.`)}>
                             {loading[`news-${idx}`] ? <><Spinner />Analyzing…</> : 'Explain →'}
                           </button>
                           {summaries[`news-${idx}`] && <div style={{ ...np.npAiBox, marginTop: 8 }}>{summaries[`news-${idx}`]}</div>}
@@ -838,9 +815,9 @@ export default function App() {
           </div>
           <div style={{ position: 'sticky', top: '1rem' }} className="news-sidebar">
             <div style={{ borderTop: '3px solid #1a1a1a', paddingTop: '0.5rem', marginBottom: '1rem' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Company Announcements</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>HIV Company Announcements</div>
             </div>
-            {pressReleases.length === 0 && <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Loading…</div>}
+            {pressReleases.length === 0 && <div style={{ fontSize: 13, color: '#aaa', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>{loadingPress ? 'Loading…' : 'No recent HIV announcements.'}</div>}
             {pressReleases.map((pr, i) => (
               <div key={i} style={{ paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid #e5e0d8' }}>
                 <a href={pr.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
