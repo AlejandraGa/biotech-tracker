@@ -1,0 +1,39 @@
+# Daily check of regulator and reimbursement websites for new HIV decisions.
+# Needs the repository secret ANTHROPIC_API_KEY (Settings → Secrets and variables → Actions).
+# Any change is committed to main, which redeploys the site on Vercel.
+name: Check for new decisions
+
+on:
+  schedule:
+    - cron: "30 5 * * *"   # every day, 05:30 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: check-decisions
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check pages
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/watch/check.mjs
+      - name: Save results
+        run: |
+          git add src/hivAutoDetections.json scripts/watch/state.json
+          if git diff --cached --quiet; then echo "Nothing changed"; exit 0; fi
+          found=$(node -e "const d=require('./src/hivAutoDetections.json');console.log(d.detections.filter(x=>x.detectedAt===d.lastRun).length)")
+          git -c user.name="catalyst-bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Daily decision check: ${found} new decision(s)"
+          git pull --rebase origin main
+          git push origin HEAD:main

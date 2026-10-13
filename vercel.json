@@ -1,9 +1,17 @@
 {
   "functions": {
-    "api/hiv-signals.js": { "maxDuration": 45 },
-    "api/hiv-digest.js": { "maxDuration": 45 }
+    "api/hiv-signals.js": {
+      "maxDuration": 45
+    },
+    "api/hiv-digest.js": {
+      "maxDuration": 45,
+      "includeFiles": "src/hivAutoDetections.json"
+    }
   },
   "crons": [
-    { "path": "/api/hiv-digest", "schedule": "0 6 * * 1" }
+    {
+      "path": "/api/hiv-digest",
+      "schedule": "0 6 * * 1"
+    }
   ]
 }
