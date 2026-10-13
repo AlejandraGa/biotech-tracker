@@ -130,6 +130,15 @@ function MultiSelect({ label, allLabel, selected, onChange, options }) {
   );
 }
 
+// Development stage, always shown in the same place: top right of the asset cell.
+function StagePill({ stage }) {
+  if (!stage) return null;
+  const tone = /^marketed/i.test(stage) ? { color: "#166534", bg: "rgba(22,101,52,0.08)" }
+    : /review/i.test(stage) ? { color: "#92580a", bg: "rgba(146,88,10,0.09)" }
+    : { color: MUTED, bg: "#f3f0ea" };
+  return <span style={{ fontSize: 11, fontWeight: 500, color: tone.color, background: tone.bg, borderRadius: 10, padding: "2px 8px", whiteSpace: "nowrap", lineHeight: 1.5 }}>{stage}</span>;
+}
+
 // ─── MATRIX ──────────────────────────────────────────────────────────────────
 
 function RegCell({ cell }) {
@@ -158,9 +167,9 @@ function ProductRow({ p, active, onOpen, cols, pick }) {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } }}
       style={{ display: "grid", gridTemplateColumns: gridFor(cols.length), borderTop: `1px solid ${LINE}`, cursor: "pointer", background: active ? PAPER : "#fff" }}>
       <div className="hiv-sticky" style={{ padding: "11px 16px", minWidth: 0, background: "inherit" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: INK }}>{p.name}</span>
-          <span style={{ fontSize: 11.5, color: FAINT }}>{p.stage}</span>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", alignItems: "start", gap: 8 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.35 }}>{p.name}</span>
+          <StagePill stage={p.stage} />
         </div>
         {showInn && <div style={{ fontSize: 12.5, color: TEXT, marginTop: 1, lineHeight: 1.4 }}>{p.inn}</div>}
         <div style={{ fontSize: 12, color: MUTED, marginTop: 3, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
