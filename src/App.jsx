@@ -387,7 +387,7 @@ function CompetitiveLandscapeTab({ callClaude }) {
       </div>
 
       {/* Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }} className="metric-grid">
         {[
           { label: 'Therapy areas', val: COMPETITIVE_LANDSCAPE_DATA.length, color: '#1a1a1a' },
           { label: 'Competitors tracked', val: totalCompetitors, color: '#1d4ed8' },
@@ -538,7 +538,7 @@ function PublicationsTab({ watchlist }) {
         <span style={{ fontSize: 13, color: '#555', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" }}>Scientific Publications & Congress Abstracts</span>
         <span style={{ fontSize: 13, color: '#c8102e', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>via Europe PMC · PubMed · Preprints</span>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px,1fr))', gap: 10, marginBottom: '1.25rem' }} className="metric-grid">
         {[
           { label: 'Watchlist pubs', val: loadingWatchlist ? '…' : watchlistPubs.length, color: '#1a1a1a' },
           { label: 'Other sector', val: loadingOther ? '…' : otherPubs.length, color: '#1a1a1a' },
@@ -677,7 +677,7 @@ export default function App() {
     { key: 'news', label: 'News' },
     { key: 'publications', label: 'Publications' },
     { key: 'calendar', label: 'Calendar' },
-    { key: 'landscape', label: 'HIV Competitive Intelligence' },
+    { key: 'landscape', label: 'HIV Competitive Intelligence', short: 'HIV CI' },
   ];
 
   return (
@@ -733,8 +733,8 @@ export default function App() {
         {/* Tab bar */}
         <div style={{ display: 'flex', gap: 4 }} className="app-tabs" role="tablist">
           {TABS.map(t => (
-            <button key={t.key} role="tab" aria-selected={tab === t.key} style={{ padding: '10px 14px', fontSize: 13.5, cursor: 'pointer', border: 'none', background: 'none', color: tab === t.key ? '#1a1a1a' : '#6b6760', borderBottom: tab === t.key ? '2px solid #c8102e' : '2px solid transparent', marginBottom: -1, fontWeight: tab === t.key ? 600 : 400, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap' }} onClick={() => setTab(t.key)}>
-              {t.label}
+            <button key={t.key} role="tab" aria-label={t.label} aria-selected={tab === t.key} style={{ padding: '10px 14px', fontSize: 13.5, cursor: 'pointer', border: 'none', background: 'none', color: tab === t.key ? '#1a1a1a' : '#6b6760', borderBottom: tab === t.key ? '2px solid #c8102e' : '2px solid transparent', marginBottom: -1, fontWeight: tab === t.key ? 600 : 400, fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", whiteSpace: 'nowrap' }} onClick={() => setTab(t.key)}>
+              {t.short ? <><span className="tab-long">{t.label}</span><span className="tab-short">{t.short}</span></> : t.label}
             </button>
           ))}
         </div>

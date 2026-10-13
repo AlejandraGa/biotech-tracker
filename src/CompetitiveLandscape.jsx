@@ -413,7 +413,7 @@ export default function CompetitiveLandscape() {
             </div>
           </div>
           {/* Inputs */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14 }}>
+          <div className="cl-inputs" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14 }}>
             <div>
               <div style={{ fontSize: 11.5, color:"#aaa", fontFamily:mono, marginBottom:5 }}>Disease / Condition <span style={{ color:"#c8102e" }}>*</span></div>
               <input style={{ width:"100%", background:"#faf8f4", border:"1px solid #d1ccc4", borderRadius:6, padding:"9px 12px", fontSize: 13, fontFamily:serif, outline:"none", boxSizing:"border-box" }}
@@ -444,7 +444,7 @@ export default function CompetitiveLandscape() {
             </div>
           )}
           {formErr && <div style={{ fontSize: 12.5, color:"#c8102e", fontFamily:mono, marginBottom:10 }}>— {formErr}</div>}
-          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:14, flexWrap:"wrap" }}>
             <Btn onClick={()=>doSearch(condition,intervention)} disabled={loading}>
               {loading?<><Spin/>Searching…</>:"Search landscape →"}
             </Btn>
