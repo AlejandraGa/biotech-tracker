@@ -1,4 +1,4 @@
-// scripts/watch/check.mjs — daily check of regulator and reimbursement pages.
+// scripts/watch/check.mjs — check of regulator and reimbursement pages.
 //
 // Run by .github/workflows/check-decisions.yml. For every body and product in
 // sources.mjs it downloads the page, keeps only the text around the product's
@@ -20,7 +20,7 @@ const STATE_FILE = new URL('scripts/watch/state.json', ROOT);
 const OUT_FILE = new URL('src/hivAutoDetections.json', ROOT);
 const DRY = process.argv.includes('--dry');
 const MODEL = process.env.CHECK_MODEL || 'claude-haiku-5-5';
-// Keeps the daily cost bounded: changes beyond this many wait for the next run.
+// Keeps the cost per run bounded: changes beyond this many wait for the next run (runs every 3 hours).
 const MAX_CLAUDE_CALLS = Number(process.env.MAX_CLAUDE_CALLS || 15);
 const WINDOW = 350;          // characters kept either side of each product name
 const MAX_SNIPPET = 5000;    // characters sent to Claude per page and product

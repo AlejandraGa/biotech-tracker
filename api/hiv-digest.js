@@ -69,7 +69,7 @@ export function buildDigest(data, appUrl = '', auto = { detections: [] }, produc
     <div style="font-size:12px;color:#6b6b6b">Catalyst · weekly digest · ${fmt(data.since)} to ${fmt(data.generatedAt.slice(0, 10))}</div>
     <h1 style="font-size:22px;font-weight:600;margin:6px 0 4px">HIV competitive intelligence</h1>
     <p style="font-size:14px;color:#444;margin:0;line-height:1.55">${total ? `${total} key update${total === 1 ? '' : 's'} across regulators, reimbursement bodies, company news and trial records.` : 'No key updates were detected this week.'}${minor.length ? ` ${minor.length} routine update${minor.length === 1 ? '' : 's'} not shown.` : ''}</p>
-    ${found.length ? `<h2 style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#c8102e;margin:26px 0 4px">New decisions picked up by the daily check · ${found.length}</h2>
+    ${found.length ? `<h2 style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#c8102e;margin:26px 0 4px">New decisions picked up by the website check · ${found.length}</h2>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">${found.map((d) => row({ date: d.date || d.detectedAt, url: d.src, title: `${nameOf[d.product] || d.product}: ${COLUMN_AGENCY[d.column] || d.body}`, detail: [d.summary, d.note].filter(Boolean).join(' · ') })).join('')}</table>` : ''}
     ${order.map(section).join('')}
     ${now.length ? `<h2 style="font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#1a1a1a;margin:30px 0 4px">Where each asset stands today</h2>
@@ -81,7 +81,7 @@ export function buildDigest(data, appUrl = '', auto = { detections: [] }, produc
       </table>` : ''}
     ${failed.length ? `<p style="font-size:12px;color:#92580a;margin:24px 0 0;line-height:1.5">Not checked this week (source did not respond): ${esc(failed.map((f) => f.name).join(', '))}.</p>` : ''}
     ${appUrl ? `<p style="margin:26px 0 0"><a href="${esc(appUrl)}" style="font-size:13px;color:#c8102e">Open the full activity log</a></p>` : ''}
-    <p style="font-size:11px;color:#9a948a;margin:22px 0 0;line-height:1.5">Compiled automatically from public sources (openFDA, EMA, Swissmedic, the Swiss Spezialitätenliste, the daily check of regulator and reimbursement websites, company and trade news, ClinicalTrials.gov). Check the linked source before relying on an item.</p>
+    <p style="font-size:11px;color:#9a948a;margin:22px 0 0;line-height:1.5">Compiled automatically from public sources (openFDA, EMA, Swissmedic, the Swiss Spezialitätenliste, the 3-hourly check of regulator and reimbursement websites, company and trade news, ClinicalTrials.gov). Check the linked source before relying on an item.</p>
   </div></body></html>`;
 
   const text = [subject, '',

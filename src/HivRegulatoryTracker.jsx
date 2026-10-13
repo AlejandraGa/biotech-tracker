@@ -24,7 +24,7 @@ const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.l
 // Column widths come from CSS variables so phones can use narrower columns (see mobile.css).
 const gridFor = (n) => `minmax(var(--asset-col, 250px),1.3fr) repeat(${n}, minmax(var(--status-col, 168px),1fr))`;
 
-// Curated data, with any decisions found by the daily page check laid over it.
+// Curated data, with any decisions found by the page check laid over it.
 const BASE = applyDetections(CURATED, AUTO);
 const OUTCOME = {
   approved: STATUS.approved,
@@ -454,7 +454,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA, EMA and Swiss reimbursement columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
         {AUTO.lastRun
-          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>The other regulators' and reimbursement bodies' websites are checked automatically every day</strong> (last check {fmtDate(AUTO.lastRun)}{Object.values(AUTO.sources).some((x) => !x.ok) ? `; ${new Set(Object.values(AUTO.sources).filter((x) => !x.ok).map((x) => x.body)).size} did not respond` : ""}). {AUTO.detections.length ? `${AUTO.detections.length} decision${AUTO.detections.length === 1 ? " was" : "s were"} picked up this way and ${AUTO.detections.length === 1 ? "is" : "are"} marked "Updated automatically".` : "No new decisions have been picked up this way yet."} </>
+          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>The other regulators' and reimbursement bodies' websites are checked automatically every 3 hours</strong> (last check {fmtDate(AUTO.lastRun)}{Object.values(AUTO.sources).some((x) => !x.ok) ? `; ${new Set(Object.values(AUTO.sources).filter((x) => !x.ok).map((x) => x.body)).size} did not respond` : ""}). {AUTO.detections.length ? `${AUTO.detections.length} decision${AUTO.detections.length === 1 ? " was" : "s were"} picked up this way and ${AUTO.detections.length === 1 ? "is" : "are"} marked "Updated automatically".` : "No new decisions have been picked up this way yet."} </>
           : null}
         Swissmedic, MHRA, Health Canada, TGA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
         Reimbursement entries ({ACCESS_BODIES.map((b) => b.label).join(", ")}) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)} for NICE, G-BA, HAS, BAG and the Dachverband and on {fmtDate(MORE_VERIFIED_ON)} for the rest; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
