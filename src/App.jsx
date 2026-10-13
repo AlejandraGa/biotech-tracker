@@ -211,27 +211,6 @@ const np = {
   npAiBox: { background: '#faf8f4', borderRadius: 6, padding: '10px 14px', fontSize: 13, color: '#333', marginTop: 10, lineHeight: 1.75, border: '1px solid #e5e0d8', fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", borderLeft: '3px solid #c8102e' },
 };
 
-// Card next to each story: which product and company it is about.
-const COMPANY_COLORS = [
-  [/gilead/i, '#c8102e'], [/viiv|gsk/i, '#7c3aed'], [/merck|msd/i, '#0369a1'], [/j&j|johnson|janssen/i, '#b45309'], [/policy/i, '#555555'],
-];
-const SEGMENT_LABELS = { Prevention: 'Prevention · PrEP', Treatment: 'Treatment', Access: 'Access & policy' };
-
-function StoryCard({ story, height }) {
-  const color = (COMPANY_COLORS.find(([re]) => re.test(story.company || '')) || [null, '#1a1a1a'])[1];
-  const big = height > 120;
-  const font = "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
-  const title = story.product || story.company || 'HIV';
-  const overline = story.product ? story.company : (story.company ? 'Company' : 'HIV news');
-  return (
-    <div style={{ width: '100%', height, boxSizing: 'border-box', borderRadius: 8, background: '#fff', border: '1px solid #e5e0d8', borderLeft: `4px solid ${color}`, padding: big ? '16px 18px' : '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontFamily: font }}>
-      <div style={{ fontSize: big ? 12.5 : 11, fontWeight: 600, color: '#888', letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{overline || ' '}</div>
-      <div style={{ fontSize: big ? 22 : 14.5, fontWeight: 700, color, lineHeight: 1.2, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{title}</div>
-      <div style={{ fontSize: big ? 13 : 11.5, color: '#555', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{SEGMENT_LABELS[story.segment] || story.source || ''}</div>
-    </div>
-  );
-}
-
 function Spinner() {
   return <span style={{ display: 'inline-block', width: 12, height: 12, border: '1.5px solid #ddd', borderTopColor: '#c8102e', borderRadius: '50%', animation: 'spin 0.7s linear infinite', marginRight: 6, verticalAlign: -2 }} />;
 }
@@ -701,7 +680,6 @@ export default function App() {
           .featured-grid { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
           .featured-headline { font-size: 22px !important; }
           .story-row { flex-direction: column !important; gap: 10px !important; }
-          .story-thumb { width: 100% !important; height: 160px !important; }
           .cat-filter-bar { flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; scrollbar-width: none !important; padding-bottom: 4px; }
           .cat-filter-bar::-webkit-scrollbar { display: none; }
           .cat-filter-bar button { flex-shrink: 0 !important; }
@@ -790,9 +768,6 @@ export default function App() {
                       <div key={idx} style={{ display: 'flex', gap: '1.25rem', padding: '1.1rem 0', borderBottom: '1px solid #e5e0d8', alignItems: 'flex-start' }} className="story-row"
                         onMouseOver={e => e.currentTarget.style.background = '#faf8f5'}
                         onMouseOut={e => e.currentTarget.style.background = 'transparent'}>
-                        <div style={{ flexShrink: 0, width: 150, height: 90, borderRadius: 6, overflow: 'hidden' }} className="story-thumb">
-                          <StoryCard story={n} height={90} />
-                        </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, flexWrap: 'wrap' }}>
                             <span style={np.tagPill(n.tag)}>{n.tag}</span>
