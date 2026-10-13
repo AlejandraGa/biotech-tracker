@@ -56,6 +56,7 @@ export default function ClinicalCompare({ products, onOpen }) {
                       <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>{p.company} · {p.stage}</div>
                       {c.status_note && <div style={{ fontSize: 11.5, color: FAINT, marginTop: 4 }}>{c.status_note}</div>}
                       {c.source && <a href={c.source} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} style={{ display: "inline-block", fontSize: 11.5, color: MUTED, marginTop: 6 }}>Source: {c.source_label || "link"} ↗</a>}
+                      {(c.additional_sources || []).map((u, i) => <a key={u} href={u} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} style={{ fontSize: 11.5, color: MUTED, marginLeft: 6 }}>[{i + 2}]</a>)}
                     </div>
                     {COLUMNS.map((col) => <Cell key={col.key} value={cellText(c, col.key)} wide={col.width} />)}
                   </div>
