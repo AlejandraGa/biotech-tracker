@@ -1,5 +1,245 @@
 {
- "lastRun": null,
- "sources": {},
+ "lastRun": "2026-10-13",
+ "model": "claude-haiku-5-5",
+ "claudeCalls": 0,
+ "sources": {
+  "ch-new": {
+   "body": "Swissmedic",
+   "ok": true
+  },
+  "mhra-biktarvy": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-bixlenvo": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-sunlenca": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-dovato": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-cab-rpv": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-yeztugo": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-apretude": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "mhra-idvynso": {
+   "body": "MHRA",
+   "ok": true
+  },
+  "hc-biktarvy": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-bixlenvo": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-sunlenca": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-dovato": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-cab-rpv": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-yeztugo": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-apretude": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "hc-idvynso": {
+   "body": "Health Canada",
+   "ok": true
+  },
+  "gba-list": {
+   "body": "G-BA",
+   "ok": true
+  },
+  "nice-cab-rpv": {
+   "body": "NICE",
+   "ok": true
+  },
+  "nice-apretude": {
+   "body": "NICE",
+   "ok": true
+  },
+  "nice-yeztugo": {
+   "body": "NICE",
+   "ok": true
+  },
+  "smc-biktarvy": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-bixlenvo": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-sunlenca": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-dovato": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-cab-rpv": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-yeztugo": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-apretude": {
+   "body": "SMC",
+   "ok": true
+  },
+  "smc-idvynso": {
+   "body": "SMC",
+   "ok": true
+  },
+  "ie-biktarvy": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-bixlenvo": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-sunlenca": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-dovato": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-cab-rpv": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-yeztugo": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-apretude": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "ie-idvynso": {
+   "body": "NCPE",
+   "ok": true
+  },
+  "has-bdpm": {
+   "body": "HAS",
+   "ok": false,
+   "error": "HTTP 404"
+  },
+  "nl-sunlenca": {
+   "body": "Zorginstituut",
+   "ok": true
+  },
+  "be-cbip": {
+   "body": "RIZIV",
+   "ok": true
+  },
+  "dk-ongoing": {
+   "body": "Medicinradet",
+   "ok": true
+  },
+  "dk-biktarvy": {
+   "body": "Medicinradet",
+   "ok": true
+  },
+  "dk-cab-rpv": {
+   "body": "Medicinradet",
+   "ok": true
+  },
+  "no-sunlenca": {
+   "body": "Nye Metoder",
+   "ok": true
+  },
+  "no-apretude": {
+   "body": "Nye Metoder",
+   "ok": true
+  },
+  "no-cab-rpv": {
+   "body": "Nye Metoder",
+   "ok": true
+  },
+  "cda-biktarvy": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-bixlenvo": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-sunlenca": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-dovato": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-cab-rpv": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-yeztugo": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-apretude": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "cda-idvynso": {
+   "body": "CDA-AMC",
+   "ok": false,
+   "error": "HTTP 403"
+  },
+  "pbac-sunlenca": {
+   "body": "PBAC",
+   "ok": true
+  },
+  "pbac-cab-rpv": {
+   "body": "PBAC",
+   "ok": true
+  },
+  "pbac-apretude": {
+   "body": "PBAC",
+   "ok": true
+  }
+ },
  "detections": []
 }

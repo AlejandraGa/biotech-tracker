@@ -1,0 +1,387 @@
+{
+ "ch-new:biktarvy": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:sunlenca": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:dovato": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:cab-rpv": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:yeztugo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:apretude": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ch-new:idvynso": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "mhra-biktarvy:biktarvy": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "mhra-bixlenvo:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "mhra-sunlenca:sunlenca": {
+  "hash": "1260ac5b52f26a5a",
+  "snippet": "{\"results\":[{\"title\":\"MHRA approves lenacapavir for the prevention of sexually transmitted HIV-1 infection\",\"link\":\"/government/news/mhra-approves-lenacapavir-for-the-prevention-of-sexually-transmitted-hiv-1-infection\",\"public_timestamp\":\"2025-12-19T15:09:13Z\",\"description\":\"As with any medicine, the MHRA will keep the safety and effectiveness of lenacapavir under close review.\",\"index\":\"govuk\",\"es_score\":null,\"_id\":\"/government/news/mhra-approves-lenacapavir-for-the-prevention-of-sexually-transmitted-hiv-1-infection\",\"elasticsearch_type\":\"edition\",\"document_type\":\"edition\"}],\"total\":1,\"start\":0,\"aggregates\":{},\"suggested_queries\":[],\"suggested_autocomplete\":[],\"es_cluster\":\"A\"}",
+  "since": "2026-10-13"
+ },
+ "mhra-dovato:dovato": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "mhra-cab-rpv:cab-rpv": {
+  "hash": "6a25fc64b00838b3",
+  "snippet": "{\"results\":[{\"title\":\"New cabotegravir formulations approved to help prevent HIV-1 infection in adults and adolescents\",\"link\":\"/government/news/new-cabotegravir-formulations-approved-to-help-prevent-hiv-1-infection-in-adults-and-adolescents\",\"public_timestamp\":\"2024-05-03T11:09:20Z\",\"description\":\"The MHRA has authorised cabotegravir as 30 mg tablets and as a 600 mg long-acting injection administered every two months\",\"index\":\"govuk\",\"es_score\":null,\"_id\":\"/government/news/new-cabotegravir-formulations-approved-to-help-prevent-hiv-1-infection-in-adults-and-adolescents\",\"elasticsearch_type\":\"edition\",\"document_type\":\"edition\"},{\"title\":\"Dolutegravir (Tivicay▼, Triumeq▼, Juluca▼): updated advice on increased risk of neural tube defects\",\"link\":\"/drug-safety-update/dolutegravir-tivicay-triumeq-juluca-updated-advice-on-increased-risk-of",
+  "since": "2026-10-13"
+ },
+ "mhra-yeztugo:yeztugo": {
+  "hash": "1260ac5b52f26a5a",
+  "snippet": "{\"results\":[{\"title\":\"MHRA approves lenacapavir for the prevention of sexually transmitted HIV-1 infection\",\"link\":\"/government/news/mhra-approves-lenacapavir-for-the-prevention-of-sexually-transmitted-hiv-1-infection\",\"public_timestamp\":\"2025-12-19T15:09:13Z\",\"description\":\"As with any medicine, the MHRA will keep the safety and effectiveness of lenacapavir under close review.\",\"index\":\"govuk\",\"es_score\":null,\"_id\":\"/government/news/mhra-approves-lenacapavir-for-the-prevention-of-sexually-transmitted-hiv-1-infection\",\"elasticsearch_type\":\"edition\",\"document_type\":\"edition\"}],\"total\":1,\"start\":0,\"aggregates\":{},\"suggested_queries\":[],\"suggested_autocomplete\":[],\"es_cluster\":\"A\"}",
+  "since": "2026-10-13"
+ },
+ "mhra-apretude:apretude": {
+  "hash": "0d6640dff73f560b",
+  "snippet": "{\"results\":[{\"title\":\"New cabotegravir formulations approved to help prevent HIV-1 infection in adults and adolescents\",\"link\":\"/government/news/new-cabotegravir-formulations-approved-to-help-prevent-hiv-1-infection-in-adults-and-adolescents\",\"public_timestamp\":\"2024-05-03T11:09:20Z\",\"description\":\"The MHRA has authorised cabotegravir as 30 mg tablets and as a 600 mg long-acting injection administered every two months\",\"index\":\"govuk\",\"es_score\":null,\"_id\":\"/government/news/new-cabotegravir-formulations-approved-to-help-prevent-hiv-1-infection-in-adults-and-adolescents\",\"elasticsearch_type\":\"edition\",\"document_type\":\"edition\"}],\"total\":1,\"start\":0,\"aggregates\":{},\"suggested_queries\":[],\"suggested_autocomplete\":[],\"es_cluster\":\"A\"}",
+  "since": "2026-10-13"
+ },
+ "mhra-idvynso:idvynso": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "hc-biktarvy:biktarvy": {
+  "hash": "39814ea169bed29e",
+  "snippet": "[{\"drug_code\":96935,\"class_name\":\"Human\",\"drug_identification_number\":\"02478579\",\"brand_name\":\"BIKTARVY\",\"descriptor\":\"\",\"number_of_ais\":\"3\",\"ai_group_no\":\"0360430001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2025-07-25\"}]",
+  "since": "2026-10-13"
+ },
+ "hc-bixlenvo:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "hc-sunlenca:sunlenca": {
+  "hash": "235a5aa06975d548",
+  "snippet": "[{\"drug_code\":102149,\"class_name\":\"Human\",\"drug_identification_number\":\"02532468\",\"brand_name\":\"SUNLENCA\",\"descriptor\":\"\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0164221001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2026-09-10\"},{\"drug_code\":102150,\"class_name\":\"Human\",\"drug_identification_number\":\"02532476\",\"brand_name\":\"SUNLENCA\",\"descriptor\":\"SINGLE-DOSE VIALS\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0164221001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2026-09-10\"}]",
+  "since": "2026-10-13"
+ },
+ "hc-dovato:dovato": {
+  "hash": "c7c8f1d6d50e436b",
+  "snippet": "[{\"drug_code\":98173,\"class_name\":\"Human\",\"drug_identification_number\":\"02491753\",\"brand_name\":\"DOVATO\",\"descriptor\":\"\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0261731001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2026-02-19\"}]",
+  "since": "2026-10-13"
+ },
+ "hc-cab-rpv:cab-rpv": {
+  "hash": "b014e5d970461c43",
+  "snippet": "[{\"drug_code\":98706,\"class_name\":\"Human\",\"drug_identification_number\":\"02497220\",\"brand_name\":\"CABENUVA\",\"descriptor\":\"KIT CONTAINING: A) VIAL (2 ML CABOTEGRAVIR) AND B) VIAL (2 ML RILPIVIRINE)\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0262115001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2026-09-21\"},{\"drug_code\":98709,\"class_name\":\"Human\",\"drug_identification_number\":\"02497247\",\"brand_name\":\"CABENUVA\",\"descriptor\":\"KIT CONTAINING: A) VIAL (2 ML CABOTEGRAVIR) AND B) VIAL (2 ML RILPIVIRINE)\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0262115001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2026-09-21\"}]",
+  "since": "2026-10-13"
+ },
+ "hc-yeztugo:yeztugo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "hc-apretude:apretude": {
+  "hash": "42cbbcdc041e10cb",
+  "snippet": "[{\"drug_code\":103642,\"class_name\":\"Human\",\"drug_identification_number\":\"02547465\",\"brand_name\":\"APRETUDE\",\"descriptor\":\"\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0162114001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2025-09-22\"},{\"drug_code\":103643,\"class_name\":\"Human\",\"drug_identification_number\":\"02547473\",\"brand_name\":\"APRETUDE\",\"descriptor\":\"\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0162114002\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2025-09-22\"}]",
+  "since": "2026-10-13"
+ },
+ "hc-idvynso:idvynso": {
+  "hash": "f0fe83a9a5607517",
+  "snippet": "[{\"drug_code\":107103,\"class_name\":\"Human\",\"drug_identification_number\":\"02568748\",\"brand_name\":\"IDVYNSO\",\"descriptor\":\"\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0268294001\",\"company_name\":\"MERCK CANADA INC\",\"last_update_date\":\"2026-06-30\"}]",
+  "since": "2026-10-13"
+ },
+ "gba-list:biktarvy": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:sunlenca": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:dovato": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:cab-rpv": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:yeztugo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:apretude": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "gba-list:idvynso": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "nice-cab-rpv:cab-rpv": {
+  "hash": "8ee1781a1b9c6106",
+  "snippet": "Overview | Cabotegravir with rilpivirine for treating HIV-1 | Guidance | NICE You are here: Home NICE Guidance Conditions and diseases Infections HIV and AIDS Cabotegravir with rilpivirine for treating HIV-1 Technology appraisal guidance Reference number: TA757 Published: 05 January 2022 Guidance Tools and resources Information for the public Evidence History Download guidance (PDF) Overview 1 Recommendations 2 Information about cabotegravir with rilpivirine 3 Committee discussion 4 Implementation 5 Appraisal committee members and NICE project team Overview Evidence-based recommendations on cabotegravir (Vocabria) with rilpivirine (Rekambys) for treating HIV-1 in adults. This includes adults with virological suppression (HIV-1 RNA fewer than 50 copies/ml) on a stable antiretroviral regimen, and without any evidence of viral resistance to, and no previous virological failure with, any non-nucleoside reverse transcriptase inhibitors or integrase inhibitors. Last reviewed: 5 January 2022 Next review: This guidance will be reviewed if there is new evidence that is likely to change the recommendations. Commercial arrangement There is a simple discount patient access scheme for cabotegravir with rilpivirine. NHS organisations can get details on the Commercial Access and Pricing (CAP) Portal. Non-NHS organisations can contact Ben.r.skull@viivhealthcare.com for details. Guidance development process How we develop NICE technology appraisal guidance Your responsibility The recommendations in this guidance represent the view of NICE, arrived at after care",
+  "since": "2026-10-13"
+ },
+ "nice-apretude:apretude": {
+  "hash": "2792b68578ce6b82",
+  "snippet": "Overview | Cabotegravir for preventing HIV-1 in adults and young people | Guidance | NICE You are here: Home NICE Guidance Conditions and diseases Infections HIV and AIDS Cabotegravir for preventing HIV-1 in adults and young people Technology appraisal guidance Reference number: TA1106 Published: 05 November 2025 Guidance Tools and resources Information for the public Evidence History Download guidance (PDF) Overview 1 Recommendations 2 Information about cabotegravir 3 Committee discussion 4 Implementation 5 Evaluation committee members and NICE project team Overview Evidence-based recommendations on cabotegravir (Apretude) for preventing HIV-1 in adults and young people. Last reviewed: 05 November 2025 Next review: This guidance will be reviewed if there is new evidence that is likely to change the recommendations. Commercial arrangement There is a Medicines Procurement and Supply Chain (MPSC) price for cabotegravir. Any provider or organisation that offers this medicine on behalf of the NHS and wants to purchase products at MPSC pricing must be approved by the supplier and registered as a purchasing point with NHS England, and agree to the key conditions of access. Please refer to NHS England's webpage on the MPSC to find out who can access MPSC frameworks.",
+  "since": "2026-10-13"
+ },
+ "nice-yeztugo:yeztugo": {
+  "hash": "926fe68e0920fd01",
+  "snippet": "Project information | Lenacapavir for preventing HIV-1 in adults and young people [ID6495] | Guidance | NICE You are here: Home NICE Guidance Conditions and diseases Infections HIV and AIDS Lenacapavir for preventing HIV-1 in adults and young people [ID6495] In development Reference number: GID-TA11638 Expected publication date: TBC Project information Project documents Suggested remit: To appraise the clinical and cost effectiveness of lenacapavir within its marketing authorisation for preventing HIV-1 in people aged 16 years or older. Status: In progress Technology type: Medicine Decision: Selected Decision publication date: 08 October 2024 Reason for decision: Anticipate the topic will be of importance to patients, carers, professionals, commissioners and the health of the public to ensur … f NHS resources Process: STA Standard ID number: 6495 Provisional Schedule Committee meeting: 2: 03 November 2026 Project Team Project lead Leena Issa Email enquiries If you have any queries please email TACommC@nice.org.uk External Assessment Group: Bristol Technology Assessment Group, University of Bristol Stakeholders Companies sponsors Gilead (lenacapavir) Others Department of Health and Social Care NHS England Patient carer groups HIV-i-Base National AIDS Trust Sophia Forum Terrence Higgins Trust The Love Tank Professional groups British Association for Sexual Health and HIV British HIV Association English HIV and Sexual Health Commissioners Group (EHSHSG) Royal College of Physicians Associated pu",
+  "since": "2026-10-13"
+ },
+ "smc-biktarvy:biktarvy": {
+  "hash": "f248878088bd7f31",
+  "snippet": "up Patient group partners Public partners Policies & publications Minutes Meetings Register for a meeting ILAP Latest update Contact us Medicines advice How we decide PACE Interim acceptance decision option Ultra-orphan medicines for extremely rare conditions Abbreviated submissions Making a submission Search results Home / Search Your search for \"bictegravir\" produced 3 results bictegravir-emtricitabine-tenofovir alafenamide (Biktarvy) For the treatment of adults infected with HIV-1 without any known mutations associated with resistance to the individual components. bictegravir/emtricitabine/tenofovir alafenamide (Biktarvy) Treatment of human immunodeficiency virus-1 (HIV-1) infection in paediatric patients at least 2 years of age and weighing at least 14 kg to less than 25kg without present or past evidence of viral resistance to the integrase inhibitor class, emtricitabine or tenofovir September 2018 decisions news release The Scottish Medicines Consortium (SMC),",
+  "since": "2026-10-13"
+ },
+ "smc-bixlenvo:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "smc-sunlenca:sunlenca": {
+  "hash": "8fd241023b7caadf",
+  "snippet": "up Patient group partners Public partners Policies & publications Minutes Meetings Register for a meeting ILAP Latest update Contact us Medicines advice How we decide PACE Interim acceptance decision option Ultra-orphan medicines for extremely rare conditions Abbreviated submissions Making a submission Search results Home / Search Your search for \"lenacapavir\" produced 1 result lenacapavir (Sunlenca) Film-coated tablets: in combination with other antiretroviral(s) for the treatment of adults with multidrug resistant HIV-1 infection for whom it is otherwise not possible to construct a suppressive anti-viral regimen, for oral loading prior to administration of long-acting lenacapavir injection.Solution for injection: in combination with other antiretroviral(s) for the treatment of adults with multidrug resistant HIV-1 infection for whom it is otherwise not possible to construct a suppressive anti-viral regimen. Search Filters Search again From To Contact us Register for a meeting Accessibility Terms and conditions Respecting y",
+  "since": "2026-10-13"
+ },
+ "smc-dovato:dovato": {
+  "hash": "9df68e41753cd11d",
+  "snippet": "etroviral medicinal products for the treatment of Human Immunodeficiency Virus (HIV) infected children aged >6 to 12 years of age. dolutegravir (Tivicay) In combination with other antiretroviral medicinal products for the treatment of Human Immunodeficiency Virus (HIV) infected adults and adolescents above 12 years of age. dolutegravir lamivudine (Dovato) Treatment of Human Immunodeficiency Virus type 1 (HIV-1) infection in adults and adolescents above 12 years of age weighing at least 40 kg, with no known or suspected resistance to the integrase inhibitor class, or lamivudine. dolutegravir rilpivirine (Juluca) For the treatment of human immunodeficiency virus type 1 (HIV-1) infection in adults wh",
+  "since": "2026-10-13"
+ },
+ "smc-cab-rpv:cab-rpv": {
+  "hash": "1d374979f7835ac7",
+  "snippet": "up Patient group partners Public partners Policies & publications Minutes Meetings Register for a meeting ILAP Latest update Contact us Medicines advice How we decide PACE Interim acceptance decision option Ultra-orphan medicines for extremely rare conditions Abbreviated submissions Making a submission Search results Home / Search Your search for \"cabotegravir\" produced 4 results cabotegravir (Vocabria) Cabotegravir long acting (CAB LA) injection is indicated, in combination with rilpivirine long acting (RPV LA) injection, for the treatment of Human Immunodeficiency Virus type 1 (HIV-1) infection in adults who are virologically suppressed (HIV-1 RNA &lt;50 copies/mL) on a stable antiretroviral regimen without present or past evidence of viral resistance to, and no prior virological failure with agents of the NNRTI and INI class. cabotegravir (Apretude) In combination with safer sex practices for pre-exposure prophylaxis (PrEP) to reduce the risk of sexually acquired human immunodeficiency-1 (HIV-1) infection in high-risk adults and adolescents, weighing at least 35 kg. February 2025 decisions news release October 2021 decisions news release The Scottish Medicines Consortium (SMC) whic",
+  "since": "2026-10-13"
+ },
+ "smc-yeztugo:yeztugo": {
+  "hash": "8fd241023b7caadf",
+  "snippet": "up Patient group partners Public partners Policies & publications Minutes Meetings Register for a meeting ILAP Latest update Contact us Medicines advice How we decide PACE Interim acceptance decision option Ultra-orphan medicines for extremely rare conditions Abbreviated submissions Making a submission Search results Home / Search Your search for \"lenacapavir\" produced 1 result lenacapavir (Sunlenca) Film-coated tablets: in combination with other antiretroviral(s) for the treatment of adults with multidrug resistant HIV-1 infection for whom it is otherwise not possible to construct a suppressive anti-viral regimen, for oral loading prior to administration of long-acting lenacapavir injection.Solution for injection: in combination with other antiretroviral(s) for the treatment of adults with multidrug resistant HIV-1 infection for whom it is otherwise not possible to construct a suppressive anti-viral regimen. Search Filters Search again From To Contact us Register for a meeting Accessibility Terms and conditions Respecting y",
+  "since": "2026-10-13"
+ },
+ "smc-apretude:apretude": {
+  "hash": "430063b29321a2fb",
+  "snippet": "up Patient group partners Public partners Policies & publications Minutes Meetings Register for a meeting ILAP Latest update Contact us Medicines advice How we decide PACE Interim acceptance decision option Ultra-orphan medicines for extremely rare conditions Abbreviated submissions Making a submission Search results Home / Search Your search for \"cabotegravir\" produced 4 results cabotegravir (Vocabria) Cabotegravir long acting (CAB LA) injection is indicated, in combination with rilpivirine long acting (RPV LA) injection, for the treatment of Human Immunodeficiency Virus type 1 (HIV-1) infection in adults who are virologically suppressed (HIV-1 RNA &lt;50 copies/mL) on a stable antiretroviral regimen without present or past evidence of viral resistance to, and no prior virological failure with agents of the NNRTI and INI class. cabotegravir (Apretude) In combination with safer sex practices for pre-exposure prophylaxis (PrEP) to reduce the risk of sexually acquired human immunodeficiency-1 (HIV-1) infection in high-risk adults and adolescents, weighing at least 35 kg. February 2025 decisions news release October 2021 decisions news release The Scottish Medicines Consortium (SMC) which advises",
+  "since": "2026-10-13"
+ },
+ "smc-idvynso:idvynso": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ie-biktarvy:biktarvy": {
+  "hash": "b31b432c06bc764b",
+  "snippet": "bictegravir | National Centre for Pharmacoeconomics Skip to content National Centre for Pharmacoeconomics NCPE Ireland Primary Menu Home Who We Are About Us Current Vacancies Glossary Register for NCPE Events Search for: Who We Are Meet The Team Current Vacancies Monthly Updates Contact Us Glossary Submission Process Overview of the Drug Reimbursement Process … International Collaborations European Union HTA Regulation EUnetHTA21 International Horizon Scanning Initiative Beneluxa Initiative Heads of Agency Group Other collaborations Research & Education Research Research Themes Peer-Reviewed Publications Conference Abstracts Covid 19 Evidence Reviews Education Drugs Other Technologies Search Results for: bictegravir Bictegravir/emtricitabine/tenofovir alafenamide (Biktarvy®) B , Drugs , Latest NCPE Advice Terms & Conditions Privacy Policy Cookies Policy Contact Us © National Centre for Pharmacoeconomics, Ireland LinkedIn X National Centre for Pharmacoeconomics, St James's Hospital, Emmet House, 138-140 Thomas St, Dublin 8, Ireland. D08 XN61",
+  "since": "2026-10-13"
+ },
+ "ie-bixlenvo:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "ie-sunlenca:sunlenca": {
+  "hash": "7ba88206ab21850b",
+  "snippet": "lenacapavir | National Centre for Pharmacoeconomics Skip to content National Centre for Pharmacoeconomics NCPE Ireland Primary Menu Home Who We Are About Us Current Vacancies Glossary Register for NCPE Events Search for: Who We Are Meet The Team Current Vacancies Monthly Updates Contact Us Glossary Submission Process Overview of the Drug Reimbursement Process … International Collaborations European Union HTA Regulation EUnetHTA21 International Horizon Scanning Initiative Beneluxa Initiative Heads of Agency Group Other collaborations Research & Education Research Research Themes Peer-Reviewed Publications Conference Abstracts Covid 19 Evidence Reviews Education Drugs Other Technologies Search Results for: lenacapavir Lenacapavir (Sunlenca®). HTA ID: 25047 Drugs , L , Latest NCPE Advice Terms & Conditions Privacy Policy Cookies Policy Contact Us © National Centre for Pharmacoeconomics, Ireland LinkedIn X National Centre for Pharmacoeconomics, St James's Hospital, Emmet House, 138-140 Thomas St, Dublin 8, Ireland. D08 XN61",
+  "since": "2026-10-13"
+ },
+ "ie-dovato:dovato": {
+  "hash": "3d115fe03db5385a",
+  "snippet": "ive Heads of Agency Group Other collaborations Research & Education Research Research Themes Peer-Reviewed Publications Conference Abstracts Covid 19 Evidence Reviews Education Drugs Other Technologies Search Results for: dolutegravir Triumeq® dispersible tablet (DT) (dolutegravir sodium, abacavir sulphate, and lamivudine). HTA ID: 24036 D , Drugs Dolutegravir/Lamivudine (Dovato®) D , Drugs Dolutegravir/Rilpivirine (Juluca®) D , Drugs Dolutegravir (Tivicay®) D , Drugs Terms & Conditions Privacy Policy Cookies Policy Contact Us © National Centre for Pharmacoeconomics, Ireland LinkedIn X National Centre for Pharmacoeconomics, St James's Hospital, Emmet House, 138-140 Thomas St, Dublin 8, Ireland. D08 XN61",
+  "since": "2026-10-13"
+ },
+ "ie-cab-rpv:cab-rpv": {
+  "hash": "94611417f1f115bb",
+  "snippet": "cabotegravir | National Centre for Pharmacoeconomics Skip to content National Centre for Pharmacoeconomics NCPE Ireland Primary Menu Home Who We Are About Us Current Vacancies Glossary Register for NCPE Events Search for: Who We Are Meet The Team Current Vacancies Monthly Updates Contact Us Glossary Submission Process Overview of the Drug Reimbursement Process … International Collaborations European Union HTA Regulation EUnetHTA21 International Horizon Scanning Initiative Beneluxa Initiative Heads of Agency Group Other collaborations Research & Education Research Research Themes Peer-Reviewed Publications Conference Abstracts Covid 19 Evidence Reviews Education Drugs Other Technologies Search Results for: cabotegravir Cabotegravir (Apretude®). HTA ID: 25072 C , Drugs , Latest NCPE Advice Cabotegravir (Vocabria®) in combination with rilpivirine (Rekambys®). HTA ID: 21026 C , Drugs , Latest NCPE Advice Terms & Conditions Privacy Policy Cookies Policy Contact Us © National Centre for Pharmacoeconomics, Ireland LinkedIn X National Centre for Pharmacoeconomics, St James's Hospital, Emmet House, 138-140 Thomas St, Dublin 8, Ireland. D08 XN61",
+  "since": "2026-10-13"
+ },
+ "ie-yeztugo:yeztugo": {
+  "hash": "7ba88206ab21850b",
+  "snippet": "lenacapavir | National Centre for Pharmacoeconomics Skip to content National Centre for Pharmacoeconomics NCPE Ireland Primary Menu Home Who We Are About Us Current Vacancies Glossary Register for NCPE Events Search for: Who We Are Meet The Team Current Vacancies Monthly Updates Contact Us Glossary Submission Process Overview of the Drug Reimbursement Process … International Collaborations European Union HTA Regulation EUnetHTA21 International Horizon Scanning Initiative Beneluxa Initiative Heads of Agency Group Other collaborations Research & Education Research Research Themes Peer-Reviewed Publications Conference Abstracts Covid 19 Evidence Reviews Education Drugs Other Technologies Search Results for: lenacapavir Lenacapavir (Sunlenca®). HTA ID: 25047 Drugs , L , Latest NCPE Advice Terms & Conditions Privacy Policy Cookies Policy Contact Us © National Centre for Pharmacoeconomics, Ireland LinkedIn X National Centre for Pharmacoeconomics, St James's Hospital, Emmet House, 138-140 Thomas St, Dublin 8, Ireland. D08 XN61",
+  "since": "2026-10-13"
+ },
+ "ie-apretude:apretude": {
+  "hash": "94611417f1f115bb",
+  "snippet": "cabotegravir | National Centre for Pharmacoeconomics Skip to content National Centre for Pharmacoeconomics NCPE Ireland Primary Menu Home Who We Are About Us Current Vacancies Glossary Register for NCPE Events Search for: Who We Are Meet The Team Current Vacancies Monthly Updates Contact Us Glossary Submission Process Overview of the Drug Reimbursement Process … International Collaborations European Union HTA Regulation EUnetHTA21 International Horizon Scanning Initiative Beneluxa Initiative Heads of Agency Group Other collaborations Research & Education Research Research Themes Peer-Reviewed Publications Conference Abstracts Covid 19 Evidence Reviews Education Drugs Other Technologies Search Results for: cabotegravir Cabotegravir (Apretude®). HTA ID: 25072 C , Drugs , Latest NCPE Advice Cabotegravir (Vocabria®) in combination with rilpivirine (Rekambys®). HTA ID: 21026 C , Drugs , Latest NCPE Advice Terms & Conditions Privacy Policy Cookies Policy Contact Us © National Centre for Pharmacoeconomics, Ireland LinkedIn X National Centre for Pharmacoeconomics, St James's Hospital, Emmet House, 138-140 Thomas St, Dublin 8, Ireland. D08 XN61",
+  "since": "2026-10-13"
+ },
+ "ie-idvynso:idvynso": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "nl-sunlenca:sunlenca": {
+  "hash": "793b9291ddbac07a",
+  "snippet": "GVS advice lenacapavir (Sunlenca®) for the treatment of HIV-1 infection | National Health Care Institute Go to content To the homepage of National Health Care Institute National Health Care Institute Home Publications Enter what you are looking for GVS advice lenacapavir (Sunlenca®) for the treatment of HIV-1 infection The National Health Care Institute has completed its assessment whether the medicinal product lenacapavir (Sunlenca®) can be included in the Medicine Reimbursement System (GVS). This product is indicated for the treatment of adults with a multi-drug resistant HIV-1 infection for whom it is otherwise not possible to construct a suppressive antiviral regimen. The National Health Care Institute advises the Minister of Health, Welfare and Sport to include lenacapavir (Sunlenca®) on List 1B of the Medicine Reimbursement System (GVS), imposing List 2 conditions. Lenacapavir has been evaluated via the parallel procedure with the Medicines Evaluation Board (MEB). In October 2022, the Minister decided to adopt the advice of the National Health Care Institute. Download: GVS advice lenacapavir (Sunlenca®) for the treatment of HIV-1 infection Report 22-09-2022 PDF document 276.17 KB 6 pages Indication for which reimbursement is requested Lenacapavir, in combination with other antiretroviral(s), is indicated for the treatment of adults with a multi-drug resistant HIV-1 infection for whom it is otherwise not possible to construct a suppressive antiviral regimen. National Health Care Institute's advice The National Health Care Institute concludes that lenacapavir (Sunlenca®) can be included on List 1B and List 2 of the Health Insurance Regulation. This report is a summary of recommendations by the National Health Care Institute. The original text is in Dutch . More on this topic Assessment of outpatient medicines for the benefit of the Medicine Reimbursement System (GVS) Other languages Nederlands Service Contact Si",
+  "since": "2026-10-13"
+ },
+ "be-cbip:biktarvy": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:sunlenca": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:dovato": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:cab-rpv": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:yeztugo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:apretude": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "be-cbip:idvynso": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:biktarvy": {
+  "hash": "36585672a2ec2d0d",
+  "snippet": "rombopag (Doptelet) Avelumab (Bavencio) Avelumab (Bavencio) i kombination med axitinib (Inlyta) Axicabtagene ciloleucel (Yescarta) Axitinib (Inlyta) Azacitidin (Onureg) Baricitinib (Olumiant) Belantamab mafodotin (Blenrep) Belumosudil (Rezurock) Belzutifan (Welireg) Benralizumab (Fasenra) Berotralstat (Orladeyo) Betibeglogene autotemcel (Zynteglo) Bictegravir/emtricitabine/tenofovir alafenamid (Biktarvy) Bimekizumab Binimetinib (Mektovi) Biosimilært adalimumab Biosimilært bevacizumab Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kin … rombopag (Doptelet) Avelumab (Bavencio) Avelumab (Bavencio) i kombination med axitinib (Inlyta) Axicabtagene ciloleucel (Yescarta) Axitinib (Inlyta) Azacitidin (Onureg) Baricitinib (Olumiant) Belantamab mafodotin (Blenrep) Belumosudil (Rezurock) Belzutifan (Welireg) Benralizumab (Fasenra) Berotralstat (Orladeyo) Betibeglogene autotemcel (Zynteglo) Bictegravir/emtricitabine/tenofovir alafenamid (Biktarvy) Bimekizumab Binimetinib (Mektovi) Biosimilært adalimumab Biosimilært bevacizumab Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kin",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:bixlenvo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:sunlenca": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:dovato": {
+  "hash": "4c63b1c301e687e2",
+  "snippet": "l) Datopotamab deruxtecan (Datroway) Daunorubicin og cytarabin (CPX-351) (Vyxeos) Decitabin + cedazuridin (Inaqovi) Decitabin + Cedazuridin (Inaqovi) i kombination med Venetoclax Delandistrogene moxeparvovec (Elevidys) Depemokimab (Exdensur) Deucravacitinib (Sotyktu) Difelikefalin (Kapruvia) Dinutuximab beta (Qarziba) Diroximel fumarate (Vumerity) Dolutegravir/lamivudin (Dovato) Donanemab (Kisunla) Donidalorsen (Dawnzera) Doravirin (Pifeltro) Doravirin/lamivudin/tenofovir disoproxil (Delstrigo) Dostarlimab (Jemperli) Dostarlimab (Jemperli) i kombination med carboplatin og paclitaxel Dupilumab (Dupixent) Durvalumab (Imfinzi) Durvalumab (Imfinzi) i komb. m. FLOT (5-fluorouracil, leucovorin, oxaliplatin, docetaxel) Durvalum … l) Datopotamab deruxtecan (Datroway) Daunorubicin og cytarabin (CPX-351) (Vyxeos) Decitabin + cedazuridin (Inaqovi) Decitabin + Cedazuridin (Inaqovi) i kombination med Venetoclax Delandistrogene moxeparvovec (Elevidys) Depemokimab (Exdensur) Deucravacitinib (Sotyktu) Difelikefalin (Kapruvia) Dinutuximab beta (Qarziba) Diroximel fumarate (Vumerity) Dolutegravir/lamivudin (Dovato) Donanemab (Kisunla) Donidalorsen (Dawnzera) Doravirin (Pifeltro) Doravirin/lamivudin/tenofovir disoproxil (Delstrigo) Dostarlimab (Jemperli) Dostarlimab (Jemperli) i kombination med carboplatin og paclitaxel Dupilumab (Dupixent) Durvalumab (Imfinzi) Durvalumab (Imfinzi) i komb. m. FLOT (5-fluorouracil, leucovorin, oxaliplatin, docetaxel) Durvalum",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:cab-rpv": {
+  "hash": "0565dfe6f5cef80b",
+  "snippet": "Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kinpeygo) Bulevirtid (Hepcludex) Burosumab (Crysvita) C1-inhibitor (human) (Berinert) Cabotegravir/rilpivirine Cabozantinib (Cabometyx) Cabozantinib (Cabometyx) i komb. med nivolumab (Opdivo) Capivasertib (Truqap) i komb. med fulvestrant Caplacizumab (Cablivi) Cemiplimab (Libtayo) Cemiplimab (Libtayo) i kombination med platinbaseret kemoterapi Certolizumab pegol (Cimzia) Chlormethin (Ledaga) Ciltacabtagene autoleucel (Carvykti) Cipaglucosidase alfa (Pombil … Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kinpeygo) Bulevirtid (Hepcludex) Burosumab (Crysvita) C1-inhibitor (human) (Berinert) Cabotegravir/rilpivirine Cabozantinib (Cabometyx) Cabozantinib (Cabometyx) i komb. med nivolumab (Opdivo) Capivasertib (Truqap) i komb. med fulvestrant Caplacizumab (Cablivi) Cemiplimab (Libtayo) Cemiplimab (Libtayo) i kombination med platinbaseret kemoterapi Certolizumab pegol (Cimzia) Chlormethin (Ledaga) Ciltacabtagene autoleucel (Carvykti) Cipaglucosidase alfa (Pombil",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:yeztugo": {
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:apretude": {
+  "hash": "38466ef74e724323",
+  "snippet": "Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kinpeygo) Bulevirtid (Hepcludex) Burosumab (Crysvita) C1-inhibitor (human) (Berinert) Cabotegravir/rilpivirine Cabozantinib (Cabometyx) Cabozantinib (Cabometyx) i komb. med nivolumab (Opdivo) Capivasertib (Truqap) i komb. med fulvestrant Caplacizumab (Cablivi) Cemiplimab (Libtayo) Cemiplimab (Libtayo) i kombination med platinbaseret kemoterapi Certolizumab pegol (Cimzia) Chlormethin (Ledaga) Ciltacabtagene autoleucel (Carvykti) Cipaglucosidase … Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kinpeygo) Bulevirtid (Hepcludex) Burosumab (Crysvita) C1-inhibitor (human) (Berinert) Cabotegravir/rilpivirine Cabozantinib (Cabometyx) Cabozantinib (Cabometyx) i komb. med nivolumab (Opdivo) Capivasertib (Truqap) i komb. med fulvestrant Caplacizumab (Cablivi) Cemiplimab (Libtayo) Cemiplimab (Libtayo) i kombination med platinbaseret kemoterapi Certolizumab pegol (Cimzia) Chlormethin (Ledaga) Ciltacabtagene autoleucel (Carvykti) Cipaglucosidase",
+  "since": "2026-10-13"
+ },
+ "dk-ongoing:idvynso": {
+  "hash": "8a18217ff9905d65",
+  "snippet": "i Specifik sygdom Benign hæmatologi, Immun trombocytopeni Status: Igangværende | 18-ugers proces Se detaljer Lægemidler og indikationsudvidelser Donanemab (Kisunla) Sygdomsområde Neurologiske sygdomme Specifik sygdom Alzheimers sygdom Status: Igangværende | 18-ugers proces Se detaljer Lægemidler og indikationsudvidelser Doravirin i kombination med islatravir (Idvynso) Sygdomsområde Infektionssygdomme Specifik sygdom Hiv/aids Status: Igangværende | 16-ugers proces Se detaljer Lægemidler og indikationsudvidelser Pirtobrutinib (Jaypirca) Sygdomsområde Kræftsygdomme Specifik sygdom Kronisk lymfatisk leukæmi Status: Igangværende | 16-ugers proces Se detaljer Lægemidler og indikationsudvidelser Tolebrutinib (Cenrifk",
+  "since": "2026-10-13"
+ },
+ "dk-biktarvy:biktarvy": {
+  "hash": "bcecceabd3616f65",
+  "snippet": "Bictegravir/emtricitabine/tenofovir alafenamid (Biktarvy) - hiv-infektion Gå til hovedindholdet Anbefalinger og vejledninger Filtrering Fritekst Fagudvalg Vælg fagudvalg ADHD hos børn og voksne Akut leukæmi Alopecia areata Alzheimers sygdom Alzheimers sygdom - FU nedlagt Amyotrofisk lateral sklerose (ALS) Analkræft Antibiotika (RADS) - FU nedlagt Anæstesi - FU nedlagt Arvelige hudsygdomme (genodermatose … rombopag (Doptelet) Avelumab (Bavencio) Avelumab (Bavencio) i kombination med axitinib (Inlyta) Axicabtagene ciloleucel (Yescarta) Axitinib (Inlyta) Azacitidin (Onureg) Baricitinib (Olumiant) Belantamab mafodotin (Blenrep) Belumosudil (Rezurock) Belzutifan (Welireg) Benralizumab (Fasenra) Berotralstat (Orladeyo) Betibeglogene autotemcel (Zynteglo) Bictegravir/emtricitabine/tenofovir alafenamid (Biktarvy) Bimekizumab Binimetinib (Mektovi) Biosimilært adalimumab Biosimilært bevacizumab Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kin … ing Medicinrådets persondatapolitik Fortrolighed Nyheder Vejledning til primærsektor Primærsektor Basislisten Behandlingsvejledninger til primær sektor Seponeringslisten Lægemiddelnyt Indhold Stamdata Anbefaling Status for vurdering af lægemidlet Abonnér på ændringer Medicinraadet.dk Anbefalinger og vejledninger Lægemidler og indikationsudvidelser Bictegravir/emtricitabine/tenofovir alafenamid (Biktarvy) - hiv-infektion Bictegravir/emtricitabine/tenofovir alafenamid (Biktarvy) Anbefalet Ansøger Gilead ATC-kode J05AR20 Sygdomsområde Infektionssygdomme Fagudvalg Hiv/aids Specifik sygdom Hiv/aids Sidst opdateret 30. januar 2019 Anvendelse Hiv-1-infektion Anbefaling Medicinrådets anbefaling vedrørende bictegravir/emtricitabin/ tenofovir alafenamid som mulig standardbehandling til hiv-1-infektion Medicinrådet anbefaler bictegravir/emtricitabin/tenofovir alafenamid som mulig standardbehandling til patienter med hiv-1-infektion, som ikke har aktuel eller tidligere påvist viral resistens overfor integrasehæmmerklassen, emtricitabin eller tenofovir. Medicinrådet finder, at der er et rimeligt forhold mellem lægemidlets kliniske merværdi og omkostningerne ved behandling med bictegravir/emtricitabin/tenofovir alafenamid sammenlignet med dolutegravir i kombination med to antiretrovirale midler af klassen nukleosid- og nukleotid- evers- ranskriptasehæmmere. Medicinrådet har besluttet, at der i 2019 udarbejdes en fælles regional behandlingsvejledning for hiv. Indtil Medicinrådet har udarbejdet en behandlingsvejledning, anbefales det … ehandlingstid Aktivitet Sagsbehandlingstiden og processen for Medicinrådets vurdering 06. december 2018 - 30. januar 2019. Medicinrådet modtog den foreløbige ansøgning den 26. februar 2018, og protokollen blev sendt til Gilead den 18. maj 2018. Den endelige ansøgning blev modtaget den 6. december 2018, og Medicinrådet har gennemført vurderingen af bictegravir/emtricitabin/tenofovir alafenamid på 7 uger og 6 dage. Medicinrådets anbefaling Aktivitet Medicinrådet har godkendt anbefalingen 30. januar 2019. Omkostningsanalyse Aktivitet Medicinrådet har modtaget Amgros' økonomiske beslutningsgrundlag 17. januar 2019. Sundhedsfaglig vurdering (lægemidlets værdi) Aktivitet Endelig vurdering af lægemidlets værdi efter modtagelse af høringssvaret 19. december 2018. Medicinrådet har godkendt vurderingen af lægemidlets værdi 12. december 2018. Medicinrådets vurdering af klinisk merværdi for bictegravir/emtricitabin/tenofovir alafenamid til behandling af hiv-1-infektion Medicinrådets udkast til vurderingen af lægemidlets værdi er sendt i høring hos ansøger 5. - 19. december 2018. Medicinrådet udarbejder vurderingsrapporten 6. - 12. december 2018. Ansøgning Aktivitet Medicinrådet har modtaget og godkendt den endelige ansøgning 06. december 2018. Ansøgningsproces Aktivitet Medicinrådet har sendt protokollen til ansøger 18. maj 2018. Medicinrådets protokol for vurdering af den kliniske merværdi af bictegravir/emtricitabine/ tenofovir alafenamid til behandling af voksne med hiv-1-infektion Medicinrådet udarbejder protokollen 26. februar - 18. maj 2018. Medicinrådet har modtaget den foreløbige ansøgning 26. februar 2018. Abonnér på ændringer ... på dette lægemiddel Jeg accepterer Medicinrådets persondatapolitik Tilmeld ændringer PS. Du kan altid afmelde",
+  "since": "2026-10-13"
+ },
+ "dk-cab-rpv:cab-rpv": {
+  "hash": "a892fdc8b054b0f7",
+  "snippet": "Cabotegravir/rilpivirin - Hiv-1-infektion Gå til hovedindholdet Anbefalinger og vejledninger Filtrering Fritekst Fagudvalg Vælg fagudvalg ADHD hos børn og voksne Akut leukæmi Alopecia areata Alzheimers sygdom Alzheimers sygdom - FU nedlagt Amyotrofisk lateral sklerose (ALS) Analkræft Antibiotika (RADS) - FU nedlagt Anæstesi - FU nedlagt Arvelige hudsygdomme (genodermatos … Biosimilært rituximab Biosimilært trastuzumab Birkebark ekstrakt (Filsuvez) Blinatumomab (Blincyto) Brentuximab vedotin (Adcetris) Brexucabtagene autoleucel (Tecartus) Brigatinib (Alunbrig) Brodalumab (Kyntheum) Brolucizumab (Beovu) Budesonid (Jorveza) Budesonid (Kinpeygo) Bulevirtid (Hepcludex) Burosumab (Crysvita) C1-inhibitor (human) (Berinert) Cabotegravir/rilpivirine Cabozantinib (Cabometyx) Cabozantinib (Cabometyx) i komb. med nivolumab (Opdivo) Capivasertib (Truqap) i komb. med fulvestrant Caplacizumab (Cablivi) Cemiplimab (Libtayo) Cemiplimab (Libtayo) i kombination med platinbaseret kemoterapi Certolizumab pegol (Cimzia) Chlormethin (Ledaga) Ciltacabtagene autoleucel (Carvykti) Cipaglucosidase alfa (Pombil … s persondatapolitik Fortrolighed Nyheder Vejledning til primærsektor Primærsektor Basislisten Behandlingsvejledninger til primær sektor Seponeringslisten Lægemiddelnyt Indhold Stamdata Anbefaling Medicinrådets tidligere vurdering - 28. april 2021 Abonnér på ændringer Medicinraadet.dk Anbefalinger og vejledninger Lægemidler og indikationsudvidelser Cabotegravir/rilpivirin - Hiv-1-infektion Cabotegravir/rilpivirin Anbefalet Ansøger GSK ATC-kode J05AJ04 og J05AG05 Sygdomsområde Infektionssygdomme Fagudvalg Hiv/aids Specifik sygdom Hiv/aids Sidst opdateret 16. juni 2022 Anvendelse Hiv-1-infektion Anbefaling Godkendt den 16. juni 2022 Medicinrådets anbefaling vedr. cabotegravir-rilpivirin til behandling af hiv-1-infektion, version 2.0 Medicinrådet anbefaler cabotegravir/rilpivirin som injektionsbehandling hver anden måned til behandling af hiv-1-infektion. Anbefalingen gælder patienter, som er virologisk supprimerede på et stabilt antiretroviralt regime uden aktuel eller tidligere evidens for viral resistens over for, og intet tidligere virologisk svigt med, lægemidler af non-nukleosid-revers-transkriptasehæmmer (NNRTI’ere) - og integrasehæmmer-klassen. Medicinrådet vurderer, at cabotegravir/rilpivirin virker lige så godt til at supprimere (hæmme) hiv-infektion, som den behandling, man bruger i dag (tabletbehandling). Injektionsbehandlingen er forbundet med lidt flere bivirkninger, men kan være en fordel for patienter, som har udfordringer med den daglige tabletbehandling. Medicinrådet vurderer, at omkostningerne til behandlingen er rimelige, nå … enligner med andre lægemidler til patientgruppen. Anbefaling og vurdering - version 2.0 Bilag til anbefaling - version 2.0 Medicinrådets tidligere vurdering - 28. april 2021 Medicinrådets anbefaling Aktivitet Medicinrådet har godkendt anbefalingen 28. april 2021. OBS: Der er en opdateret version 2.0 pr. 15. juni 2022 Medicinrådets anbefaling vedr. cabotegravir/rilpivirin til hiv-1-infektion-vers. 1.0 Bilag til Medicinrådets anbefaling vedr. cabotegravir/rilpivirin til hiv-1-infektion-vers. 1.0 Sagsbehandlingstid Aktivitet Sagsbehandlingstiden og processen for Medicinrådets vurdering 27. januar - 28. april 2021. Medicinrådet har brugt 13 uger (91 dage) på arbejdet med cabotegravir/rilpivirin til hiv-1-infektion. Sundhedsfaglig vurdering (lægemidlets værdi) Aktivitet Endelig vurdering af lægemidlets værdi efter modtagelse af høringssvaret 24. marts - 28. april 2021. Medicinrådet har godkendt vurderingen af lægemidlets værdi 24. marts 2021. Medicinrådets vurdering vedrørende cabotegravir/rilpivirin til behandling af hiv-1-infektion Medicinrådets udkast til vurderingen af lægemidlets værdi er sendt i høring hos ansøger 12. marts 2021. Medicinrådet udarbejder vurderingsrapporten 27. januar - 24. marts 2021. Sundhedsøkonomisk vurdering Aktivitet Medicinrådet har godkendt de sundhedsøkonomiske modelantagelser 28. april 2021. Medicinrådet udarbejder det økonomiske beslutningsgrundlag 27. januar - 28. april 2021. Ansøgningsproces Aktivitet Medicinrådet har sendt protokollen til ansøger 07. december 2020. Medicinrådet udarbejder protokollen 6. juli - 07. december 2020. Medicinrådets protokol for vurdering af cabotegravir/rilpivirin til behandling af hiv-1-infektion Medicinrådet har modtaget den foreløbige ansøgning 06. juli 2020. Ansøgning Aktivitet Medicinrådet har modtaget og godkendt den endelige ansøgning 27. januar 2021. Abonnér på ændringer ... på dette lægemiddel Jeg accepterer Medicinrådets persondatapolitik Tilmeld ændringer PS. Du kan altid afmelde notifikation i d",
+  "since": "2026-10-13"
+ },
+ "no-sunlenca:sunlenca": {
+  "hash": "c0aa93dbd4c17ea3",
+  "snippet": "Lenacapavir - Nye metoder Hopp til innhold ID2022_037 Lenacapavir Behandling av multiresistent humant immunsviktvirus (HIV-1) infeksjon. Beslutning foreligger Forslag Sendt inn 17.02.2022 Sendt inn av Statens legemiddelverk ID-nummer ID2022_037 Om metoden Legemiddel (injeksjonsvæske/tablett) til behandling av multiresistent humant immunsviktvirus (HIV-1) infeksjon. Metodevarsel Beslutning i Bestillerforum RHF (2 … ing. Sakspapirer og protokoll Alle sakspapirer og protokoll finner du i møtearkivet \" Møter i Bestillerforum \", se Bestillerforum for nye metoder 28.04.2025, sak 075-25. ​​​ Bestillerforum for nye metoder (21.03.2022) Beslutning En forenklet metodevurdering med en vurdering av effekt og sikkerhet (løp D) gjennomføres ved Statens legemiddelverk for lenacapavir til behandling av multiresistent humant immunsviktvirus (HIV-1) infeksjon. Prisnotat utarbeides av Sykehusinnkjøp HF, LIS. Protokoll og sakspapirer fra Bestillerforum for nye metoder (21.03.2022) finner du her , se sak 057-22. Beslutning Beslutning tatt 28.04.2025 Ansvarlig Interregionalt fagdirektørmøte Beslutning interregionalt fagdirektørmøte (",
+  "since": "2026-10-13"
+ },
+ "no-sunlenca:yeztugo": {
+  "hash": "c0aa93dbd4c17ea3",
+  "snippet": "Lenacapavir - Nye metoder Hopp til innhold ID2022_037 Lenacapavir Behandling av multiresistent humant immunsviktvirus (HIV-1) infeksjon. Beslutning foreligger Forslag Sendt inn 17.02.2022 Sendt inn av Statens legemiddelverk ID-nummer ID2022_037 Om metoden Legemiddel (injeksjonsvæske/tablett) til behandling av multiresistent humant immunsviktvirus (HIV-1) infeksjon. Metodevarsel Beslutning i Bestillerforum RHF (2 … ing. Sakspapirer og protokoll Alle sakspapirer og protokoll finner du i møtearkivet \" Møter i Bestillerforum \", se Bestillerforum for nye metoder 28.04.2025, sak 075-25. ​​​ Bestillerforum for nye metoder (21.03.2022) Beslutning En forenklet metodevurdering med en vurdering av effekt og sikkerhet (løp D) gjennomføres ved Statens legemiddelverk for lenacapavir til behandling av multiresistent humant immunsviktvirus (HIV-1) infeksjon. Prisnotat utarbeides av Sykehusinnkjøp HF, LIS. Protokoll og sakspapirer fra Bestillerforum for nye metoder (21.03.2022) finner du her , se sak 057-22. Beslutning Beslutning tatt 28.04.2025 Ansvarlig Interregionalt fagdirektørmøte Beslutning interregionalt fagdirektørmøte (",
+  "since": "2026-10-13"
+ },
+ "no-apretude:apretude": {
+  "hash": "147f7fc56c1ba152",
+  "snippet": "Cabotegravir (Apretude) - Nye metoder Hopp til innhold ID2023_045 Cabotegravir (Apretude) I kombinasjon med tiltak for sikker sex som preeksponeringsprofylakse (PrEP) for å redusere risikoen for seksuelt overført hiv-1-infeksjon hos voksne og ungdom med høy risiko, som veier minst 35 kg Beslutning foreligger Forslag Sendt inn 16.03.2023 Sendt inn av Statens legemiddelverk ID-nummer ID2023_045 Beslutning i Bestillerforum for nye metode … i møtearkivet \"Møter i Bestillerforum\", se Bestillerforum for nye metoder 23.09.2024, sak 134-24. Tidligere beslutning i Bestillerforum Metodevarsel (publisert 16.03.2023) Innspill fra firma (publisert 11.04.2023) Bestillerforum for nye metoder (24.04.2023)* En forenklet metodevurdering (løp D) gjennomføres ved Statens legemiddelverk (nå DMP) for cabotegravir (Apretude) i kombinasjon med tiltak for sikker sex som preeksponeringsprofylakse (PrEP) for å redusere risikoen for seksuelt overført hiv-1-infeksjon hos voksne og ungdom med høy risiko, som veier minst 35 kg. Prisnotat utarbeides av Sykehusinnkjøp HF, LIS. *Oppdatert 20.08.2024. Tidligere beslutning: En forenklet metodevurdering (løp D) gjennomføres ved Statens legemiddelverk for cabotegravir som preeksponeringsprofylakse av HIV-1-infeksjon. Prisnotat utarbeides av Sykehusinnkjøp HF, LIS. Protokoll og sakspapirer fra Bestillerforum for nye metoder (24.04.2023) finner du her , se sak 075-23. Metodevurdering Direktoratet for medisinske produkter har utarbeidet et notat og Bestillerforum har avbestilt oppdraget. Notatet ble 25.09.2024 sendt til de regionale helseforetakene, som forbereder saken til beslutning. Notat_ID2023_045 (PDF) (publisert 26.09.2024) Beslutning Beslutning tatt 21.10.2024 Ansvarlig Interregionalt fagdirektørmøte Beslutning interregionalt fagdirektørmøte (21.10.2024) Fagdirektørmøte tar til orientering at ID2023_045 Cabotegravir ( Apretude) i kombinasjon med tiltak for sikker sex som preeksponeringsprofylakse (PrEP) for å redusere risikoen for seksuelt overført hiv-1-infeksjon hos voksne og ungdom med høy risiko, som veier minst 35 kg er avbestilt av Bestillerforum. Legemidlet skal ikke benyttes til den aktuelle indikasjonen Beslutningen legges frem som referatsak i Beslutningsforum",
+  "since": "2026-10-13"
+ },
+ "no-cab-rpv:cab-rpv": {
+  "hash": "a3243d4ec95e8998",
+  "snippet": "Kabotegravir (Vocabria) - Nye metoder Hopp til innhold ID2020_012 Kabotegravir (Vocabria) Til behandling av humant immunsviktvirus type 1 (hiv-1)- infeksjon hos voksne og ungdom (som er minst 12 år gamle og som veier minst 35 kg), som er virologisk supprimert (hiv-1 RNA < 50 kopier/ml) på et stabilt antiretroviralt regime uten eksisterende eller tidligere tegn på viral resistens mot, og ingen tidligere virologisk svikt med, legemidler i ikke-nukleosid reverstranskriptasehemmer (NNRTI)- og integrasehemmer (INI)-gruppen. Beslutning foreligger Forslag Sendt inn 13.02.2020 Sendt inn av Statens legemiddelverk ID-nummer ID2020_012 Om metoden Alternativ skrivemåte: cabotegravir Historikk - ungdom Leverandøren sendte i mars 2025 inn en anmodning om vurdering av bruken for ungdom. Beslutning i Bestillerforum for nye metoder (28.04.2025) Et prisnotat utarbeides av Sykehusinnkjøp HF. Sakspapirer og protokoll Alle sakspapirer og protokoll finner du i møtearkivet \" Møter i Bestillerforum \", se Bestillerforum for nye metoder 28 … sak 063-25. Sakspapirene inkluderer blant annet: Anmodning ID2020_012 til ungdom (PDF) (publisert 08.04.2025) Ekspanderende overskrift: Tidligere beslutning Historikk - voksne Beslutning i Bestillerforum RHF (30.03.2020)* En forenklet metodevurdering med oppsummering av effekt, sikkerhet og kostnader (D) gjennomføres ved Statens legemiddelverk for Kabotegravir- injeksjon i kombinasjon med rilpivirin-injeksjon til behandling av HIV-infeksjon hos voksne som er virologisk supprimert på et stabilt antiretroviralt regime. Prisnotat utarbeides av Sykehusinnkjøp HF, LIS. Saksdokumenter og protokoll fra Bestillerforum RHF finner du her . Se sak 060-20. *Beslutningen ble oppdatert og justert 14.12.2020 etter positiv opinion i EMA. Opprinnelig beslutning: En forenklet metodevurdering med oppsummering av effekt, sikkerhet og kostnader (D) gjennomføres ved Statens legemiddelverk for Kabotegravir som langtidsvirkende kombinasjonsbehandling med rilpivirin til behandling av HIV. Prisnotat utarbeides av Sykehusinnkjøp HF, LIS. ​ Metodevarsel (13.02.2020) Innspill fra HivNorge (27.02.2020) Innspill fra firma (18.03.2020) Metodevurdering Oppdrag gitt 30.03.2020 Type Forenklet metodevurdering (D) - bruk til voksne Utreder Statens legemiddelverk … ngdom (PDF) (publisert 16.06.2025) Prisnotatet ble utkvittert av medlemmene i Bestillerforum for nye metoder og dokumentene 20.05.2025 sendt til de fire regionale helseforetakene (RHF-ene) for forberedelser til beslutning. Beslutning Beslutning tatt 16.06.2025 Ansvarlig Beslutningsforum for nye metoder Beslutningsforum for nye metoder (16.06.2025) Kabotegravir (Vocabria) innføres i kombinasjon med rilpivirin-injeksjon, til behandling av humant immunsviktvirus type 1 (hiv-1)- infeksjon hos voksne og ungdom (som er minst 12 år gamle og som veier minst 35 kg), som er virologisk supprimert (hiv-1 RNA < 50 kopier/ml) på et stabilt antiretroviralt regime uten eksisterende eller tidligere tegn på viral resistens mot, og … er at prisen er lik eller lavere enn den prisen som er grunnlaget for denne beslutningen. Behandlingen kan tas i bruk fra beslutningstidspunktet. Les mer om saksgrunnlag og beslutning i sakspapirer (PDF) og protokoll (PDF) fra Beslutningsforum for nye metoder 16.06.2025 under sak 104-2025. Beslutning i Beslutningsforum for nye metoder (22.03.2021) Kabotegravir-injeksjon (Vocabria) i kombinasjon med rilpivirin-injeksjon (Rekambys) innføres til behandling av hiv-infeksjon hos voksne som er virologisk supprimert på et stabilt antiretroviralt regime og som er motivert for behandling, men som har utfordringer med daglig tablettbehandling. Det forutsetter at prisen er lik eller lavere enn den prisen som er grunnlaget for denne beslutningen. Behandlingen kan tas i bruk fra 01.05",
+  "since": "2026-10-13"
+ },
+ "pbac-sunlenca:sunlenca": {
+  "hash": "454c6dd4cf1f3b9a",
+  "snippet": "Medicine Status | Pharmaceutical Benefits Scheme (PBS) Skip to navigation Skip to content Medicine Status News Contact Medicine Status News Contact LENACAPAVIR Information current as at: 1 October 2026 The pharmaceutical company has not advised whether they intend to proceed or not within 60 days of receiving the ratified PBAC minutes. The process for listing is considered inactive. Legend: Completed N In progress Not applicable N Yet to commence Submission Details Brand name: Sunlenca® Form and strength: Please search for and view the medicine's Public Summary Document (PSD) for more information Submission sponsor: Gilead Sciences Pty Limited Condition/indication: (therapeutic use) Human immunodeficiency virus (HIV) Listing requested: Please see PSD for more information Funding program: Please see PSD for more information Request authority level: Please see PSD for more information PBAC Submission type: New listing (Standard Re-entry Pathway) Comment: -- Other PBAC consideration: LENACAPAVIR Progress Details Submission received for: November 2023 PBAC meeting Opportunity for consumer comment: Open 26/07/2023 and close 20/09/2023 (see PBS Website ) PBAC meeting: Held on 01/11/2023 PBAC outcome published: Recommended (see PBAC Outcomes ) Notice of intent submitted: Awaiting lodgement from pharmaceutical company 5 Lodgement of required d",
+  "since": "2026-10-13"
+ },
+ "pbac-cab-rpv:cab-rpv": {
+  "hash": "ef97797c5fa5558b",
+  "snippet": "CABOTEGRAVIR (&) RILPIVIRINE - 12937x | Pharmaceutical Benefits Scheme (PBS) Skip to navigation Skip to content Medicine Status News Contact Medicine Status News Contact CABOTEGRAVIR (&) RILPIVIRINE cabotegravir 600 mg/3 mL modified release injection [3 mL vial] (&) rilpivirine 900 mg/3 mL modified release injection [3 mL vial], 1 pack CABOTEGRAVIR (&) RILPIVIRINE (12937X) cabotegravir 600 mg/3 mL modified release injection [3 mL vial] (&) rilpivirine 900 mg/3 mL modified release injection [3 mL vial], 1 pack 12937X Body System: Antiinfectives For Systemic Use > Antivirals For Systemic Use > Direct Acting Antivirals Manner of administration: Injection S100 HSD Community Access Authority Required (STREAMLINED) Restriction (Streamlined authority code: 12636 ) Indication: HIV infection Quantities & Cost Max qty packs Max qty units # of repeats DPMQ Max safety net General Patient Charge Max qty packs: 1 Max qty units: 1 # of repeats: 5 DPMQ: $2,907.84 Max safety net: $25.00 General Patient Charge: $25.00 Available brands Cabenuva PBS Information Frequently asked questions PBS Reviews PBS Statistics Report adverse drug reactions PBS Software Developers Latest News Subscribe to PBS News About About This Site Accessibility Privacy Disclaimer Copyright Browse Dental Items Explanatory notes Midwife Items Nurse Practitioner Items Optometrical Items Palliative Care Items Prescrib",
+  "since": "2026-10-13"
+ },
+ "pbac-apretude:apretude": {
+  "hash": "8ba2995091359c3f",
+  "snippet": "CABOTEGRAVIR - 12939b | Pharmaceutical Benefits Scheme (PBS) Skip to navigation Skip to content Medicine Status News Contact Medicine Status News Contact CABOTEGRAVIR cabotegravir 30 mg tablet, 30 CABOTEGRAVIR (12939B) cabotegravir 30 mg tablet, 30 12939B Body System: Antiinfectives For Systemic Use > Antivirals For Systemic Use > Direct Acting Antivirals Manner of administration: Oral S100 HSD Community Access Authority Required (STREAMLINED) Restriction (Streamlined authority code: 12619 ) Indication: HIV infection Quantities & Cost Max qty packs Max qty units # of repeats",
+  "since": "2026-10-13"
+ }
+}
