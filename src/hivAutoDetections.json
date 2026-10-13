@@ -1,6 +1,7 @@
 {
  "lastRun": "2026-10-13",
  "model": "claude-haiku-5-5",
+ "claudeKey": "ok",
  "claudeCalls": 0,
  "sources": {
   "ch-new": {
@@ -153,8 +154,7 @@
   },
   "has-bdpm": {
    "body": "HAS",
-   "ok": false,
-   "error": "HTTP 404"
+   "ok": true
   },
   "nl-sunlenca": {
    "body": "Zorginstituut",
@@ -187,46 +187,6 @@
   "no-cab-rpv": {
    "body": "Nye Metoder",
    "ok": true
-  },
-  "cda-biktarvy": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-bixlenvo": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-sunlenca": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-dovato": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-cab-rpv": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-yeztugo": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-apretude": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
-  },
-  "cda-idvynso": {
-   "body": "CDA-AMC",
-   "ok": false,
-   "error": "HTTP 403"
   },
   "pbac-sunlenca": {
    "body": "PBAC",
