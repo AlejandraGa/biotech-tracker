@@ -1,45 +1,13 @@
 // api/rss.js — Vercel serverless function
-// Fetches RSS feeds from multiple biotech/pharma news sources
+// Fetches HIV news: HIV-specific feeds plus trade press filtered to HIV stories
+import { isHivNews, stripPublisher, gnews } from './_lib/hivNews.js';
 
-// Known biotech/pharma companies — ticker + name variants to detect in headlines
+// Companies active in HIV — ticker + name variants to detect in headlines
 const KNOWN_COMPANIES = [
-  { ticker: 'MRNA', names: ['Moderna'] },
-  { ticker: 'EDIT', names: ['Editas'] },
-  { ticker: 'RXRX', names: ['Recursion'] },
-  { ticker: 'BEAM', names: ['Beam Therapeutics'] },
-  { ticker: 'KYMR', names: ['Kymera'] },
-  { ticker: 'GBIO', names: ['Generation Bio'] },
-  { ticker: 'KALA', names: ['Kailera'] },
-  { ticker: 'NVAX', names: ['Novavax'] },
   { ticker: 'GILD', names: ['Gilead'] },
-  { ticker: 'BIIB', names: ['Biogen'] },
-  { ticker: 'REGN', names: ['Regeneron'] },
-  { ticker: 'VRTX', names: ['Vertex'] },
-  { ticker: 'ALNY', names: ['Alnylam'] },
-  { ticker: 'BMRN', names: ['BioMarin'] },
-  { ticker: 'BLUE', names: ['bluebird bio', 'bluebird'] },
-  { ticker: 'CRSP', names: ['CRISPR Therapeutics'] },
-  { ticker: 'NTLA', names: ['Intellia'] },
-  { ticker: 'PFE',  names: ['Pfizer'] },
-  { ticker: 'JNJ',  names: ['Johnson & Johnson', 'J&J', 'Janssen'] },
-  { ticker: 'LLY',  names: ['Eli Lilly', 'Lilly'] },
-  { ticker: 'NVO',  names: ['Novo Nordisk', 'Novo'] },
-  { ticker: 'AZN',  names: ['AstraZeneca'] },
-  { ticker: 'RHHBY',names: ['Roche', 'Genentech'] },
-  { ticker: 'NVS',  names: ['Novartis'] },
-  { ticker: 'ABBV', names: ['AbbVie'] },
-  { ticker: 'BMY',  names: ['Bristol Myers', 'Bristol-Myers', 'BMS'] },
+  { ticker: 'GSK',  names: ['ViiV', 'GSK', 'GlaxoSmithKline'] },
   { ticker: 'MRK',  names: ['Merck', 'MSD'] },
-  { ticker: 'AMGN', names: ['Amgen'] },
-  { ticker: 'BNTX', names: ['BioNTech'] },
-  { ticker: 'SGEN', names: ['Seagen'] },
-  { ticker: 'INCY', names: ['Incyte'] },
-  { ticker: 'RARE', names: ['Ultragenyx'] },
-  { ticker: 'IONS', names: ['Ionis'] },
-  { ticker: 'FOLD', names: ['Amicus'] },
-  { ticker: 'PTGX', names: ['Protagonist'] },
-  { ticker: 'FATE', names: ['Fate Therapeutics'] },
-  { ticker: 'SRRK', names: ['Scholar Rock'] },
+  { ticker: 'JNJ',  names: ['Johnson & Johnson', 'J&J', 'Janssen'] },
 ];
 
 // Detect company mentions in headline+summary, return { ticker, companyName }[]
@@ -58,6 +26,11 @@ function detectCompanies(text) {
 }
 
 const RSS_FEEDS = [
+  { url: 'https://www.eatg.org/hiv-news/feed/', source: 'EATG' },
+  { url: gnews('HIV treatment OR "HIV prevention" OR "HIV PrEP"'), source: 'Google News' },
+  { url: gnews('lenacapavir OR cabotegravir OR islatravir OR bictegravir OR doravirine OR Yeztugo OR Apretude OR Cabenuva OR Biktarvy OR Dovato'), source: 'Google News' },
+  { url: gnews('"ViiV Healthcare" OR "Gilead HIV" OR "Merck HIV"'), source: 'Google News' },
+  { url: gnews('HIV UNAIDS OR PEPFAR OR "Global Fund"'), source: 'Google News' },
   { url: 'https://www.biopharmadive.com/feeds/news/', source: 'BioPharma Dive' },
   { url: 'https://endpts.com/feed/', source: 'Endpoints News' },
   { url: 'https://www.fiercebiotech.com/rss/xml', source: 'Fierce Biotech' },
@@ -117,13 +90,15 @@ function parseRSS(xml, source) {
 
   while ((match = itemRegex.exec(xml)) !== null) {
     const block = match[1];
-    const title = extractTag(block, 'title');
+    const publisher = extractTag(block, 'source');
+    const title = stripPublisher(extractTag(block, 'title'), publisher);
     const link = extractTag(block, 'link');
     const pubDate = extractTag(block, 'pubDate');
     const description = extractTag(block, 'description');
     const category = extractTag(block, 'category');
 
     if (!title) continue;
+    if (!isHivNews(title, description, publisher)) continue;
 
     let date = '';
     let dateObj = null;
@@ -134,18 +109,19 @@ function parseRSS(xml, source) {
       date = pubDate || '';
     }
 
-    const summary = description.length > 340
+    // Google News descriptions only repeat the title and publisher.
+    const summary = publisher ? '' : description.length > 340
       ? description.slice(0, 340).replace(/\s+\S*$/, '') + '…'
       : description;
 
-    const text = (title + ' ' + category).toLowerCase();
-    let tag = 'Industry News';
-    if (text.includes('trial') || text.includes('phase') || text.includes('efficacy') || text.includes('readout')) tag = 'Trial Results';
-    else if (text.includes('fda') || text.includes('approv') || text.includes('pdufa') || text.includes('regulat') || text.includes('ema')) tag = 'Regulatory';
+    const text = (title + ' ' + category + ' ').toLowerCase();
+    let tag = 'HIV News';
+    if (text.includes('trial') || text.includes('phase') || text.includes('efficacy') || text.includes('readout') || text.includes('data')) tag = 'Trial Results';
+    else if (text.includes('fda') || text.includes('approv') || text.includes('pdufa') || text.includes('regulat') || text.includes('ema') || text.includes('chmp') || text.includes('swissmedic')) tag = 'Regulatory';
+    else if (text.includes('croi') || text.includes('ias ') || text.includes('aids 20') || text.includes('idweek') || text.includes('eacs') || text.includes('glasgow') || text.includes('conference')) tag = 'Conference';
+    else if (text.includes('pepfar') || text.includes('unaids') || text.includes('global fund') || text.includes('price') || text.includes('reimburs') || text.includes('access') || text.includes('guideline') || text.includes('generic') || text.includes('nice')) tag = 'Access & Policy';
     else if (text.includes('partner') || text.includes('deal') || text.includes('acqui') || text.includes('merger') || text.includes('licens')) tag = 'Partnership';
-    else if (text.includes('crispr') || text.includes('gene edit') || text.includes('mrna') || text.includes('cell therapy') || text.includes('gene therapy')) tag = 'Clinical Data';
-    else if (text.includes('conference') || text.includes('congress') || text.includes('asco') || text.includes('ats') || text.includes('esmo') || text.includes('ash ')) tag = 'Conference';
-    else if (text.includes('finance') || text.includes('invest') || text.includes('earning') || text.includes('revenue') || text.includes('ipo') || text.includes('funding')) tag = 'Finance';
+    else if (text.includes('earning') || text.includes('revenue') || text.includes('sales') || text.includes('quarter')) tag = 'Market';
 
     const photoKeyword = extractPhotoKeyword(title, tag);
 
@@ -157,7 +133,7 @@ function parseRSS(xml, source) {
     items.push({
       headline: title,
       summary,
-      source,
+      source: publisher || source,
       date,
       dateObj: dateObj ? dateObj.toISOString() : '',
       link,
@@ -236,7 +212,7 @@ export default async function handler(req, res) {
       }
     });
 
-    if (allArticles.length === 0) {
+    if (results.every(r => r.status === 'rejected')) {
       return res.status(502).json({ error: 'All feeds failed' });
     }
 
@@ -249,7 +225,7 @@ export default async function handler(req, res) {
       'electric vehicle', 'crypto', 'bitcoin', 'real estate', 'stock market crash',
       'medicaid work requirement', 'social security', 'medicare cuts', 'opioid politics',
       'opinion:', 'stat+:', 'letters to the editor', 'podcast:', 'news roundup',
-      'deadliest drug', 'abortion', 'election', 'political', 'congress',
+      'deadliest drug', 'abortion',
     ];
 
     // French-language detection — common French words that wouldn't appear in English pharma headlines
@@ -267,6 +243,7 @@ export default async function handler(req, res) {
 
     // Source priority weights — higher = shown first when same date
     const SOURCE_PRIORITY = {
+      'EATG': 11,
       'BioPharma Dive': 10,
       'Endpoints News': 9,
       'Fierce Biotech': 8,

@@ -1,7 +1,10 @@
-// api/press.js — Press releases / company announcements
-// Fetches from BioPharma Dive press releases + GlobeNewswire biotech feed
+// api/press.js — Press releases / company announcements about HIV
+// Fetches press-release wires via Google News plus trade press-release feeds, kept to HIV items
+import { isHivNews, stripPublisher, gnews } from './_lib/hivNews.js';
 
 const PRESS_FEEDS = [
+  { url: gnews('HIV (site:businesswire.com OR site:prnewswire.com OR site:globenewswire.com)'), source: 'Press wire' },
+  { url: gnews('HIV (site:gilead.com OR site:viivhealthcare.com OR site:merck.com OR site:gsk.com)'), source: 'Company newsroom' },
   { url: 'https://www.biopharmadive.com/press-release/feed/', source: 'BioPharma Dive' },
   { url: 'https://www.fiercebiotech.com/rss/press-releases', source: 'Fierce Biotech' },
   { url: 'https://www.fiercepharma.com/rss/press-releases', source: 'Fierce Pharma' },
@@ -54,10 +57,12 @@ function parsePressRSS(xml, source) {
   let match;
   while ((match = itemRegex.exec(xml)) !== null) {
     const block = match[1];
-    const title = extractTag(block, 'title');
+    const publisher = extractTag(block, 'source');
+    const title = stripPublisher(extractTag(block, 'title'), publisher);
     const link = extractTag(block, 'link');
     const pubDate = extractTag(block, 'pubDate');
     if (!title) continue;
+    if (!isHivNews(title, extractTag(block, 'description'), publisher)) continue;
 
     let date = '';
     let dateObj = null;
@@ -70,7 +75,7 @@ function parsePressRSS(xml, source) {
 
     items.push({
       headline: title,
-      company: company || source,
+      company: company || publisher || source,
       source,
       date,
       dateObj: dateObj ? dateObj.toISOString() : '',
@@ -113,20 +118,6 @@ export default async function handler(req, res) {
 
     all = deduplicate(all);
 
-    // Keep only articles with pharma/biotech relevant keywords
-    const PHARMA_KEYWORDS = [
-      'trial', 'phase', 'fda', 'ema', 'approval', 'drug', 'therapy', 'therapeutic',
-      'clinical', 'patient', 'data', 'efficacy', 'safety', 'biomarker', 'endpoint',
-      'cancer', 'oncol', 'tumor', 'immuno', 'antibody', 'biologic', 'biosimilar',
-      'gene', 'crispr', 'mrna', 'rna', 'cell therapy', 'rare disease', 'orphan',
-      'nda', 'bla', 'ind', 'pdufa', 'sNDA', 'label', 'investigational',
-      'pharma', 'biotech', 'biopharma', 'medicine', 'disease', 'treatment',
-      'compound', 'molecule', 'mechanism', 'pathway', 'target', 'inhibitor',
-      'agonist', 'antagonist', 'monoclonal', 'vaccine', 'immunotherapy',
-      'acquisition', 'merger', 'licensing', 'partnership', 'collaboration',
-      'milestone', 'royalty', 'series a', 'series b', 'ipo', 'financing',
-    ];
-
     // French-language detection
     const FRENCH_WORDS = ['selon', 'pour', ' dans ', 'avec ', ' les ', ' des ', ' qui ', ' est ', ' par ', 'après', "l'", 'améliore', 'finalise', 'annonce', 'lance'];
 
@@ -135,8 +126,7 @@ export default async function handler(req, res) {
       // Reject French
       const frenchCount = FRENCH_WORDS.filter(w => lower.includes(w)).length;
       if (frenchCount >= 2) return false;
-      // Must contain at least one pharma keyword
-      return PHARMA_KEYWORDS.some(kw => lower.includes(kw));
+      return true;
     });
 
     all.sort((a, b) => {
