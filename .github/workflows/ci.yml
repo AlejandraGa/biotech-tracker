@@ -1,0 +1,26 @@
+# Runs the tests and a production build on every pull request, so a broken change
+# shows up as a red check before it reaches the live site.
+name: Tests and build
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # npm install rather than npm ci: the lockfile is not fully in sync with package.json.
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - run: npm run build
+        env:
+          CI: true
