@@ -4,7 +4,8 @@
 // looked for on it; `terms` are the names whose surrounding text is compared.
 // Bodies whose sites forbid automated reading (robots.txt) or need a browser
 // are left out and stay curated by hand: TGA, AIFA, Spain's funding search,
-// INFARMED, TLV / NT-rådet, RIZIV and the Austrian Erstattungskodex.
+// INFARMED, TLV / NT-rådet, RIZIV and the Austrian Erstattungskodex. CDA-AMC refuses
+// automated requests (HTTP 403), so it stays curated too.
 import { BASE } from '../../src/hivData.js';
 
 const TERMS = {
@@ -37,7 +38,7 @@ const now = new Date();
 
 // HAS opinions, from the French public medicines database's open-data files:
 // the brand names come from CIS_bdpm, the SMR and ASMR ratings from the HAS files.
-const BDPM = 'https://base-donnees-publique.medicaments.gouv.fr/telechargement.php?fichier=';
+const BDPM = 'https://base-donnees-publique.medicaments.gouv.fr/download/file/';
 async function hasOpinions(getRaw) {
   const [cis, smr, asmr] = await Promise.all(['CIS_bdpm.txt', 'CIS_HAS_SMR_bdpm.txt', 'CIS_HAS_ASMR_bdpm.txt'].map((f) => getRaw(BDPM + f)));
   const brands = Object.values(TERMS).map((t) => t[0].toUpperCase());
@@ -67,7 +68,7 @@ export const WATCHES = [
   ...perProduct({ body: 'NCPE', bodyName: 'the NCPE (Ireland)', country: 'Ireland', column: 'ie', type: 'access' }, IDS,
     (id) => `https://www.ncpe.ie/?s=${encodeURIComponent(INN_QUERY[id].split(' ')[0])}`),
   { id: 'has-bdpm', body: 'HAS', bodyName: 'the HAS Transparency Committee', country: 'France', column: 'has', type: 'access',
-    url: 'https://base-donnees-publique.medicaments.gouv.fr/telechargement.php', fetch: hasOpinions, products: all('has', 'access') },
+    url: 'https://base-donnees-publique.medicaments.gouv.fr/telechargement', fetch: hasOpinions, products: all('has', 'access') },
   { id: 'nl-sunlenca', body: 'Zorginstituut', bodyName: 'Zorginstituut Nederland', country: 'Netherlands', column: 'nl', type: 'access',
     url: 'https://english.zorginstituutnederland.nl/documents/2022/09/22/gvs-advice-lenacapavir-sunlenca', products: [product('sunlenca', 'nl', 'access')] },
   { id: 'be-cbip', body: 'RIZIV', bodyName: 'RIZIV / INAMI (as reported by the CBIP monthly update)', country: 'Belgium', column: 'be', type: 'access',
@@ -80,8 +81,6 @@ export const WATCHES = [
     url: 'https://medicinraadet.dk/anbefalinger-og-vejledninger/laegemidler-og-indikationsudvidelser/revurderinger/cabotegravirrilpivirin-hiv-1-infektion', products: [product('cab-rpv', 'dk', 'access')] },
   ...[['lenacapavir/', ['sunlenca', 'yeztugo']], ['cabotegravir/', ['apretude']], ['kabotegravir-vocabria', ['cab-rpv']]].map(([path, ids]) => (
     { id: `no-${ids[0]}`, body: 'Nye Metoder', bodyName: 'Nye Metoder', country: 'Norway', column: 'no', type: 'access', url: `https://www.nyemetoder.no/metoder/${path}`, products: ids.map((id) => product(id, 'no', 'access')) })),
-  ...perProduct({ body: 'CDA-AMC', bodyName: 'CDA-AMC', country: 'Canada', column: 'cda', type: 'access' }, IDS,
-    (id) => `https://www.cda-amc.ca/find-reports?search_api_fulltext=${encodeURIComponent(INN_QUERY[id])}`),
   ...[['medicinestatus/document/1059.html', 'sunlenca'], ['medicine/item/12937X', 'cab-rpv'], ['medicine/item/12939B', 'apretude']].map(([path, id]) => (
     { id: `pbac-${id}`, body: 'PBAC', bodyName: 'the PBAC / PBS', country: 'Australia', column: 'pbac', type: 'access', url: `https://www.pbs.gov.au/${path}`, products: [product(id, 'pbac', 'access')] })),
 ];
