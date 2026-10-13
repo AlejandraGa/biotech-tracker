@@ -5,7 +5,6 @@ import { MORE_VERIFIED_ON } from "./hivAccessMore";
 import { BASE as CURATED, applyDetections } from "./hivData";
 import AUTO from "./hivAutoDetections.json";
 import { applyLive } from "./liveStatus";
-import HivProgressMap from "./HivProgressMap";
 import { openOnePager } from "./onePager";
 import { FONT, INK, TEXT, MUTED, FAINT, LINE, HAIR, PAPER, COMPANY_COLOR, fmtDate, todayIso } from "./ui";
 
@@ -375,7 +374,7 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
 
       {/* Controls */}
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
-        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Timeline", "Map"]} />
+        <Segmented label="View" value={view} onChange={setView} options={["Regulatory", "Reimbursement", "Timeline"]} />
         <Segmented label="Segment" value={segment} onChange={setSegment} options={["All", "Treatment", "PrEP"]} />
         <Segmented label="Company" value={company} onChange={setCompany} options={["All", "Gilead", "ViiV", "MSD"]} />
       </div>
@@ -427,7 +426,6 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
       )}
 
       {view === "Timeline" && products.length > 0 && <Timeline products={products} />}
-      {view === "Map" && products.length > 0 && <HivProgressMap products={products} onOpen={setOpenId} />}
 
       {/* Earlier pipeline */}
       {early.length > 0 && segment !== "PrEP" && (
