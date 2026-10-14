@@ -6,7 +6,10 @@ import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import { AGENCIES, STATUS } from "./hivRegulatoryData";
 import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS_STATUS } from "./hivAccessData";
-import { BASE as CURATED, applyDetections } from "./hivData";
+import { BASE as CURATED, applyDetections, applyConfirmations } from "./hivData";
+import { applySheet } from "./hivSheet";
+import { useHivStatuses } from "./useHivStatuses";
+import { freshness, TONE_COLOR } from "./freshness";
 import AUTO from "./hivAutoDetections.json";
 import { applyLive } from "./liveStatus";
 import { useHivSignals } from "./HivSignals";
@@ -17,7 +20,8 @@ const ATLAS_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.
 const ALL_STATUS = { ...STATUS, ...ACCESS_STATUS };
 const BODY = Object.fromEntries([...AGENCIES, { key: "mhra", label: "MHRA" }, ...EXTRA_REGULATORS, ...ACCESS_BODIES].map((b) => [b.key, b.label]));
 const shortBody = (k) => BODY[k].split(" · ")[0];
-const BASE = applyDetections(CURATED, AUTO);
+// Same layering as the tracker: the team's sheet, then the website check's findings.
+const buildBase = (rows) => applyConfirmations(applyDetections(applySheet(CURATED, rows), AUTO), AUTO);
 
 // One row per market we track. `id` is the ISO 3166 numeric code used by world-atlas,
 // `reg` the regulator columns (first one decides; EU members fall back to the CHMP opinion),
@@ -232,6 +236,7 @@ function Decision({ k, cell, full }) {
         : <><StatusText def={statusOf(c)} />{c.date && <span style={{ color: TEXT, marginLeft: 6, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{c.expected ? "by " : ""}{fmtDate(c.date)}</span>}</>}
       {full && !quiet && c.note && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 1 }}>{c.note}</span>}
       {full && c.auto && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 1 }}>Updated automatically by {c.auto}.</span>}
+      {full && (() => { const f = freshness(c, todayIso()); return f.long ? <span style={{ display: "block", fontSize: 12, color: TONE_COLOR[f.tone], marginTop: 1 }}>{f.long}{f.page && f.tone === "flag" ? <> <SourceLink href={f.page} /></> : null}</span> : null; })()}
       {full && c.src && <span style={{ display: "block", marginTop: 1 }}><SourceLink href={c.src} /></span>}
     </div>
   );
@@ -724,7 +729,9 @@ const SEGMENTS = [{ value: "All", label: "All" }, { value: "Treatment", label: "
 
 export default function HivLaunchMap() {
   const feed = useHivSignals();
-  const ALL = useMemo(() => applyLive(BASE, feed.live).products, [feed.live]);
+  const statuses = useHivStatuses();
+  const base = useMemo(() => buildBase(statuses.rows), [statuses.rows]);
+  const ALL = useMemo(() => applyLive(base, feed.live).products, [base, feed.live]);
   const today = todayIso();
   const [view, setView] = useState("product");
   const [segment, setSegment] = useState("All");
@@ -857,7 +864,7 @@ export default function HivLaunchMap() {
       <HowToRead />
 
       <p style={{ fontSize: 12, color: FAINT, lineHeight: 1.6, margin: "4px 0 0" }}>
-        Same data as the HIV CI tab: FDA, EMA and Swiss listings are checked against the official datasets each time the page loads, the other regulators' and reimbursement bodies' websites are checked automatically{AUTO.lastRun ? ` (last check ${fmtDate(AUTO.lastRun)})` : ""}, and the rest is curated by hand from each body's published decisions. "Not verified" means the listing was not confirmed, not that the product is unlisted.
+        Same data as the HIV CI tab: FDA, EMA and Swiss listings are checked against the official datasets each time the page loads, the other regulators' and reimbursement bodies' websites are checked automatically{AUTO.lastRun ? ` (last check ${fmtDate(AUTO.lastRun)})` : ""}, and the rest comes from the team's sheet, where each status has its source and the date it was last checked by hand. "Not verified" means the listing was not confirmed, not that the product is unlisted.
       </p>
 
       {detail && <Detail x={detail} onClose={closeDetail} />}

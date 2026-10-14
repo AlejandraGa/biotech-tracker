@@ -1,5 +1,6 @@
 # Check of regulator and reimbursement websites for new HIV decisions, every 3 hours.
 # Needs the repository secret ANTHROPIC_API_KEY (Settings → Secrets and variables → Actions).
+# It also saves a copy of the team's Google Sheet and re-confirms each status.
 # Any change is committed to main, which redeploys the site on Vercel.
 name: Check for new decisions
 
@@ -27,10 +28,11 @@ jobs:
       - name: Check pages
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          HIV_SHEET_ID: ${{ vars.HIV_SHEET_ID }}
         run: node scripts/watch/check.mjs
       - name: Save results
         run: |
-          git add src/hivAutoDetections.json scripts/watch/state.json
+          git add src/hivAutoDetections.json src/hivSheetSnapshot.json scripts/watch/state.json
           if git diff --cached --quiet; then echo "Nothing changed"; exit 0; fi
           found=$(node -e "const d=require('./src/hivAutoDetections.json');console.log(d.detections.filter(x=>x.detectedAt===d.lastRun).length)")
           git -c user.name="catalyst-bot" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \

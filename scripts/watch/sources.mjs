@@ -6,7 +6,13 @@
 // are left out and stay curated by hand: TGA, AIFA, Spain's funding search,
 // INFARMED, TLV / NT-rådet, RIZIV and the Austrian Erstattungskodex. CDA-AMC refuses
 // automated requests (HTTP 403), so it stays curated too.
+import { readFileSync } from 'node:fs';
 import { BASE } from '../../src/hivData.js';
+import { applySheet, unpackRows } from '../../src/hivSheet.js';
+
+// What the tracker currently shows: the team's sheet (as last saved by check.mjs) over the built-in data.
+const SNAPSHOT = JSON.parse(readFileSync(new URL('../../src/hivSheetSnapshot.json', import.meta.url), 'utf8'));
+const CURRENT = applySheet(BASE, unpackRows(SNAPSHOT));
 
 const TERMS = {
   biktarvy: ['Biktarvy', 'bictegravir'],
@@ -20,7 +26,7 @@ const TERMS = {
 };
 const IDS = Object.keys(TERMS);
 const product = (id, column, type) => {
-  const p = BASE.find((x) => x.id === id);
+  const p = CURRENT.find((x) => x.id === id);
   const current = type === 'access' ? p.access[column] : p.reg[column];
   return { id, name: p.name, inn: p.inn, terms: TERMS[id], current };
 };

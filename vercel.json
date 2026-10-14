@@ -5,7 +5,7 @@
     },
     "api/hiv-digest.js": {
       "maxDuration": 45,
-      "includeFiles": "src/hivAutoDetections.json"
+      "includeFiles": "src/{hivAutoDetections,hivSheetSnapshot}.json"
     }
   },
   "crons": [

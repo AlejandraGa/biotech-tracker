@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AGENCIES, STATUS, EARLY_PIPELINE, VERIFIED_ON } from "./hivRegulatoryData";
-import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS_STATUS, ACCESS_VERIFIED_ON } from "./hivAccessData";
-import { MORE_VERIFIED_ON } from "./hivAccessMore";
-import { BASE as CURATED, applyDetections } from "./hivData";
+import { AGENCIES, STATUS, EARLY_PIPELINE } from "./hivRegulatoryData";
+import { ACCESS_BODIES, EXTRA_REGULATORS, ACCESS_STATUS } from "./hivAccessData";
+import { BASE as CURATED, applyDetections, applyConfirmations } from "./hivData";
+import { applySheet, SHEET_ID, sheetEditUrl } from "./hivSheet";
+import { useHivStatuses } from "./useHivStatuses";
+import { freshness, TONE_COLOR } from "./freshness";
 import AUTO from "./hivAutoDetections.json";
 import { applyLive } from "./liveStatus";
 import ClinicalCompare from "./ClinicalCompare";
@@ -24,8 +26,9 @@ const statusOf = (cell) => (cell?.label ? { ...ALL_STATUS[cell.s], label: cell.l
 // Column widths come from CSS variables so phones can use narrower columns (see mobile.css).
 const gridFor = (n) => `minmax(var(--asset-col, 250px),1.3fr) repeat(${n}, minmax(var(--status-col, 168px),1fr))`;
 
-// Curated data, with any decisions found by the page check laid over it.
-const BASE = applyDetections(CURATED, AUTO);
+// The team's sheet laid over the seed data in the code, then any decisions the website
+// check found, then what it confirmed. Built inside the component (see useHivStatuses).
+const buildBase = (rows) => applyConfirmations(applyDetections(applySheet(CURATED, rows), AUTO), AUTO);
 const OUTCOME = {
   approved: STATUS.approved,
   positive: STATUS.positive,
@@ -134,11 +137,18 @@ function StagePill({ stage }) {
 
 // ─── MATRIX ──────────────────────────────────────────────────────────────────
 
+// When the status was last confirmed, in one short line; the full sentence is in the tooltip and the drawer.
+function Checked({ cell }) {
+  const f = freshness(cell, todayIso());
+  if (!f.short) return null;
+  return <div title={f.long} style={{ fontSize: 11, color: TONE_COLOR[f.tone], marginTop: 3, fontWeight: f.tone === "flag" ? 600 : 400 }}>{f.short}</div>;
+}
+
 function RegCell({ cell }) {
   const s = cell?.s || "none";
   const def = statusOf(cell);
   if (s === "none" || s === "pending") {
-    return <div style={cellStyle}><span style={{ fontSize: 12.5, color: FAINT }}>{s === "pending" ? cell?.note || "Awaiting opinion" : cell?.note || "No public filing"}</span></div>;
+    return <div style={cellStyle}><span style={{ fontSize: 12.5, color: FAINT }}>{s === "pending" ? cell?.note || "Awaiting opinion" : cell?.note || "No public filing"}</span><Checked cell={cell} /></div>;
   }
   return (
     <div style={cellStyle}>
@@ -148,6 +158,7 @@ function RegCell({ cell }) {
       </div>
       {cell.note && <div style={{ fontSize: 11.5, color: MUTED, marginTop: 2, lineHeight: 1.4 }}>{cell.note}</div>}
       {cell.auto && <div style={{ fontSize: 11.5, color: "#1e40af", marginTop: 2 }}>Updated automatically</div>}
+      <Checked cell={cell} />
     </div>
   );
 }
@@ -189,7 +200,7 @@ function StatusSection({ title, cols, pick }) {
                     : <><StatusText def={statusOf(c)} />{c.date && <span style={{ color: TEXT, marginLeft: 8, fontVariantNumeric: "tabular-nums" }}>{c.expected ? "by " : ""}{fmtDate(c.date)}</span>}</>}
                   {!quiet && c.note && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>{c.note}</span>}
                   {c.auto && <span style={{ display: "block", fontSize: 12, color: "#1e40af", marginTop: 2, lineHeight: 1.45 }}>Updated automatically from {c.auto}.{c.was ? ` The curated entry said: ${ALL_STATUS[c.was.s].label.toLowerCase()}${c.was.date ? `, ${fmtDate(c.was.date)}` : ""}.` : ""}</span>}
-                  {c.confirmedBy && <span style={{ display: "block", fontSize: 12, color: MUTED, marginTop: 2 }}>Confirmed against {c.confirmedBy}.</span>}
+                  {(() => { const f = freshness(c, todayIso()); return f.long ? <span style={{ display: "block", fontSize: 12, color: TONE_COLOR[f.tone], marginTop: 2, lineHeight: 1.45 }}>{f.long}{f.page && f.tone === "flag" ? <> <SourceLink href={f.page}>Page checked</SourceLink></> : null}</span> : null; })()}
                   {c.src && <span style={{ display: "block", marginTop: 2 }}><SourceLink href={c.src} /></span>}
                 </span>
               </div>
@@ -304,7 +315,14 @@ function Timeline({ products }) {
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 export default function HivRegulatoryTracker({ live, liveStatus }) {
-  const liveResult = useMemo(() => applyLive(BASE, live), [live]);
+  const statuses = useHivStatuses();
+  const base = useMemo(() => buildBase(statuses.rows), [statuses.rows]);
+  const liveResult = useMemo(() => applyLive(base, live), [base, live]);
+  // How many statuses the website check has confirmed or flagged.
+  const checks = useMemo(() => {
+    const cells = liveResult.products.flatMap((p) => [...Object.values(p.reg || {}), ...Object.values(p.access || {})]);
+    return { confirmed: cells.filter((c) => ["agrees", "absent"].includes(c?.verified?.result)).length, flagged: cells.filter((c) => c?.verified?.result === "differs").length };
+  }, [liveResult]);
   const ALL = liveResult.products;
   const [view, setView] = useState("Regulatory");
   const [segment, setSegment] = useState("All");
@@ -454,10 +472,10 @@ export default function HivRegulatoryTracker({ live, liveStatus }) {
           ? <><strong style={{ color: MUTED, fontWeight: 600 }}>FDA, EMA and Swiss reimbursement columns are checked against the official datasets each time the page loads:</strong> {liveResult.confirmed} of {liveResult.checked} statuses confirmed{liveResult.updated ? `, ${liveResult.updated} updated automatically` : ""}. </>
           : liveStatus === "loading" ? "Checking FDA and EMA statuses against the official datasets… " : "The live check against FDA and EMA datasets is unavailable right now, so curated values are shown. "}
         {AUTO.lastRun
-          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>The other regulators' and reimbursement bodies' websites are checked automatically every 3 hours</strong> (last check {fmtDate(AUTO.lastRun)}{Object.values(AUTO.sources).some((x) => !x.ok) ? `; ${new Set(Object.values(AUTO.sources).filter((x) => !x.ok).map((x) => x.body)).size} did not respond` : ""}). {AUTO.detections.length ? `${AUTO.detections.length} decision${AUTO.detections.length === 1 ? " was" : "s were"} picked up this way and ${AUTO.detections.length === 1 ? "is" : "are"} marked "Updated automatically".` : "No new decisions have been picked up this way yet."} </>
+          ? <><strong style={{ color: MUTED, fontWeight: 600 }}>The other regulators' and reimbursement bodies' websites are checked automatically every 3 hours</strong> (last check {fmtDate(AUTO.lastRun)}{Object.values(AUTO.sources).some((x) => !x.ok) ? `; ${new Set(Object.values(AUTO.sources).filter((x) => !x.ok).map((x) => x.body)).size} did not respond` : ""}): {checks.confirmed} statuses confirmed this way{checks.flagged ? `, ${checks.flagged} flagged "Check source" because the page may say something different` : ""}. {AUTO.detections.length ? `${AUTO.detections.length} new decision${AUTO.detections.length === 1 ? " was" : "s were"} picked up and ${AUTO.detections.length === 1 ? "is" : "are"} marked "Updated automatically". ` : ""}</>
           : null}
-        Swissmedic, MHRA, Health Canada, TGA, filings under review and planned filings are curated by hand, last checked on {fmtDate(VERIFIED_ON)}.
-        Reimbursement entries ({ACCESS_BODIES.map((b) => b.label).join(", ")}) are curated by hand from each body's published decisions, last checked on {fmtDate(ACCESS_VERIFIED_ON)} for NICE, G-BA, HAS, BAG and the Dachverband and on {fmtDate(MORE_VERIFIED_ON)} for the rest; Swiss prices are public prices read from the Spezialitätenliste on that date. "Not verified" means the listing was not confirmed, not that the product is unlisted.
+        <strong style={{ color: MUTED, fontWeight: 600 }}>Everything else comes from the team's sheet</strong>{SHEET_ID ? <> (<a href={sheetEditUrl()} target="_blank" rel="noopener noreferrer" style={{ color: MUTED }}>open the sheet</a>)</> : null}, where each status has its source and the date it was last checked by hand{statuses.live ? "" : statuses.fetchedAt ? `; the sheet could not be read just now, so the copy saved on ${fmtDate(statuses.fetchedAt)} is shown` : ""}.
+        Under each status, "✓ date" means confirmed automatically on that date and "Checked date" means checked by hand. TGA, AIFA, Spain's funding decisions, INFARMED, TLV, RIZIV and the Austrian Erstattungskodex cannot be read automatically, so they rely on the hand checks. "Not verified" means the listing was not confirmed, not that the product is unlisted.
         "No public filing" means no announcement was found, not that none exists.
       </p>
 
