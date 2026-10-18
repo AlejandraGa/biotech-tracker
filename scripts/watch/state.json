@@ -80,8 +80,8 @@
   "since": "2026-10-13"
  },
  "hc-biktarvy:biktarvy": {
-  "hash": "e3b0c44298fc1c14",
-  "snippet": "",
+  "hash": "39814ea169bed29e",
+  "snippet": "[{\"drug_code\":96935,\"class_name\":\"Human\",\"drug_identification_number\":\"02478579\",\"brand_name\":\"BIKTARVY\",\"descriptor\":\"\",\"number_of_ais\":\"3\",\"ai_group_no\":\"0360430001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2025-07-25\"}]",
   "since": "2026-10-18"
  },
  "hc-bixlenvo:bixlenvo": {
@@ -90,18 +90,18 @@
   "since": "2026-10-13"
  },
  "hc-sunlenca:sunlenca": {
-  "hash": "e3b0c44298fc1c14",
-  "snippet": "",
+  "hash": "235a5aa06975d548",
+  "snippet": "[{\"drug_code\":102149,\"class_name\":\"Human\",\"drug_identification_number\":\"02532468\",\"brand_name\":\"SUNLENCA\",\"descriptor\":\"\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0164221001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2026-09-10\"},{\"drug_code\":102150,\"class_name\":\"Human\",\"drug_identification_number\":\"02532476\",\"brand_name\":\"SUNLENCA\",\"descriptor\":\"SINGLE-DOSE VIALS\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0164221001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2026-09-10\"}]",
   "since": "2026-10-18"
  },
  "hc-dovato:dovato": {
-  "hash": "e3b0c44298fc1c14",
-  "snippet": "",
+  "hash": "c7c8f1d6d50e436b",
+  "snippet": "[{\"drug_code\":98173,\"class_name\":\"Human\",\"drug_identification_number\":\"02491753\",\"brand_name\":\"DOVATO\",\"descriptor\":\"\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0261731001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2026-02-19\"}]",
   "since": "2026-10-18"
  },
  "hc-cab-rpv:cab-rpv": {
-  "hash": "e3b0c44298fc1c14",
-  "snippet": "",
+  "hash": "b014e5d970461c43",
+  "snippet": "[{\"drug_code\":98706,\"class_name\":\"Human\",\"drug_identification_number\":\"02497220\",\"brand_name\":\"CABENUVA\",\"descriptor\":\"KIT CONTAINING: A) VIAL (2 ML CABOTEGRAVIR) AND B) VIAL (2 ML RILPIVIRINE)\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0262115001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2026-09-21\"},{\"drug_code\":98709,\"class_name\":\"Human\",\"drug_identification_number\":\"02497247\",\"brand_name\":\"CABENUVA\",\"descriptor\":\"KIT CONTAINING: A) VIAL (2 ML CABOTEGRAVIR) AND B) VIAL (2 ML RILPIVIRINE)\",\"number_of_ais\":\"2\",\"ai_group_no\":\"0262115001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2026-09-21\"}]",
   "since": "2026-10-18"
  },
  "hc-yeztugo:yeztugo": {
@@ -110,8 +110,8 @@
   "since": "2026-10-13"
  },
  "hc-apretude:apretude": {
-  "hash": "e3b0c44298fc1c14",
-  "snippet": "",
+  "hash": "42cbbcdc041e10cb",
+  "snippet": "[{\"drug_code\":103642,\"class_name\":\"Human\",\"drug_identification_number\":\"02547465\",\"brand_name\":\"APRETUDE\",\"descriptor\":\"\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0162114001\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2025-09-22\"},{\"drug_code\":103643,\"class_name\":\"Human\",\"drug_identification_number\":\"02547473\",\"brand_name\":\"APRETUDE\",\"descriptor\":\"\",\"number_of_ais\":\"1\",\"ai_group_no\":\"0162114002\",\"company_name\":\"VIIV HEALTHCARE ULC\",\"last_update_date\":\"2025-09-22\"}]",
   "since": "2026-10-18"
  },
  "hc-idvynso:idvynso": {
