@@ -154,8 +154,7 @@
   },
   "has-bdpm": {
    "body": "HAS",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "nl-sunlenca": {
    "body": "Zorginstituut",
