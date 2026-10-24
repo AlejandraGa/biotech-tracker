@@ -10,19 +10,23 @@
   },
   "mhra-biktarvy": {
    "body": "MHRA",
-   "ok": true
+   "ok": false,
+   "error": "HTTP 503"
   },
   "mhra-bixlenvo": {
    "body": "MHRA",
-   "ok": true
+   "ok": false,
+   "error": "HTTP 503"
   },
   "mhra-sunlenca": {
    "body": "MHRA",
-   "ok": true
+   "ok": false,
+   "error": "HTTP 503"
   },
   "mhra-dovato": {
    "body": "MHRA",
-   "ok": true
+   "ok": false,
+   "error": "HTTP 503"
   },
   "mhra-cab-rpv": {
    "body": "MHRA",
@@ -30,11 +34,13 @@
   },
   "mhra-yeztugo": {
    "body": "MHRA",
-   "ok": true
+   "ok": false,
+   "error": "HTTP 503"
   },
   "mhra-apretude": {
    "body": "MHRA",
-   "ok": true
+   "ok": false,
+   "error": "HTTP 503"
   },
   "mhra-idvynso": {
    "body": "MHRA",
