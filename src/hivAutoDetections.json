@@ -1,13 +1,12 @@
 {
- "lastRun": "2026-10-23",
+ "lastRun": "2026-10-24",
  "model": "claude-haiku-5-5",
  "claudeKey": "ok",
  "claudeCalls": 0,
  "sources": {
   "ch-new": {
    "body": "Swissmedic",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "mhra-biktarvy": {
    "body": "MHRA",
@@ -44,42 +43,42 @@
   "hc-biktarvy": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-bixlenvo": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-sunlenca": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-dovato": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-cab-rpv": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-yeztugo": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-apretude": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "hc-idvynso": {
    "body": "Health Canada",
    "ok": false,
-   "error": "fetch failed"
+   "error": "HTTP 503"
   },
   "gba-list": {
    "body": "G-BA",
