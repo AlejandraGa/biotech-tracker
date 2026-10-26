@@ -1,8 +1,8 @@
 {
- "lastRun": "2026-10-25",
+ "lastRun": "2026-10-26",
  "model": "claude-haiku-5-5",
  "claudeKey": "ok",
- "claudeCalls": 0,
+ "claudeCalls": 1,
  "sources": {
   "ch-new": {
    "body": "Swissmedic",
@@ -42,43 +42,35 @@
   },
   "hc-biktarvy": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-bixlenvo": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-sunlenca": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-dovato": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-cab-rpv": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-yeztugo": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-apretude": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "hc-idvynso": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "HTTP 503"
+   "ok": true
   },
   "gba-list": {
    "body": "G-BA",
