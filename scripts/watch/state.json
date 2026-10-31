@@ -80,8 +80,8 @@
   "since": "2026-10-13"
  },
  "hc-biktarvy:biktarvy": {
-  "hash": "e3b0c44298fc1c14",
-  "snippet": "",
+  "hash": "39814ea169bed29e",
+  "snippet": "[{\"drug_code\":96935,\"class_name\":\"Human\",\"drug_identification_number\":\"02478579\",\"brand_name\":\"BIKTARVY\",\"descriptor\":\"\",\"number_of_ais\":\"3\",\"ai_group_no\":\"0360430001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2025-07-25\"}]",
   "since": "2026-10-31"
  },
  "hc-bixlenvo:bixlenvo": {
@@ -370,9 +370,9 @@
   "since": "2026-10-13"
  },
  "pbac-sunlenca:sunlenca": {
-  "hash": "454c6dd4cf1f3b9a",
-  "snippet": "Medicine Status | Pharmaceutical Benefits Scheme (PBS) Skip to navigation Skip to content Medicine Status News Contact Medicine Status News Contact LENACAPAVIR Information current as at: 1 October 2026 The pharmaceutical company has not advised whether they intend to proceed or not within 60 days of receiving the ratified PBAC minutes. The process for listing is considered inactive. Legend: Completed N In progress Not applicable N Yet to commence Submission Details Brand name: Sunlenca® Form and strength: Please search for and view the medicine's Public Summary Document (PSD) for more information Submission sponsor: Gilead Sciences Pty Limited Condition/indication: (therapeutic use) Human immunodeficiency virus (HIV) Listing requested: Please see PSD for more information Funding program: Please see PSD for more information Request authority level: Please see PSD for more information PBAC Submission type: New listing (Standard Re-entry Pathway) Comment: -- Other PBAC consideration: LENACAPAVIR Progress Details Submission received for: November 2023 PBAC meeting Opportunity for consumer comment: Open 26/07/2023 and close 20/09/2023 (see PBS Website ) PBAC meeting: Held on 01/11/2023 PBAC outcome published: Recommended (see PBAC Outcomes ) Notice of intent submitted: Awaiting lodgement from pharmaceutical company 5 Lodgement of required d",
-  "since": "2026-10-13"
+  "hash": "c6c7a56b41b3a12f",
+  "snippet": "Medicine Status | Pharmaceutical Benefits Scheme (PBS) Skip to navigation Skip to content Medicine Status News Contact Medicine Status News Contact LENACAPAVIR Information current as at: 1 November 2026 The pharmaceutical company has not advised whether they intend to proceed or not within 60 days of receiving the ratified PBAC minutes. The process for listing is considered inactive. Legend: Completed N In progress Not applicable N Yet to commence Submission Details Brand name: Sunlenca® Form and strength: Please search for and view the medicine's Public Summary Document (PSD) for more information Submission sponsor: Gilead Sciences Pty Limited Condition/indication: (therapeutic use) Human immunodeficiency virus (HIV) Listing requested: Please see PSD for more information Funding program: Please see PSD for more information Request authority level: Please see PSD for more information PBAC Submission type: New listing (Standard Re-entry Pathway) Comment: -- Other PBAC consideration: LENACAPAVIR Progress Details Submission received for: November 2023 PBAC meeting Opportunity for consumer comment: Open 26/07/2023 and close 20/09/2023 (see PBS Website ) PBAC meeting: Held on 01/11/2023 PBAC outcome published: Recommended (see PBAC Outcomes ) Notice of intent submitted: Awaiting lodgement from pharmaceutical company 5 Lodgement of required d",
+  "since": "2026-10-31"
  },
  "pbac-cab-rpv:cab-rpv": {
   "hash": "ef97797c5fa5558b",
