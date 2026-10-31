@@ -80,9 +80,9 @@
   "since": "2026-10-13"
  },
  "hc-biktarvy:biktarvy": {
-  "hash": "39814ea169bed29e",
-  "snippet": "[{\"drug_code\":96935,\"class_name\":\"Human\",\"drug_identification_number\":\"02478579\",\"brand_name\":\"BIKTARVY\",\"descriptor\":\"\",\"number_of_ais\":\"3\",\"ai_group_no\":\"0360430001\",\"company_name\":\"GILEAD SCIENCES CANADA INC\",\"last_update_date\":\"2025-07-25\"}]",
-  "since": "2026-10-18"
+  "hash": "e3b0c44298fc1c14",
+  "snippet": "",
+  "since": "2026-10-31"
  },
  "hc-bixlenvo:bixlenvo": {
   "hash": "e3b0c44298fc1c14",
