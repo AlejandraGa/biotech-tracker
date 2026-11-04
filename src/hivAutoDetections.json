@@ -2,7 +2,7 @@
  "lastRun": "2026-11-04",
  "model": "claude-haiku-5-5",
  "claudeKey": "ok",
- "claudeCalls": 4,
+ "claudeCalls": 5,
  "sources": {
   "ch-new": {
    "body": "Swissmedic",
