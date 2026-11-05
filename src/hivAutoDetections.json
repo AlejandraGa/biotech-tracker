@@ -162,8 +162,7 @@
   },
   "be-cbip": {
    "body": "RIZIV",
-   "ok": false,
-   "error": "HTTP 404"
+   "ok": true
   },
   "dk-ongoing": {
    "body": "Medicinradet",
