@@ -1,8 +1,8 @@
 {
- "lastRun": "2026-11-09",
+ "lastRun": "2026-11-10",
  "model": "claude-haiku-5-5",
  "claudeKey": "ok",
- "claudeCalls": 13,
+ "claudeCalls": 5,
  "sources": {
   "ch-new": {
    "body": "Swissmedic",
