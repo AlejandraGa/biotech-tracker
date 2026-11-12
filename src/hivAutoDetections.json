@@ -1,8 +1,8 @@
 {
  "lastRun": "2026-11-12",
  "model": "claude-haiku-5-5",
- "claudeKey": "ok",
- "claudeCalls": 4,
+ "claudeKey": "rejected (HTTP 401)",
+ "claudeCalls": 0,
  "sources": {
   "ch-new": {
    "body": "Swissmedic",
