@@ -42,35 +42,43 @@
   },
   "hc-biktarvy": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-bixlenvo": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-sunlenca": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-dovato": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-cab-rpv": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-yeztugo": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-apretude": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "hc-idvynso": {
    "body": "Health Canada",
-   "ok": true
+   "ok": false,
+   "error": "fetch failed"
   },
   "gba-list": {
    "body": "G-BA",
