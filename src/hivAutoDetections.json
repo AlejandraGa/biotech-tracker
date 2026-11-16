@@ -1,5 +1,5 @@
 {
- "lastRun": "2026-11-15",
+ "lastRun": "2026-11-16",
  "model": "claude-haiku-5-5",
  "claudeKey": "rejected (HTTP 401)",
  "claudeCalls": 0,
@@ -42,43 +42,35 @@
   },
   "hc-biktarvy": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-bixlenvo": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-sunlenca": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-dovato": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-cab-rpv": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-yeztugo": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-apretude": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "hc-idvynso": {
    "body": "Health Canada",
-   "ok": false,
-   "error": "fetch failed"
+   "ok": true
   },
   "gba-list": {
    "body": "G-BA",
